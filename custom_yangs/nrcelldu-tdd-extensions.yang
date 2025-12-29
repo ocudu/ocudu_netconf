@@ -1,0 +1,54 @@
+//
+// Copyright 2021-2025 Software Radio Systems Limited
+//
+// By using this file, you agree to the terms and conditions set
+// forth in the LICENSE file which can be found at the top level of
+// the distribution.
+//
+
+module nrcelldu-tdd-extensions {
+    yang-version 1.1;
+    namespace "urn:srsran-nrcelldu-tdd-extension:1.0";
+    prefix "srsran-nrcelldu-tdd";
+   
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for srsRAN
+                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    revision 2025-01-08 { description "Initial version"; }
+
+    grouping tdd_extensions_subtree {
+        description "srsRAN Extension of 3gpp TDD config";
+
+        container srs_nrcelldu_tdd_extensions {
+            leaf dl_ul_tx_period {
+                description "TDD pattern periodicity in slots. The combination of this value and the chosen numerology must lead to a TDD periodicity of 0.5, 0.625, 1, 1.25, 2, 2.5, 3, 4, 5 or 10 milliseconds.";
+                type int32;
+                default "10";
+            }
+
+            leaf nof_dl_slots {
+                description "TDD pattern nof. consecutive full DL slots";
+                type int32;
+                default "7";
+            }
+
+            leaf nof_dl_symbols {
+                description "TDD pattern nof. DL symbols at the beginning of the slot following full DL slots";
+                type int32;
+                default "6";
+            }
+
+            leaf nof_ul_slots {
+                description "TDD pattern nof. consecutive full UL slots";
+                type int32 { range 0..13; }
+                default "2";
+            }            
+            
+            leaf nof_ul_symbols {
+                description "TDD pattern nof. UL symbols at the end of the slot preceding the first full UL slot";
+                type int32 { range 0..13; }
+                default "4";
+            }
+        }
+    }
+}

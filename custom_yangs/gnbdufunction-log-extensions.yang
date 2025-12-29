@@ -1,0 +1,105 @@
+//
+// Copyright 2021-2025 Software Radio Systems Limited
+//
+// By using this file, you agree to the terms and conditions set
+// forth in the LICENSE file which can be found at the top level of
+// the distribution.
+//
+
+module gnbdufunction-log-extensions {
+    yang-version 1.1;
+    namespace "urn:srsran-gnbdufunction-log-extension:1.0";
+    prefix "srsran-gnbdufunction-log";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for srsRAN
+                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    revision 2025-01-08 { description "Initial version"; }
+
+
+    typedef log_level {
+        type enumeration {
+            enum debug {
+                value 0;
+                description "Debug level";
+            }
+            enum info {
+                value 1;
+                description "Info level";
+            }
+            enum warning {
+                value 2;
+                description "Warning level";
+            }
+            enum error {
+                value 3;
+                description "Error level";
+            }
+        }
+        description "srsRAN log level enumeration";
+    }
+
+    grouping log_extensions_subtree {
+        description "srsRAN Extension of GNBDUFunction";
+
+        container srs_gnbdufunction_log_extensions {
+
+            leaf filename {
+                description "Path of the log file";
+                type string;
+                default "/tmp/gnb.log";
+            }
+
+            leaf all_level {
+                description "Log level for all log channels";
+                type log_level;
+                default warning;
+            }
+
+            leaf config_level {
+                description "Log level for config handling (set to debug to print full config)";
+                type log_level;
+            }
+
+            leaf phy_level {
+                description "Log level for PHY";
+                type log_level;
+            }
+
+            leaf mac_level {
+                description "Log level for MAC";
+                type log_level;
+            }
+
+            leaf rlc_level {
+                description "Log level for RLC";
+                type log_level;
+            }
+
+            leaf pdcp_level {
+                description "Log level for PDCP";
+                type log_level;
+            }
+
+            leaf rrc_level {
+                description "Log level for RRC";
+                type log_level;
+            }   
+
+            leaf sdap_level {
+                description "Log level for SDAP";
+                type log_level;
+            }
+
+            leaf ngap_level {
+                description "Log level for NGAP";
+                type log_level;
+            }
+
+            leaf gtpu_level {
+                description "Log level for GTPU";
+                type log_level;
+            }
+        }        
+    }
+}

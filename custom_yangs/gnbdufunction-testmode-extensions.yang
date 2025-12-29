@@ -1,0 +1,69 @@
+//
+// Copyright 2021-2025 Software Radio Systems Limited
+//
+// By using this file, you agree to the terms and conditions set
+// forth in the LICENSE file which can be found at the top level of
+// the distribution.
+//
+
+module gnbdufunction-testmode-extensions {
+    yang-version 1.1;
+    namespace "urn:srsran-gnbdufunction-testmode-extension:1.0";
+    prefix "srsran-gnbdufunction-testmode";
+
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for srsRAN
+                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    revision 2025-01-08 { description "Initial version"; }
+
+
+    grouping testmode_extensions_subtree {
+        description "srsRAN Extension of GNBDUFunction";
+
+        container srs_gnbdufunction_testmode_extensions {
+
+            leaf enabled {
+                description "Set to enable to attach test UEs";
+                type boolean;
+                default false;
+            }
+
+            leaf rnti {
+                description "RNTI of test UE";
+                type int32 { range 1..65519; }
+                default "44";
+            }
+
+            leaf ri {
+                description "Rank indicator reported by UE";
+                type int32 { range 1..4; }
+                default "1";
+            }
+
+            leaf cqi {
+                description "CQI reported by UE";
+                type int32 { range 1..15; }
+                default "15";
+            }
+
+            leaf nof_ues {
+                description "Number of UEs to attach";
+                type int32 { range 1..128; }
+                default "1";
+            }
+
+            leaf pdsch_active {
+                description "Whether to enable DL transmissions for active UEs";
+                type boolean;
+                default true;
+            }
+
+            leaf pusch_active {
+                description "Whether to enable UL transmissions for active UEs";
+                type boolean;
+                default true;
+            }
+        }        
+    }
+}

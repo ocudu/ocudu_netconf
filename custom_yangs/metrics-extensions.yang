@@ -1,0 +1,117 @@
+//
+// Copyright 2021-2025 Software Radio Systems Limited
+//
+// By using this file, you agree to the terms and conditions set
+// forth in the LICENSE file which can be found at the top level of
+// the distribution.
+//
+
+module metrics-extensions {
+    yang-version 1.1;
+    namespace "urn:srsran-metrics-extension:1.0";
+    prefix "srsran-metrics";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for srsRAN
+                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    revision 2025-01-08 { description "Initial version"; }
+
+
+    grouping metrics_extensions_subtree {
+        description "srsRAN Extension for metrics configuration";
+
+        container srs_metrics_extensions {
+
+            leaf autostart_stdout_metrics {
+                description "Autostart stdout metrics reporting";
+                type boolean;
+            }
+
+            leaf enable_json {
+                description "Enable metrics reporting in JSON format";
+                type boolean;
+            }
+
+            leaf enable_log {
+                description "Enable metrics reporting through log file";
+                type boolean;
+            }
+
+            container periodicity {
+                description "Configure metrics reporting periodicity per component";
+
+                leaf du_report_period {
+                    description "Report period in milliseconds for DU metrics";
+                    type uint32;
+                    default 1000;
+                }
+
+                leaf cu_up_report_period {
+                    description "Report period in milliseconds for CU-UP metrics";
+                    type uint32;
+                    default 1000;
+                }
+
+                leaf cu_cp_report_period {
+                    description "Report period in milliseconds for CU-CP metrics";
+                    type uint32;
+                    default 1000;
+                }
+            }
+
+            container layers {
+                description "Enable metrics reporting per layer";
+
+                leaf enable_ru {
+                    description "Enable RU layer metrics reporting";
+                    type boolean;
+                }
+
+                leaf enable_du_low {
+                    description "Enable DU low metrics reporting";
+                    type boolean;
+                }
+
+                leaf enable_sched {
+                    description "Enable scheduler layer metrics reporting";
+                    type boolean;
+                }
+
+                leaf enable_mac {
+                    description "Enable MAC layer metrics reporting";
+                    type boolean;
+                }
+
+                leaf enable_rlc {
+                    description "Enable RLC layer metrics reporting";
+                    type boolean;
+                }
+
+                leaf enable_pdcp {
+                    description "Enable PDCP layer metrics reporting";
+                    type boolean;
+                }
+
+                leaf enable_app_usage {
+                    description "Enable application metrics reporting";
+                    type boolean;
+                }
+
+                leaf enable_e1ap {
+                    description "Enable E1AP layer metrics reporting";
+                    type boolean;
+                }
+
+                leaf enable_rrc {
+                    description "Enable RRC layer metrics reporting";
+                    type boolean;
+                }
+                
+                leaf enable_ngap {
+                    description "Enable NGAP layer metrics reporting";
+                    type boolean;
+                }
+            }
+       }
+    }
+}

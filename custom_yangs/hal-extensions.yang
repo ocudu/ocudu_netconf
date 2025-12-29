@@ -1,0 +1,31 @@
+//
+// Copyright 2021-2025 Software Radio Systems Limited
+//
+// By using this file, you agree to the terms and conditions set
+// forth in the LICENSE file which can be found at the top level of
+// the distribution.
+//
+
+module hal-extensions {
+    yang-version 1.1;
+    namespace "urn:srsran-hal-extension:1.0";
+    prefix "srsran-hal";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for srsRAN
+                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    revision 2025-01-08 { description "Initial version"; }
+
+
+    grouping hal_extensions_subtree {
+        description "srsRAN Extension for Hardware Abstraction Layer";
+
+        container srs_hal_extensions {
+
+            leaf eal_args {
+                description "EAL configuration parameters used to initialize DPDK";
+                type string;
+            }
+       }
+    }
+}

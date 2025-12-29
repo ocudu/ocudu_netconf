@@ -1,0 +1,47 @@
+//
+// Copyright 2021-2025 Software Radio Systems Limited
+//
+// By using this file, you agree to the terms and conditions set
+// forth in the LICENSE file which can be found at the top level of
+// the distribution.
+//
+
+module nrcelldu-extensions {
+    yang-version 1.1;
+    namespace "urn:srsran-nrcelldu-extension:1.0";
+    prefix "srsran-nrcelldu";
+
+    import _3gpp-common-managed-element { prefix me3gpp; }
+    import _3gpp-nr-nrm-gnbdufunction { prefix gnbdu3gpp; }
+    import _3gpp-nr-nrm-nrcelldu { prefix nrcelldu3gpp; }
+    
+    import nrcelldu-ssb-extensions { prefix srsran-nrcelldu-ssb; }
+    import nrcelldu-prach-extensions { prefix srsran-nrcelldu-prach; }
+    import nrcelldu-ofh-extensions { prefix srsran-nrcelldu-ofh; }
+    import nrcelldu-pdsch-extensions { prefix srsran-nrcelldu-pdsch; }
+    import nrcelldu-base-extensions { prefix srsran-nrcelldu-base; }
+    import nrcelldu-tdd-extensions { prefix srsran-nrcelldu-tdd; }
+    
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for srsRAN
+                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    revision 2025-01-08 { description "Initial version"; }
+
+    grouping nrcelldu_extensions_subtree {
+
+        container srs_nrcelldu_extensions {
+            description "srsRAN extension of 3gpp NRCellDU config";
+
+            uses srsran-nrcelldu-base:base_extensions_subtree;
+            uses srsran-nrcelldu-ofh:ofh_extensions_subtree;
+            uses srsran-nrcelldu-ssb:ssb_extensions_subtree;
+            uses srsran-nrcelldu-prach:prach_extensions_subtree;
+            uses srsran-nrcelldu-pdsch:pdsch_extensions_subtree;
+            uses srsran-nrcelldu-tdd:tdd_extensions_subtree;
+        }          
+    }
+
+    augment /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/nrcelldu3gpp:NRCellDU/nrcelldu3gpp:attributes {
+        uses nrcelldu_extensions_subtree;
+    }
+}

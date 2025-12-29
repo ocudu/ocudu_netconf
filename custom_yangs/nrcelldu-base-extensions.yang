@@ -1,0 +1,47 @@
+//
+// Copyright 2021-2025 Software Radio Systems Limited
+//
+// By using this file, you agree to the terms and conditions set
+// forth in the LICENSE file which can be found at the top level of
+// the distribution.
+//
+
+module nrcelldu-base-extensions {
+    yang-version 1.1;
+    namespace "urn:srsran-nrcelldu-base-extension:1.0";
+    prefix "srsran-nrcelldu-base";
+
+    import o-ran-module-cap { prefix "mcap"; }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for srsRAN
+                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    revision 2025-01-08 { description "Initial version"; }
+
+
+    grouping base_extensions_subtree {
+        description "srsRAN Extension of 3gpp DU cell config";
+
+        container srs_nrcelldu_base_extensions {
+
+            leaf nof_antennas_dl {
+                description "Number of downlink antennas";
+                type int32 { range 1..4; }
+                default "1";
+            }
+
+            leaf nof_antennas_ul {
+                description "Number of uplink antennas";
+                type int32 { range 1..4; }
+                default "1";
+            }
+
+            leaf common_scs {
+                description "Cell common subcarrier spacing";
+                type mcap:scs-config-type;
+                default KHZ_30;
+            }
+        }        
+    }
+
+}

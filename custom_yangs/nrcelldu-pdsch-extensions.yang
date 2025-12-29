@@ -1,0 +1,49 @@
+//
+// Copyright 2021-2025 Software Radio Systems Limited
+//
+// By using this file, you agree to the terms and conditions set
+// forth in the LICENSE file which can be found at the top level of
+// the distribution.
+//
+
+module nrcelldu-pdsch-extensions {
+    yang-version 1.1;
+    namespace "urn:srsran-nrcelldu-pdsch-extension:1.0";
+    prefix "srsran-nrcelldu-pdsch";
+    
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for srsRAN
+                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    revision 2025-01-08 { description "Initial version"; }
+
+
+    typedef mcs_table_enum {
+        type enumeration {
+            enum qam64 {
+                value 0;
+                description "QAM64 table";
+            }
+            enum qam256 {
+                value 1;
+                description "QAM256 table";
+            }
+            enum qam64lowse {
+                value 2;
+                description "qam64lowse table";
+            }
+        }
+        description "srsRAN MCS table enumeration";
+    }
+
+    grouping pdsch_extensions_subtree {
+        description "srsRAN Extension of 3gpp PDSCH config";
+
+        container srs_nrcelldu_pdsch_extensions {
+            leaf mcs_table {
+                description "MCS table to use PDSCH";
+                type mcs_table_enum;
+                default qam64;
+            }
+        }        
+    }
+}

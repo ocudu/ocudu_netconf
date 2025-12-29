@@ -1,0 +1,240 @@
+//
+// Copyright 2021-2025 Software Radio Systems Limited
+//
+// By using this file, you agree to the terms and conditions set
+// forth in the LICENSE file which can be found at the top level of
+// the distribution.
+//
+
+module nrcelldu-ofh-extensions {
+    yang-version 1.1;
+    namespace "urn:srsran-nrcelldu-ofh-extension:1.0";
+    prefix "srsran-nrcelldu-ofh";
+   
+    import ietf-yang-types {
+        prefix yang;
+    }
+
+    import o-ran-compression-factors {
+        prefix "cf";
+    }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for srsRAN
+                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    revision 2025-01-08 { description "Initial version"; }
+
+    grouping ofh_extensions_subtree {
+        description "srsRAN Extension of 3gpp SSB config";
+
+        container srs_nrcelldu_ofh_extensions {
+            leaf network_interface {
+                type string;
+                description "Network interface name for raw sockets. PCIe (or other bus) port identifier when using DPDK";
+                default "lo";
+            }
+
+            leaf ru_mac_addr {
+                type yang:mac-address;
+                description "Radio Unit MAC address";
+                default "00:11:22:33:44:55";
+            }
+            
+            leaf du_mac_addr {
+                type yang:mac-address;
+                description "Distributed Unit MAC address";
+                default "aa:bb:cc:dd:ee:ff";
+            }
+            
+            leaf vlan_tag_cp {
+                type int32;
+                description "C-Plane V-LAN identifier";
+                default "100";
+            }
+
+            leaf vlan_tag_up {
+                type int32;
+                description "U-Plane V-LAN identifier";
+                default "100";
+            }
+
+            leaf prach_port_id {
+                type string;
+                description "RU PRACH port identifier";
+                default "[4, 5]";
+            }
+            
+            leaf dl_port_id {
+                type string;
+                description "RU DL port identifier";
+                default "[0, 1]";
+            }
+
+            leaf ul_port_id {
+                type string;
+                description "RU UL port identifier";
+                default "[0, 1]";
+            }
+
+            leaf enable_promiscuous {
+                type boolean;
+                description "Enable promiscuous mode on the RU interface";
+                default false;
+            }
+
+            leaf check_link_status {
+                type boolean;
+                description "Enable link status checks for the RU interface";
+                default false;
+            }
+
+            leaf t1a_max_cp_dl {
+                type uint32;
+                units nanoseconds;
+                default "350";
+            }
+
+            leaf t1a_min_cp_dl {
+                type uint32;
+                units nanoseconds;
+                default "200";
+            }
+
+            leaf t1a_max_cp_ul {
+                type uint32;
+                units nanoseconds;
+                default "350";
+            }
+
+            leaf t1a_min_cp_ul {
+                type uint32;
+                units nanoseconds;
+                default "200";
+            }
+
+            leaf t1a_max_up {
+                type uint32;
+                units nanoseconds;
+                default "500";
+            }
+
+            leaf t1a_min_up {
+                type uint32;
+                units nanoseconds;
+                default "0";
+            }
+
+            leaf ta4_max {
+                type uint32;
+                units nanoseconds;
+                default "500";
+            }
+            
+            leaf ta4_min {
+                type uint32;
+                units nanoseconds;
+                default "0";
+            }
+
+            leaf compr_method_ul {
+                type cf:ci-compression-method-def;
+                description "Channel information compression method UL";
+                default BLOCK_FLOATING_POINT;
+            }
+
+            leaf compr_bitwidth_ul {
+                type uint8 {
+                    range "1..16";
+                }
+                description "Downlink compression bit width UL";
+                default "9";
+            }
+
+            leaf compr_method_dl {
+                type cf:ci-compression-method-def;
+                description "Channel information compression method DL";
+                default BLOCK_FLOATING_POINT;
+            }
+
+            leaf compr_bitwidth_dl {
+                type uint8 {
+                    range "1..16";
+                }
+                description "Downlink compression bit width DL";
+                default "9";
+            }
+
+            leaf compr_method_prach {
+                type cf:ci-compression-method-def;
+                description "Channel information compression method PRACH";
+                default BLOCK_FLOATING_POINT;
+            }
+
+            leaf compr_bitwidth_prach {
+                type uint8 {
+                    range "1..16";
+                }
+                description "Downlink compression bit width PRACH";
+                default "9";
+            }
+
+            leaf enable_dl_static_compr_hdr {
+                type cf:compression-type-def;
+                
+                description "Compression type that O-DU wants to be supported";
+                default STATIC;
+            }
+
+            leaf enable_ul_static_compr_hdr {
+                type cf:compression-type-def;
+                
+                description "Compression type that O-DU wants to be supported";
+                default STATIC;
+            }
+
+            leaf is_prach_cp_enabled {
+                type boolean;
+                default true;
+            }
+
+            leaf ignore_ecpri_payload_size {
+                type boolean;
+                default false;
+            }
+            
+            leaf ignore_ecpri_seq_id {
+                type boolean;
+                default false;
+            }
+            
+            leaf iq_scaling {
+                type decimal64 {
+                    fraction-digits 2;
+                    range "0 .. 20";
+                }
+                
+                default 5.0;
+            }
+
+            leaf ru_reference_level_dBFS {
+                type decimal64 {
+                    fraction-digits 2;
+                    range "-100 .. 0";
+                }
+                
+                description "RU IQ reference level mapped to the maximum RF power";
+                default -15.0;
+            }
+
+            leaf subcarrier_rms_backoff_dB {
+                type decimal64 {
+                    fraction-digits 2;
+                    range "0 .. 100";
+                }
+                
+                description "Power back-off attenuation applied to all subcarriers with respect to the RU reference level";
+                default 0.0;
+            }            
+        }
+    }   
+}
