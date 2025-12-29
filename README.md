@@ -1,26 +1,22 @@
-# Netconf-based Configuration Service for srsRAN
+# O1/Netconf-based Configuration Service for OCUDU
 
-### Build container
+All commands should work with docker/podman
 
-`$ docker build -t srsran-sysrepo/srsran-sysrepo:latest . --progress=plain`
+## Build container
 
-### Run with Docker compose
-
-This automatically adds the container into the SMO network
-
-`$ docker compose up`
+`$ docker build -t ocudu-netconf/ocudu-netconf:latest . --progress=plain`
 
 ## Run netopeer2-server as standalone container
 
-`$ docker run -it -p 830:830 srsran-sysrepo/srsran-sysrepo:v1`
+`$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest`
 
 ## Run with console access
 
-`$ docker run --entrypoint /bin/bash -it -p 830:830 srsran-sysrepo/srsran-sysrepo:v1`
+`$ docker run --entrypoint /bin/bash -it -p 830:830 ocudu-netconf/ocudu-netconf:latest`
 
 ## Connect with netopeer2-client
 
-Get shell in srsran-sysrepo container and execute:
+Get shell in the ocudu-netconf container and execute:
 
 ```
 $ netopeer2-cli
@@ -35,7 +31,7 @@ $ netopeer2-cli
 
 ## Get IP address
 
-To be later able to add the srsRAN CU/DU as ORAN components into the SMO we need to
-know the assigned IP address to the srsran-sysrepo container. To do that check the 
+To be later able to add the OCUDU gNB/CU/DU as ORAN components into the SMO we need to
+know the assigned IP address to the ocudu-netconf container. To do that, check the output of:
 
 `$ docker network inspect smo_integration | grep -i ipaddress`
