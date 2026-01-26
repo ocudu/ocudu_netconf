@@ -42,8 +42,6 @@ stages:
 headers:
   stage: ci
   extends: .headers
-stages:
-  - test
 
 ################################################################################
 # Test
