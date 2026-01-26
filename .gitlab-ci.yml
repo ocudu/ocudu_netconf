@@ -42,3 +42,40 @@ stages:
 headers:
   stage: ci
   extends: .headers
+stages:
+  - test
+
+################################################################################
+# Test
+################################################################################
+
+yang validation:
+  stage: test
+  image: ubuntu:22.04
+  rules:
+    - if: $ON_MR
+  variables:
+    DEBIAN_FRONTEND: noninteractive
+    YANG_REPO_3GPP_TAG: Tag_Rel16_SA104
+  script:
+    - apt update && apt install -y --no-install-recommends git ca-certificates python3-pip
+    - pip install pyang
+    - ${CI_PROJECT_DIR}/docker/netconf/custom_yangs/download_yang_models.sh /opt/dev
+    - |
+      pyang --path /opt/dev/MnS/yang-models \
+        ${CI_PROJECT_DIR}/docker/netconf/custom_yangs/*.yang /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/o-ran-compression-factors.yang \
+        /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/o-ran-module-cap.yang \
+        /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/o-ran-wg4-features.yang \
+        /opt/dev/modeling/data-model/yang/published/ietf/*.yang \
+        -f sample-xml-skeleton --sample-xml-skeleton-defaults --sample-xml-skeleton-annotations > 3gpp_yang_tree.out
+  artifacts:
+    when: always
+    paths:
+      - 3gpp_yang_tree.out
+    expire_in: 1 hour
+
+################################################################################
+# Publish
+################################################################################
+
+# TODO: add publish jobs
