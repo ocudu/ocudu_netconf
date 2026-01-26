@@ -60,10 +60,10 @@ yang validation:
   script:
     - apt update && apt install -y --no-install-recommends git ca-certificates python3-pip
     - pip install pyang
-    - ${CI_PROJECT_DIR}/docker/netconf/custom_yangs/download_yang_models.sh /opt/dev
+    - ${CI_PROJECT_DIR}/custom_yangs/download_yang_models.sh /opt/dev
     - |
       pyang --path /opt/dev/MnS/yang-models \
-        ${CI_PROJECT_DIR}/docker/netconf/custom_yangs/*.yang /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/o-ran-compression-factors.yang \
+        ${CI_PROJECT_DIR}/custom_yangs/*.yang /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/o-ran-compression-factors.yang \
         /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/o-ran-module-cap.yang \
         /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/o-ran-wg4-features.yang \
         /opt/dev/modeling/data-model/yang/published/ietf/*.yang \
