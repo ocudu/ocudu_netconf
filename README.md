@@ -8,7 +8,9 @@ All commands should work with docker/podman
 
 ## Run netopeer2-server as standalone container
 
-`$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest`
+This command has to be called from within the main directory of this repo.
+
+`$ docker run -it -p 830:830 -v "$(pwd)/default_config.xml:/config/default_config.xml" ocudu-netconf/ocudu-netconf:latest /config/default_config.xml`
 
 ## Run with console access
 
