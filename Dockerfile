@@ -7,7 +7,7 @@
 #
 
 ARG OS_VERSION=22.04
-FROM ubuntu:$OS_VERSION as base
+FROM ubuntu:$OS_VERSION AS base
 
 ENV PYTHONBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
