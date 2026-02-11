@@ -16,6 +16,8 @@ if [ -z "$PRELOAD_CONFIG" ]; then
     exit 1
 fi
 
+mkdir -p "$(dirname "$RUNNING_CONFIG")"
+
 cleanup() {
     if [ -n "$PRELOAD_CONFIG" ]; then
         echo "Container stopped, exporting running config .."
