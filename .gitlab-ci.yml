@@ -84,7 +84,6 @@ yang validation:
   stage: publish
   rules:
     - if: $CI_PIPELINE_SCHEDULE_DESCRIPTION =~ /Nightly/
-    - if: $ON_MR
   retry: 2
   interruptible: false
 
