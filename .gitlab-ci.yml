@@ -41,7 +41,7 @@ stages:
   - ci
   - test
   - build
-  - deploy
+  - publish
 
 headers:
   stage: ci
@@ -77,11 +77,11 @@ yang validation:
     expire_in: 1 hour
 
 ################################################################################
-# Deploy Docker images
+# Publish Docker images
 ################################################################################
 
-.deploy:
-  stage: deploy
+.publish:
+  stage: publish
   rules:
     - if: $CI_PIPELINE_SCHEDULE_DESCRIPTION =~ /Nightly/
     - if: $ON_MR
@@ -91,7 +91,7 @@ yang validation:
 netconf image:
   extends:
     - .docker-builder
-    - .deploy
+    - .publish
   variables: &netconf-image-variables
     # CI & Infrastructure
     KUBERNETES_CPU_REQUEST: ${SRS_CPU_LIMIT}
@@ -130,7 +130,7 @@ netconf image:
 netconf image update latest:
   extends:
     - .docker manifest
-    - .deploy
+    - .publish
   variables:
     <<: *netconf-image-variables
 
