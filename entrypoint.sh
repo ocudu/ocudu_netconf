@@ -42,7 +42,7 @@ sysrepocfg --import $RUNNING_CONFIG --datastore running -f xml -m _3gpp-common-m
 sysrepocfg --import $RUNNING_CONFIG --datastore running -f xml -m _3gpp-nr-nrm-rrmpolicy
 
 echo "Starting netconf server .."
-/usr/local/sbin/netopeer2-server -v3 -d
+netopeer2-server -v3 -d
 
 # Wait for all child processes to terminate
 wait

@@ -12,28 +12,11 @@ FROM ubuntu:$OS_VERSION AS base
 ENV PYTHONBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Check tag here https://forge.3gpp.org/rep/sa5/MnS/-/tree/Tag_Rel16_SA102?ref_type=tags
-ARG YANG_REPO_3GPP_TAG=Tag_Rel16_SA104
-ARG NETOPEER2_TAG=v2.2.31
-ARG LIBNETCONF2_TAG=v3.5.1
-ARG LIBYANG_TAG=v3.4.2
-ARG SYSREPO_TAG=v2.11.7
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get update \
-    && apt install -y software-properties-common
-
-# install dependencies
-RUN apt-get install -y \
+# install common dependencies
+RUN apt-get update \
+    && apt-get install -y \
+    openssh-client \
     sudo \
-    git \
-    cmake \
-    build-essential \
-    libpcre2-dev \
-    pkg-config \
-    libssh-dev \
-    libssl-dev \
-    libcurlpp-dev \
-    libsystemd-dev \
     wget \
     # needed for convinience in container
     nano \
@@ -58,42 +41,102 @@ RUN mkdir /opt/dev && sudo chown -R netconf /opt/dev
 # set root password to root
 RUN echo "root:root" | chpasswd
 
+FROM base AS builder
+
+# Check tag here https://forge.3gpp.org/rep/sa5/MnS/-/tree/Tag_Rel16_SA102?ref_type=tags
+ARG YANG_REPO_3GPP_TAG=Tag_Rel16_SA104
+ARG NETOPEER2_TAG=v2.2.31
+ARG LIBNETCONF2_TAG=v3.5.1
+ARG LIBYANG_TAG=v3.4.2
+ARG SYSREPO_TAG=v2.11.7
+
+# install build dependencies
+RUN apt-get update \
+    && apt-get install -y \
+    build-essential \
+    cmake \
+    debhelper \
+    git \
+    graphviz \
+    libcmocka-dev \
+    libcurlpp-dev \
+    libpam0g-dev \
+    libpcre2-dev \
+    libssh-dev \
+    libssl-dev \
+    libsystemd-dev \
+    pkg-config \
+    python3-pip \
+    software-properties-common \
+    valgrind \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip3 install apkg
+
 # libyang
 RUN cd /opt/dev && \
     git clone --branch ${LIBYANG_TAG} https://github.com/CESNET/libyang.git && \
-    cd libyang && mkdir build && cd build && \
-    cmake -DCMAKE_BUILD_TYPE:String="Release" -DGEN_LANGUAGE_BINDINGS=ON -DENABLE_BUILD_TESTS=OFF .. && \
-    make -j4 && \
-    make install && \
-    ldconfig
+    cd libyang && apkg build -b && \
+    find pkg/pkgs/ubuntu-22.04 -type f -name "*.deb" > deb_packages.txt && \
+    dpkg -i $(cat deb_packages.txt) && \
+    mkdir -p /out/libyang && \
+    xargs -a deb_packages.txt -I{} cp "{}" /out/libyang/
 
 # sysrepo
 RUN cd /opt/dev && \
     git clone --branch ${SYSREPO_TAG} https://github.com/sysrepo/sysrepo.git && \
-    cd sysrepo && mkdir build && cd build && \
-    cmake -DCMAKE_BUILD_TYPE:String="Release" -DGEN_LANGUAGE_BINDINGS=ON -DGEN_CPP_BINDINGS=ON -DGEN_PYTHON_BINDINGS=OFF -DENABLE_TESTS=OFF -DREPOSITORY_LOC:PATH=/etc/sysrepo -DREQUEST_TIMEOUT=60 -DOPER_DATA_PROVIDE_TIMEOUT=60 .. && \
-    make -j4 && \
-    make install && \
-    ldconfig
+    cd sysrepo && apkg build -b && \
+    find pkg/pkgs/ubuntu-22.04 -type f -name "*.deb" > deb_packages.txt && \
+    dpkg -i $(cat deb_packages.txt) && \
+    mkdir -p /out/sysrepo && \
+    xargs -a deb_packages.txt -I{} cp "{}" /out/sysrepo/
 
 # libnetconf2
 RUN cd /opt/dev && \
     git clone --branch ${LIBNETCONF2_TAG} https://github.com/CESNET/libnetconf2.git && \
-    cd libnetconf2 && mkdir build && cd build && \
-    cmake -DCMAKE_BUILD_TYPE:String="Release" -DENABLE_BUILD_TESTS=OFF .. && \
-    make -j4 && \
-    make install && \
-    ldconfig
+    cd libnetconf2 && apkg build -b && \
+    find pkg/pkgs/ubuntu-22.04 -type f -name "*.deb" > deb_packages.txt && \
+    dpkg -i $(cat deb_packages.txt) && \
+    mkdir -p /out/libnetconf2 && \
+    xargs -a deb_packages.txt -I{} cp "{}" /out/libnetconf2/
 
 # netopeer2
 RUN cd /opt/dev && \
     git clone --branch ${NETOPEER2_TAG} https://github.com/CESNET/Netopeer2.git && \
-    cd Netopeer2 && mkdir build && cd build && \
-    cmake -DCMAKE_BUILD_TYPE:String="Release" -DGENERATE_HOSTKEY=OFF -DMERGE_LISTEN_CONFIG=OFF .. && \
-    make -j4 && \
-    make install
+    cd Netopeer2 && apkg build -b && \
+    find pkg/pkgs/ubuntu-22.04 -type f -name "*.deb" > deb_packages.txt && \
+    dpkg -i $(cat deb_packages.txt) && \
+    mkdir -p /out/netopeer2 && \
+    xargs -a deb_packages.txt -I{} cp "{}" /out/netopeer2/
 
-# Prepare mandatory user.xml 
+# download yangs
+ADD custom_yangs/download_yang_models.sh /usr/local/bin/download_yang_models.sh
+RUN /usr/local/bin/download_yang_models.sh
+
+
+FROM base AS runner
+
+# copy packages from builder
+COPY --from=builder /out/ /out/
+
+# install package dependencies
+RUN apt-get update \
+    && apt-get install -y \
+    libpcre2-dev \
+    libcurl4 \
+    && rm -rf /var/lib/apt/lists/*
+
+# install packages from builder
+RUN dpkg -i /out/libyang/*.deb && \
+    dpkg -i /out/sysrepo/*.deb && \
+    dpkg -i /out/libnetconf2/*.deb && \
+    dpkg -i /out/netopeer2/*.deb
+
+# copy downloaded yangs from builder
+COPY --from=builder /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/ /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/
+COPY --from=builder /opt/dev/modeling/data-model/yang/published/ietf/        /opt/dev/modeling/data-model/yang/published/ietf/
+COPY --from=builder /opt/dev/MnS/yang-models/                                /opt/dev/MnS/yang-models/
+
+# Prepare mandatory user.xml
 RUN echo '<users xmlns="urn:o-ran:user-mgmt:1.0">\n\
     <user>\n\
     <name>netconf</name>\n\
@@ -101,9 +144,6 @@ RUN echo '<users xmlns="urn:o-ran:user-mgmt:1.0">\n\
     <enabled>true</enabled>\n\
     </user>\n\
     </users>' > /opt/dev/user.xml
-
-ADD custom_yangs/download_yang_models.sh /usr/local/bin/download_yang_models.sh
-RUN /usr/local/bin/download_yang_models.sh
 
 # O-RAN YANG models
 RUN cd /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh && \
