@@ -6,7 +6,7 @@
 # the distribution.
 #
 
-ARG OS_VERSION=22.04
+ARG OS_VERSION=24.04
 FROM ubuntu:$OS_VERSION AS base
 
 ENV PYTHONBUFFERED=1
@@ -43,10 +43,11 @@ RUN echo "root:root" | chpasswd
 
 FROM base AS builder
 
+ARG OS_VERSION
 # Check tag here https://forge.3gpp.org/rep/sa5/MnS/-/tree/Tag_Rel16_SA102?ref_type=tags
 ARG YANG_REPO_3GPP_TAG=Tag_Rel16_SA104
-ARG NETOPEER2_TAG=v2.2.31
-ARG LIBNETCONF2_TAG=v3.5.1
+ARG NETOPEER2_TAG=v2.7.0
+ARG LIBNETCONF2_TAG=v4.1.2
 ARG LIBYANG_TAG=v4.2.2
 ARG SYSREPO_TAG=v4.2.10
 
@@ -65,18 +66,21 @@ RUN apt-get update \
     libssh-dev \
     libssl-dev \
     libsystemd-dev \
+    pipx \
     pkg-config \
-    python3-pip \
     software-properties-common \
     valgrind \
-    && rm -rf /var/lib/apt/lists/* \
-    && pip3 install apkg
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/root/.local/bin:${PATH}"
+
+RUN pipx install apkg
 
 # libyang
 RUN cd /opt/dev && \
     git clone --branch ${LIBYANG_TAG} https://github.com/CESNET/libyang.git && \
     cd libyang && apkg build -b && \
-    find pkg/pkgs/ubuntu-22.04 -type f -name "*.deb" > deb_packages.txt && \
+    find pkg/pkgs/ubuntu-${OS_VERSION} -type f -name "*.deb" > deb_packages.txt && \
     dpkg -i $(cat deb_packages.txt) && \
     mkdir -p /out/libyang && \
     xargs -a deb_packages.txt -I{} cp "{}" /out/libyang/
@@ -85,7 +89,7 @@ RUN cd /opt/dev && \
 RUN cd /opt/dev && \
     git clone --branch ${SYSREPO_TAG} https://github.com/sysrepo/sysrepo.git && \
     cd sysrepo && apkg build -b && \
-    find pkg/pkgs/ubuntu-22.04 -type f -name "*.deb" > deb_packages.txt && \
+    find pkg/pkgs/ubuntu-${OS_VERSION} -type f -name "*.deb" > deb_packages.txt && \
     dpkg -i $(cat deb_packages.txt) && \
     mkdir -p /out/sysrepo && \
     xargs -a deb_packages.txt -I{} cp "{}" /out/sysrepo/
@@ -94,7 +98,7 @@ RUN cd /opt/dev && \
 RUN cd /opt/dev && \
     git clone --branch ${LIBNETCONF2_TAG} https://github.com/CESNET/libnetconf2.git && \
     cd libnetconf2 && apkg build -b && \
-    find pkg/pkgs/ubuntu-22.04 -type f -name "*.deb" > deb_packages.txt && \
+    find pkg/pkgs/ubuntu-${OS_VERSION} -type f -name "*.deb" > deb_packages.txt && \
     dpkg -i $(cat deb_packages.txt) && \
     mkdir -p /out/libnetconf2 && \
     xargs -a deb_packages.txt -I{} cp "{}" /out/libnetconf2/
@@ -103,7 +107,7 @@ RUN cd /opt/dev && \
 RUN cd /opt/dev && \
     git clone --branch ${NETOPEER2_TAG} https://github.com/CESNET/Netopeer2.git && \
     cd Netopeer2 && apkg build -b && \
-    find pkg/pkgs/ubuntu-22.04 -type f -name "*.deb" > deb_packages.txt && \
+    find pkg/pkgs/ubuntu-${OS_VERSION} -type f -name "*.deb" > deb_packages.txt && \
     dpkg -i $(cat deb_packages.txt) && \
     mkdir -p /out/netopeer2 && \
     xargs -a deb_packages.txt -I{} cp "{}" /out/netopeer2/
