@@ -125,15 +125,14 @@ COPY --from=builder /out/ /out/
 # install package dependencies
 RUN apt-get update \
     && apt-get install -y \
-    libpcre2-dev \
     libcurl4 \
     && rm -rf /var/lib/apt/lists/*
 
-# install packages from builder
-RUN dpkg -i /out/libyang/*.deb && \
-    dpkg -i /out/sysrepo/*.deb && \
-    dpkg -i /out/libnetconf2/*.deb && \
-    dpkg -i /out/netopeer2/*.deb
+# install packages from builder, skip dev packages
+RUN find /out/libyang -maxdepth 1 -type f -name "*.deb" ! -name "*-dev*" -print0 | xargs -0 dpkg -i && \
+    find /out/sysrepo -maxdepth 1 -type f -name "*.deb" ! -name "*-dev*" -print0 | xargs -0 dpkg -i && \
+    find /out/libnetconf2 -maxdepth 1 -type f -name "*.deb" ! -name "*-dev*" -print0 | xargs -0 dpkg -i && \
+    find /out/netopeer2 -maxdepth 1 -type f -name "*.deb" ! -name "*-dev*" -print0 | xargs -0 dpkg -i
 
 # copy downloaded yangs from builder
 COPY --from=builder /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/ /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/
