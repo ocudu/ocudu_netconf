@@ -18,6 +18,7 @@ RUN apt-get update \
     openssh-client \
     sudo \
     wget \
+    unzip \
     # needed for convinience in container
     nano \
     && rm -rf /var/lib/apt/lists/*
@@ -114,7 +115,7 @@ RUN cd /opt/dev && \
 
 # download yangs
 ADD custom_yangs/download_yang_models.sh /usr/local/bin/download_yang_models.sh
-RUN /usr/local/bin/download_yang_models.sh
+RUN chmod +x /usr/local/bin/download_yang_models.sh && /usr/local/bin/download_yang_models.sh
 
 
 FROM base AS runner
@@ -134,12 +135,25 @@ RUN find /out/libyang -maxdepth 1 -type f -name "*.deb" ! -name "*-dev*" -print0
     find /out/libnetconf2 -maxdepth 1 -type f -name "*.deb" ! -name "*-dev*" -print0 | xargs -0 dpkg -i && \
     find /out/netopeer2 -maxdepth 1 -type f -name "*.deb" ! -name "*-dev*" -print0 | xargs -0 dpkg -i
 
+# set environment variables for netopeer2 postinstall scripts
+ENV NP2_MODULE_DIR=/usr/share/yang/modules/netopeer2 \
+    NP2_MODULE_PERMS=640 \
+    NP2_MODULE_OWNER=root \
+    NP2_MODULE_GROUP=sysrepo \
+    LN2_MODULE_DIR=/usr/share/yang/modules/libnetconf2
+
+# netopeer2 postinstall scripts setting default values for ietf-netconf-server yang module
+RUN bash /usr/share/netopeer2/scripts/setup.sh && \
+    bash /usr/share/netopeer2/scripts/merge_hostkey.sh && \
+    bash /usr/share/netopeer2/scripts/merge_config.sh
+    
 # copy downloaded yangs from builder
 COPY --from=builder /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/ /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/
 COPY --from=builder /opt/dev/modeling/data-model/yang/published/ietf/        /opt/dev/modeling/data-model/yang/published/ietf/
 COPY --from=builder /opt/dev/MnS/yang-models/                                /opt/dev/MnS/yang-models/
+COPY --from=builder /opt/dev/yang-models-misc/                               /opt/dev/yang-models-misc/
 
-# Prepare mandatory user.xml
+# Prepare mandatory user.xml 
 RUN echo '<users xmlns="urn:o-ran:user-mgmt:1.0">\n\
     <user>\n\
     <name>netconf</name>\n\
@@ -148,23 +162,49 @@ RUN echo '<users xmlns="urn:o-ran:user-mgmt:1.0">\n\
     </user>\n\
     </users>' > /opt/dev/user.xml
 
-# O-RAN YANG models
-RUN cd /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh && \
+# Install IANA, IETF, IEEE and O-RAN YANG Models
+RUN cd /opt/dev/yang-models-misc && \
     sysrepoctl -i iana-if-type\@2017-01-19.yang && \
     sysrepoctl -i iana-hardware\@2018-03-13.yang && \
     sysrepoctl -i ietf-hardware\@2018-03-13.yang && \
-    sysrepoctl -i o-ran-interfaces.yang && \
+    sysrepoctl -i ietf-system.yang && \
+    sysrepoctl -i ietf-dhcpv6-common\@2021-01-29.yang && \
+    sysrepoctl -i ietf-dhcpv6-types\@2018-09-04.yang && \
+    sysrepoctl -i ietf-alarms\@2019-09-11.yang && \
+    sysrepoctl -i ietf-yang-schema-mount.yang && \
+    sysrepoctl -i ietf-yang-types@2013-07-15.yang && \
+    sysrepoctl -i ietf-netconf-monitoring.yang && \
+    sysrepoctl -i ieee802-types.yang && \
+    sysrepoctl -i ieee802-dot1x-types.yang && \
+    sysrepoctl -i ieee802-dot1x.yang && \
+    sysrepoctl -i o-ran-common-yang-types.yang && \
     sysrepoctl -i o-ran-wg4-features.yang && \
+    sysrepoctl -i o-ran-interfaces.yang && \
     sysrepoctl -i o-ran-usermgmt.yang -v3 --init-data /opt/dev/user.xml && \
     sysrepoctl -i o-ran-processing-element.yang && \
     sysrepoctl -i o-ran-compression-factors.yang && \
     sysrepoctl -i o-ran-module-cap.yang && \
     sysrepoctl -i o-ran-hardware.yang && \
+    sysrepoctl -i o-ran-delay-management.yang && \
     sysrepoctl -i o-ran-uplane-conf.yang && \
-    sysrepoctl -i ietf-alarms\@2019-09-11.yang && \
-    sysrepoctl -i ietf-yang-schema-mount.yang && \
-    sysrepoctl -i ietf-yang-types@2013-07-15.yang && \
-    sysrepoctl -i ietf-netconf-monitoring.yang
+    sysrepoctl -i o-ran-mplane-int.yang && \
+    sysrepoctl -i o-ran-sync.yang && \
+    sysrepoctl -i o-ran-troubleshooting.yang && \
+    sysrepoctl -i o-ran-supervision.yang && \
+    sysrepoctl -i o-ran-file-management.yang && \
+    sysrepoctl -i o-ran-software-management.yang && \
+    sysrepoctl -i o-ran-operations.yang && \
+    sysrepoctl -i o-ran-fm.yang && \    
+    sysrepoctl -i o-ran-dhcp.yang && \
+    sysrepoctl -i o-ran-certificates.yang
+
+# enable YANG options
+RUN sysrepoctl -c ietf-hardware -e hardware-state && \
+    sysrepoctl -c o-ran-hardware -e ENERGYSAVING && \
+    sysrepoctl -c o-ran-interfaces -e UDPIP-BASED-CU-PLANE && \
+    sysrepoctl -c o-ran-module-cap -e PRACH-STATIC-CONFIGURATION-SUPPORTED -e SRS-STATIC-CONFIGURATION-SUPPORTED -e CONFIGURABLE-TDD-PATTERN-SUPPORTED && \
+    sysrepoctl -c o-ran-wg4-features -e SUPERVISION-WITH-SESSION-ID && \
+    sysrepoctl -c o-ran-sync -e GNSS -e ANTI-JAM
 
 # 3GPP YANG models
 RUN cd /opt/dev/MnS/yang-models && \
@@ -215,5 +255,6 @@ RUN cd /opt/dev && \
     sysrepoctl -i gnbdufunction-extensions.yang
 
 COPY entrypoint.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/entrypoint.sh 
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
