@@ -60,7 +60,7 @@ yang validation:
     DEBIAN_FRONTEND: noninteractive
     YANG_REPO_3GPP_TAG: Tag_Rel16_SA104
   script:
-    - apt update && apt install -y --no-install-recommends git ca-certificates python3-pip
+    - apt update && apt install -y --no-install-recommends git ca-certificates python3-pip wget unzip
     - pip install pyang
     - ${CI_PROJECT_DIR}/custom_yangs/download_yang_models.sh /opt/dev
     - |
