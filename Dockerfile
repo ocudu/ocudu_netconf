@@ -113,7 +113,7 @@ RUN cd /opt/dev && \
     xargs -a deb_packages.txt -I{} cp "{}" /out/netopeer2/
 
 # download yangs
-ADD custom_yangs/download_yang_models.sh /usr/local/bin/download_yang_models.sh
+ADD scripts/download_yang_models.sh /usr/local/bin/download_yang_models.sh
 RUN chmod +x /usr/local/bin/download_yang_models.sh && /usr/local/bin/download_yang_models.sh
 
 
@@ -161,102 +161,16 @@ RUN echo '<users xmlns="urn:o-ran:user-mgmt:1.0">\n\
     </user>\n\
     </users>' > /opt/dev/user.xml
 
-# Install IANA, IETF, IEEE and O-RAN YANG Models
-RUN cd /opt/dev/yang-models-misc && \
-    sysrepoctl -i iana-if-type\@2017-01-19.yang && \
-    sysrepoctl -i iana-hardware\@2018-03-13.yang && \
-    sysrepoctl -i ietf-hardware\@2018-03-13.yang && \
-    sysrepoctl -i ietf-system.yang && \
-    sysrepoctl -i ietf-dhcpv6-common\@2021-01-29.yang && \
-    sysrepoctl -i ietf-dhcpv6-types\@2018-09-04.yang && \
-    sysrepoctl -i ietf-alarms\@2019-09-11.yang && \
-    sysrepoctl -i ietf-yang-schema-mount.yang && \
-    sysrepoctl -i ietf-yang-types@2013-07-15.yang && \
-    sysrepoctl -i ietf-netconf-monitoring.yang && \
-    sysrepoctl -i ieee802-types.yang && \
-    sysrepoctl -i ieee802-dot1x-types.yang && \
-    sysrepoctl -i ieee802-dot1x.yang && \
-    sysrepoctl -i o-ran-common-yang-types.yang && \
-    sysrepoctl -i o-ran-wg4-features.yang && \
-    sysrepoctl -i o-ran-interfaces.yang && \
-    sysrepoctl -i o-ran-usermgmt.yang -v3 --init-data /opt/dev/user.xml && \
-    sysrepoctl -i o-ran-processing-element.yang && \
-    sysrepoctl -i o-ran-compression-factors.yang && \
-    sysrepoctl -i o-ran-module-cap.yang && \
-    sysrepoctl -i o-ran-hardware.yang && \
-    sysrepoctl -i o-ran-delay-management.yang && \
-    sysrepoctl -i o-ran-uplane-conf.yang && \
-    sysrepoctl -i o-ran-mplane-int.yang && \
-    sysrepoctl -i o-ran-sync.yang && \
-    sysrepoctl -i o-ran-troubleshooting.yang && \
-    sysrepoctl -i o-ran-supervision.yang && \
-    sysrepoctl -i o-ran-file-management.yang && \
-    sysrepoctl -i o-ran-software-management.yang && \
-    sysrepoctl -i o-ran-operations.yang && \
-    sysrepoctl -i o-ran-fm.yang && \    
-    sysrepoctl -i o-ran-dhcp.yang && \
-    sysrepoctl -i o-ran-certificates.yang
+# copy custom yangs to the image
+COPY custom_yangs/*.yang        /opt/dev/
 
-# enable YANG options
-RUN sysrepoctl -c ietf-hardware -e hardware-state && \
-    sysrepoctl -c o-ran-hardware -e ENERGYSAVING && \
-    sysrepoctl -c o-ran-interfaces -e UDPIP-BASED-CU-PLANE && \
-    sysrepoctl -c o-ran-module-cap -e PRACH-STATIC-CONFIGURATION-SUPPORTED -e SRS-STATIC-CONFIGURATION-SUPPORTED -e CONFIGURABLE-TDD-PATTERN-SUPPORTED && \
-    sysrepoctl -c o-ran-wg4-features -e SUPERVISION-WITH-SESSION-ID && \
-    sysrepoctl -c o-ran-sync -e GNSS -e ANTI-JAM
+# copy config xmls to the image
+COPY configs/config_cudu.xml    /opt/dev/configs/config_cudu.xml
+COPY configs/config_cu.xml      /opt/dev/configs/config_cu.xml
+COPY configs/config_du.xml      /opt/dev/configs/config_du.xml
+COPY configs/config_ru.xml      /opt/dev/configs/config_ru.xml
 
-# 3GPP YANG models
-RUN cd /opt/dev/MnS/yang-models && \
-    sysrepoctl -i _3gpp-common-yang-extensions.yang && \
-    sysrepoctl -i _3gpp-common-yang-types.yang && \
-    sysrepoctl -i _3gpp-common-top.yang && \
-    sysrepoctl -i _3gpp-common-files.yang && \
-    sysrepoctl -i _3gpp-common-measurements.yang && \
-    sysrepoctl -i _3gpp-common-ep-rp.yang && \
-    sysrepoctl -i _3gpp-common-trace.yang && \
-    sysrepoctl -i _3gpp-common-managed-function.yang && \
-    sysrepoctl -i _3gpp-common-subscription-control.yang && \
-    sysrepoctl -i _3gpp-common-fm.yang && \
-    sysrepoctl -i _3gpp-5gc-nrm-configurable5qiset.yang && \
-    sysrepoctl -i _3gpp-5gc-nrm-ecmconnectioninfo.yang && \
-    sysrepoctl -i _3gpp-5g-common-yang-types.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-ecmappingrule.yang && \
-    sysrepoctl -i _3gpp-common-subnetwork.yang && \
-    sysrepoctl -i _3gpp-common-managed-element.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-gnbdufunction.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-bwp.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-nrcelldu.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-gnbcucpfunction.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-nrcellcu.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-nrsectorcarrier.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-gnbcuupfunction.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-ep.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-rrmpolicy.yang
-
-RUN cd /opt/dev/MnS/yang-models && \
-    sysrepoctl -c _3gpp-common-managed-function -e MeasurementsUnderManagedFunction && \
-    sysrepoctl -c _3gpp-common-managed-element -e FmUnderManagedElement && \
-    sysrepoctl -c _3gpp-nr-nrm-ep -e EPClassesUnderGNBDUFunction && \
-    sysrepoctl -c _3gpp-nr-nrm-ep -e EPClassesUnderGNBCUUPFunction && \
-    sysrepoctl -c _3gpp-nr-nrm-ep -e EPClassesUnderGNBCUCPFunction
-
-COPY custom_yangs/*.yang /opt/dev/
-RUN cd /opt/dev && \
-    sysrepoctl -i nrcelldu-base-extensions.yang && \
-    sysrepoctl -i nrcelldu-pdsch-extensions.yang && \
-    sysrepoctl -i nrcelldu-prach-extensions.yang && \
-    sysrepoctl -i nrcelldu-ssb-extensions.yang && \
-    sysrepoctl -i nrcelldu-ofh-extensions.yang && \
-    sysrepoctl -i nrcelldu-tdd-extensions.yang && \
-    sysrepoctl -i nrcelldu-extensions.yang && \
-    sysrepoctl -i gnbdufunction-log-extensions.yang && \
-    sysrepoctl -i gnbdufunction-testmode-extensions.yang && \
-    sysrepoctl -i hal-extensions.yang && \
-    sysrepoctl -i metrics-extensions.yang && \
-    sysrepoctl -i remote-control-extensions.yang && \
-    sysrepoctl -i gnbdufunction-extensions.yang
-
-COPY entrypoint.sh /usr/local/bin
-RUN chmod +x /usr/local/bin/entrypoint.sh 
+COPY scripts/sysrepo_common.sh scripts/setup_cu.sh scripts/setup_du.sh scripts/setup_ru.sh scripts/setup_cudu.sh entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/sysrepo_common.sh /usr/local/bin/setup_cu.sh /usr/local/bin/setup_du.sh /usr/local/bin/setup_ru.sh /usr/local/bin/setup_cudu.sh /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
