@@ -10,7 +10,17 @@ All commands should work with docker/podman
 
 This command has to be called from within the main directory of this repo.
 
-`$ docker run -it -p 830:830 -v "$(pwd)/default_config.xml:/config/default_config.xml" ocudu-netconf/ocudu-netconf:latest /config/default_config.xml`
+Use one of the built-in configs bundled in the image:
+
+`$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config cudu`
+
+`$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config cu`
+
+`$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config du`
+
+`$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config ru`
+
+On first start, the selected config also triggers the matching YANG setup script inside the container.
 
 ## Run with console access
 
