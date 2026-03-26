@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 -->
 
-<!-- Main DU base config -->
+<!-- Main CU/DU base config -->
 <ManagedElement xmlns="urn:3gpp:sa5:_3gpp-common-managed-element">
   <id>ran1</id>
   <attributes>
@@ -407,12 +407,3 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
   </GNBDUFunction>
 </ManagedElement>
-
-<!-- mandatory user -->
-<users xmlns="urn:o-ran:user-mgmt:1.0">
-  <user>
-    <name>netconf</name>
-    <account-type>PASSWORD</account-type>
-    <enabled>true</enabled>
-  </user>
-</users>

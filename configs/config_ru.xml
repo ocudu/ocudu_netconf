@@ -1,0 +1,58 @@
+<!--
+SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+-->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!-- Minimal RU config for testing -->
+<sync xmlns="urn:o-ran:sync:1.0">
+  <ptp-config>
+    <accepted-clock-classes>
+      <clock-classes>6</clock-classes>
+    </accepted-clock-classes>
+    <accepted-clock-classes>
+      <clock-classes>7</clock-classes>
+    </accepted-clock-classes>
+    <accepted-clock-classes>
+      <clock-classes>135</clock-classes>
+    </accepted-clock-classes>
+  </ptp-config>
+</sync>
+
+<user-plane-configuration xmlns="urn:o-ran:uplane-conf:1.0">
+  <configurable-tdd-patterns>
+    <tdd-pattern-id>1</tdd-pattern-id>
+    <switching-points>
+      <switching-point-id>1</switching-point-id>
+      <direction>GP</direction>
+      <frame-offset>4564114</frame-offset>
+    </switching-points>
+    <switching-points>
+      <switching-point-id>2</switching-point-id>
+      <direction>UL</direction>
+      <frame-offset>4739657</frame-offset>
+    </switching-points>
+    <switching-points>
+      <switching-point-id>3</switching-point-id>
+      <direction>DL</direction>
+      <frame-offset>6144000</frame-offset>
+    </switching-points>
+    <switching-points>
+      <switching-point-id>4</switching-point-id>
+      <direction>GP</direction>
+      <frame-offset>10708114</frame-offset>
+    </switching-points>
+    <switching-points>
+      <switching-point-id>5</switching-point-id>
+      <direction>UL</direction>
+      <frame-offset>10883657</frame-offset>
+    </switching-points>
+    <switching-points>
+      <switching-point-id>6</switching-point-id>
+      <direction>DL</direction>
+      <frame-offset>12288000</frame-offset>
+    </switching-points>
+  </configurable-tdd-patterns>
+</user-plane-configuration>
