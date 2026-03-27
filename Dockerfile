@@ -10,12 +10,16 @@ ENV DEBIAN_FRONTEND=noninteractive
 # install common dependencies
 RUN apt-get update \
     && apt-get install -y \
+    ca-certificates \
     openssh-client \
     sudo \
     wget \
     unzip \
     # needed for convinience in container
     nano \
+    && wget -q -O /usr/local/share/ca-certificates/GeoTrustTLSRSACAG1.crt \
+       https://cacerts.digicert.com/GeoTrustTLSRSACAG1.crt.pem \
+    && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Adding netconf user
