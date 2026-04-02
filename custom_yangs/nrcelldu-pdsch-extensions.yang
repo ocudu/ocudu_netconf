@@ -3,12 +3,13 @@
 
 module nrcelldu-pdsch-extensions {
     yang-version 1.1;
-    namespace "urn:srsran-nrcelldu-pdsch-extension:1.0";
-    prefix "srsran-nrcelldu-pdsch";
+    namespace "urn:ocudu-nrcelldu-pdsch-extension:1.0";
+    prefix "ocudu-nrcelldu-pdsch";
     
     organization "Software Radio Systems Ltd";
-    description "The module defines YANG extensions needed for srsRAN
-                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
 
 
@@ -27,13 +28,13 @@ module nrcelldu-pdsch-extensions {
                 description "qam64lowse table";
             }
         }
-        description "srsRAN MCS table enumeration";
+        description "OCUDU MCS table enumeration";
     }
 
     grouping pdsch_extensions_subtree {
-        description "srsRAN Extension of 3gpp PDSCH config";
+        description "OCUDU Extension of 3gpp PDSCH config";
 
-        container srs_nrcelldu_pdsch_extensions {
+        container ocudu_nrcelldu_pdsch_extensions {
             leaf mcs_table {
                 description "MCS table to use PDSCH";
                 type mcs_table_enum;

@@ -3,22 +3,21 @@
 
 module remote-control-extensions {
     yang-version 1.1;
-    namespace "urn:srsran-remote-control-extensions:1.0";
-    prefix "srsran-remote-control";
+    namespace "urn:ocudu-remote-control-extensions:1.0";
+    prefix "ocudu-remote-control";
 
     import ietf-inet-types { prefix inet; }
 
     organization "Software Radio Systems Ltd";
-    description "YANG extensions exposing remote control configuration defaults for srsRAN.";
-
-    revision 2025-01-08 {
-        description "Initial version.";
-    }
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-04-02 { description "Renamed srs instances to ocudu";}
+    revision 2025-01-08 { description "Initial version"; }
 
     grouping remote_control_extensions_subtree {
-        description "srsRAN extensions for remote control configuration.";
+        description "OCUDU extensions for remote control configuration.";
 
-        container srs_remote_control_extensions {
+        container ocudu_remote_control_extensions {
             description "Remote control specific configuration options.";
 
             leaf enabled {

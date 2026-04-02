@@ -3,19 +3,20 @@
 
 module metrics-extensions {
     yang-version 1.1;
-    namespace "urn:srsran-metrics-extension:1.0";
-    prefix "srsran-metrics";
+    namespace "urn:ocudu-metrics-extension:1.0";
+    prefix "ocudu-metrics";
 
     organization "Software Radio Systems Ltd";
-    description "The module defines YANG extensions needed for srsRAN
-                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
 
 
     grouping metrics_extensions_subtree {
-        description "srsRAN Extension for metrics configuration";
+        description "OCUDU Extension for metrics configuration";
 
-        container srs_metrics_extensions {
+        container ocudu_metrics_extensions {
 
             leaf autostart_stdout_metrics {
                 description "Autostart stdout metrics reporting";

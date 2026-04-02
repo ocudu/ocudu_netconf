@@ -3,33 +3,34 @@
 
 module gnbdufunction-extensions {
     yang-version 1.1;
-    namespace "urn:srsran-gnbdufunction-extension:1.0";
-    prefix "srsran-gnbdufunction";
+    namespace "urn:ocudu-gnbdufunction-extension:1.0";
+    prefix "ocudu-gnbdufunction";
 
     import _3gpp-common-managed-element { prefix me3gpp; }
     import _3gpp-nr-nrm-gnbdufunction { prefix gnbdu3gpp; }
     
-    import gnbdufunction-testmode-extensions { prefix srsran-gnbdufunction-testmode; }
-    import gnbdufunction-log-extensions { prefix srsran-gnbdufunction-log; }
-    import hal-extensions { prefix srsran-hal; }
-    import metrics-extensions { prefix srsran-metrics; }
-    import remote-control-extensions { prefix srsran-remote-control; }
+    import gnbdufunction-testmode-extensions { prefix ocudu-gnbdufunction-testmode; }
+    import gnbdufunction-log-extensions { prefix ocudu-gnbdufunction-log; }
+    import hal-extensions { prefix ocudu-hal; }
+    import metrics-extensions { prefix ocudu-metrics; }
+    import remote-control-extensions { prefix ocudu-remote-control; }
     
     organization "Software Radio Systems Ltd";
-    description "The module defines YANG extensions needed for srsRAN
-                 Copyright (c) 2024-2025 Software Radio Systems. All rights reserved.";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
 
     grouping gnbdufunction_extensions_subtree {
 
-        container srs_gnbdufunction_extensions {
-            description "srsRAN extension of GNBDUFunction";
+        container ocudu_gnbdufunction_extensions {
+            description "OCUDU extension of GNBDUFunction";
 
-            uses srsran-gnbdufunction-testmode:testmode_extensions_subtree;
-            uses srsran-gnbdufunction-log:log_extensions_subtree;
-            uses srsran-hal:hal_extensions_subtree;
-            uses srsran-metrics:metrics_extensions_subtree;
-            uses srsran-remote-control:remote_control_extensions_subtree;
+            uses ocudu-gnbdufunction-testmode:testmode_extensions_subtree;
+            uses ocudu-gnbdufunction-log:log_extensions_subtree;
+            uses ocudu-hal:hal_extensions_subtree;
+            uses ocudu-metrics:metrics_extensions_subtree;
+            uses ocudu-remote-control:remote_control_extensions_subtree;
         }          
     }
 
