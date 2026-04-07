@@ -59,7 +59,7 @@ yang validation:
     - wget -q -O /usr/local/share/ca-certificates/GeoTrustTLSRSACAG1.crt https://cacerts.digicert.com/GeoTrustTLSRSACAG1.crt.pem
     - update-ca-certificates
     - pip install pyang
-    - ${CI_PROJECT_DIR}/custom_yangs/download_yang_models.sh /opt/dev
+    - ${CI_PROJECT_DIR}/scripts/download_yang_models.sh /opt/dev
     - |
       pyang --path /opt/dev/MnS/yang-models \
         ${CI_PROJECT_DIR}/custom_yangs/*.yang /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/o-ran-compression-factors.yang \
