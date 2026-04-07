@@ -58,8 +58,8 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <ssbOffset>0</ssbOffset>
         <ssbDuration>1</ssbDuration>
         <nRSectorCarrierRef>SCarr=not_used</nRSectorCarrierRef>
-          <srs_nrcelldu_extensions xmlns="urn:srsran-nrcelldu-extension:1.0">
-            <srs_nrcelldu_ofh_extensions>
+          <ocudu_nrcelldu_extensions xmlns="urn:ocudu-nrcelldu-extension:1.0">
+            <ocudu_nrcelldu_ofh_extensions>
               <network_interface>lo</network_interface>
               <ru_mac_addr>00:11:22:33:44:55</ru_mac_addr>
               <du_mac_addr>aa:bb:cc:dd:ee:ff</du_mac_addr>
@@ -90,23 +90,23 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <ignore_ecpri_payload_size>false</ignore_ecpri_payload_size>
               <ignore_ecpri_seq_id>false</ignore_ecpri_seq_id>
               <iq_scaling>5.0</iq_scaling>
-            </srs_nrcelldu_ofh_extensions>
-            <srs_nrcelldu_base_extensions>
+            </ocudu_nrcelldu_ofh_extensions>
+            <ocudu_nrcelldu_base_extensions>
               <nof_antennas_dl>2</nof_antennas_dl>
               <nof_antennas_ul>2</nof_antennas_ul>
               <common_scs>KHZ_30</common_scs>
-            </srs_nrcelldu_base_extensions>            
-            <srs_nrcelldu_ssb_extensions>
+            </ocudu_nrcelldu_base_extensions>            
+            <ocudu_nrcelldu_ssb_extensions>
               <ssb_block_power_dbm>-16</ssb_block_power_dbm>
-            </srs_nrcelldu_ssb_extensions>
-            <srs_nrcelldu_prach_extensions>
+            </ocudu_nrcelldu_ssb_extensions>
+            <ocudu_nrcelldu_prach_extensions>
               <prach_config_index>159</prach_config_index>
               <prach_root_sequence_index>1</prach_root_sequence_index>
-            </srs_nrcelldu_prach_extensions>
-            <srs_nrcelldu_pdsch_extensions>
+            </ocudu_nrcelldu_prach_extensions>
+            <ocudu_nrcelldu_pdsch_extensions>
               <mcs_table>qam64</mcs_table>
-            </srs_nrcelldu_pdsch_extensions>
-          </srs_nrcelldu_extensions>
+            </ocudu_nrcelldu_pdsch_extensions>
+          </ocudu_nrcelldu_extensions>
       </attributes>
     </NRCellDU>
 
@@ -142,8 +142,8 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <ssbOffset>0</ssbOffset>
         <ssbDuration>1</ssbDuration>
         <nRSectorCarrierRef>SCarr=not_used</nRSectorCarrierRef>
-          <srs_nrcelldu_extensions xmlns="urn:srsran-nrcelldu-extension:1.0">
-            <srs_nrcelldu_ofh_extensions>
+          <ocudu_nrcelldu_extensions xmlns="urn:ocudu-nrcelldu-extension:1.0">
+            <ocudu_nrcelldu_ofh_extensions>
               <network_interface>lo</network_interface>
               <ru_mac_addr>00:11:22:33:44:55</ru_mac_addr>
               <du_mac_addr>aa:bb:cc:dd:ee:ff</du_mac_addr>
@@ -174,19 +174,19 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <ignore_ecpri_payload_size>false</ignore_ecpri_payload_size>
               <ignore_ecpri_seq_id>false</ignore_ecpri_seq_id>
               <iq_scaling>5.0</iq_scaling>
-            </srs_nrcelldu_ofh_extensions>
-            <srs_nrcelldu_base_extensions>
+            </ocudu_nrcelldu_ofh_extensions>
+            <ocudu_nrcelldu_base_extensions>
               <nof_antennas_dl>2</nof_antennas_dl>
               <nof_antennas_ul>2</nof_antennas_ul>
               <common_scs>KHZ_30</common_scs>
-            </srs_nrcelldu_base_extensions>            
-            <srs_nrcelldu_ssb_extensions>
+            </ocudu_nrcelldu_base_extensions>            
+            <ocudu_nrcelldu_ssb_extensions>
               <ssb_block_power_dbm>-16</ssb_block_power_dbm>
-            </srs_nrcelldu_ssb_extensions>
-            <srs_nrcelldu_prach_extensions>
+            </ocudu_nrcelldu_ssb_extensions>
+            <ocudu_nrcelldu_prach_extensions>
               <prach_root_sequence_index>1</prach_root_sequence_index>
-            </srs_nrcelldu_prach_extensions>
-          </srs_nrcelldu_extensions>
+            </ocudu_nrcelldu_prach_extensions>
+          </ocudu_nrcelldu_extensions>
       </attributes>
     </NRCellDU>
     -->
@@ -216,8 +216,8 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
       </attributes>
     </EP_F1U>
 
-    <srs_gnbdufunction_extensions xmlns="urn:srsran-gnbdufunction-extension:1.0">
-      <srs_gnbdufunction_testmode_extensions>
+    <ocudu_gnbdufunction_extensions xmlns="urn:ocudu-gnbdufunction-extension:1.0">
+      <ocudu_gnbdufunction_testmode_extensions>
         <enabled>true</enabled>
         <rnti>44</rnti>
         <ri>1</ri>
@@ -225,21 +225,21 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <nof_ues>1</nof_ues>
         <pdsch_active>true</pdsch_active>
         <pusch_active>true</pusch_active>
-      </srs_gnbdufunction_testmode_extensions>
-      <srs_gnbdufunction_log_extensions>
+      </ocudu_gnbdufunction_testmode_extensions>
+      <ocudu_gnbdufunction_log_extensions>
         <filename>/tmp/gnb.log</filename>
         <all_level>warning</all_level>
-      </srs_gnbdufunction_log_extensions>
-      <srs_hal_extensions>
+      </ocudu_gnbdufunction_log_extensions>
+      <ocudu_hal_extensions>
         <eal_args>--lcores (0-1)@(0-11)</eal_args>
-      </srs_hal_extensions>
+      </ocudu_hal_extensions>
 
-      <srs_remote_control_extensions>
+      <ocudu_remote_control_extensions>
         <enabled>true</enabled>
         <bind_addr>0.0.0.0</bind_addr>
-      </srs_remote_control_extensions>
+      </ocudu_remote_control_extensions>
 
-      <srs_metrics_extensions>
+      <ocudu_metrics_extensions>
         <autostart_stdout_metrics>true</autostart_stdout_metrics>
         <enable_json>false</enable_json>
         <enable_log>true</enable_log>
@@ -256,9 +256,9 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <enable_pdcp>false</enable_pdcp>
           <enable_du_low>false</enable_du_low>
         </layers>
-      </srs_metrics_extensions>
+      </ocudu_metrics_extensions>
 
-    </srs_gnbdufunction_extensions>
+    </ocudu_gnbdufunction_extensions>
 
   </GNBDUFunction>
 </ManagedElement>

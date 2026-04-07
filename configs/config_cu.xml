@@ -40,7 +40,7 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         </rRMPolicyMemberList>
         <gNBId>1</gNBId>
         <gNBIdLength>24</gNBIdLength>
-        <gNBCUName>srscu1</gNBCUName>
+        <gNBCUName>ocuducu1</gNBCUName>
         <pLMNId>
           <mcc>001</mcc>
           <mnc>01</mnc>
