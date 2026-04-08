@@ -12,9 +12,13 @@ This command has to be called from within the main directory of this repo.
 
 Use one of the built-in configs bundled in the image:
 
-`$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config cudu`
+`$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config gnb`
 
 `$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config cu`
+
+`$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config cucp`
+
+`$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config cuup`
 
 `$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config du`
 
