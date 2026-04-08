@@ -43,7 +43,6 @@ ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-ep.yang"
 ensure_feature "_3gpp-common-managed-function" "MeasurementsUnderManagedFunction"
 ensure_feature "_3gpp-common-managed-element" "FmUnderManagedElement"
 ensure_feature "_3gpp-nr-nrm-ep" "EPClassesUnderGNBDUFunction"
-ensure_feature "_3gpp-nr-nrm-ep" "EPClassesUnderGNBCUCPFunction"
 
 ensure_module "$CUSTOM_YANG_DIR/nrcelldu-base-extensions.yang"
 ensure_module "$CUSTOM_YANG_DIR/nrcelldu-pdsch-extensions.yang"

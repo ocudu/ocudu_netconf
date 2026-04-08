@@ -52,5 +52,13 @@ ensure_feature() {
     local feature="$2"
 
     echo "Enabling feature $feature on module $module ..."
-    sysrepoctl -c "$module" -e "$feature"
+    local output
+    if ! output=$(sysrepoctl -c "$module" -e "$feature" 2>&1); then
+        if echo "$output" | grep -q "already enabled"; then
+            echo "Feature $feature on module $module already enabled, skipping."
+            return 0
+        fi
+        echo "$output" >&2
+        return 1
+    fi
 }

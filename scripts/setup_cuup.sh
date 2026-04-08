@@ -9,7 +9,7 @@ source /usr/local/bin/sysrepo_common.sh
 
 YANG_3GPP_DIR=/opt/dev/MnS/yang-models
 
-echo "Installing CU YANG modules ..."
+echo "Installing CU-UP YANG modules ..."
 
 ensure_module "$YANG_3GPP_DIR/_3gpp-common-yang-extensions.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-common-yang-types.yang"
@@ -25,15 +25,7 @@ ensure_module "$YANG_3GPP_DIR/_3gpp-common-managed-element.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-5gc-nrm-configurable5qiset.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-5g-common-yang-types.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-rrmpolicy.yang"
-ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-gnbdufunction.yang"
-ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-bwp.yang"
-ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-gnbcucpfunction.yang"
-ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-nrcellcu.yang"
-ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-nrsectorcarrier.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-gnbcuupfunction.yang"
-ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-ep.yang"
 
 ensure_feature "_3gpp-common-managed-function" "MeasurementsUnderManagedFunction"
 ensure_feature "_3gpp-common-managed-element" "FmUnderManagedElement"
-ensure_feature "_3gpp-nr-nrm-ep" "EPClassesUnderGNBCUCPFunction"
-ensure_feature "_3gpp-nr-nrm-ep" "EPClassesUnderGNBCUUPFunction"

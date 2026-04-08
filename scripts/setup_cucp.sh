@@ -9,7 +9,7 @@ source /usr/local/bin/sysrepo_common.sh
 
 YANG_3GPP_DIR=/opt/dev/MnS/yang-models
 
-echo "Installing CU YANG modules ..."
+echo "Installing CU-CP YANG modules ..."
 
 ensure_module "$YANG_3GPP_DIR/_3gpp-common-yang-extensions.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-common-yang-types.yang"
@@ -36,4 +36,3 @@ ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-ep.yang"
 ensure_feature "_3gpp-common-managed-function" "MeasurementsUnderManagedFunction"
 ensure_feature "_3gpp-common-managed-element" "FmUnderManagedElement"
 ensure_feature "_3gpp-nr-nrm-ep" "EPClassesUnderGNBCUCPFunction"
-ensure_feature "_3gpp-nr-nrm-ep" "EPClassesUnderGNBCUUPFunction"
