@@ -165,12 +165,14 @@ RUN echo '<users xmlns="urn:o-ran:user-mgmt:1.0">\n\
 COPY custom_yangs/*.yang        /opt/dev/
 
 # copy config xmls to the image
-COPY configs/config_cudu.xml    /opt/dev/configs/config_cudu.xml
+COPY configs/config_gnb.xml     /opt/dev/configs/config_gnb.xml
 COPY configs/config_cu.xml      /opt/dev/configs/config_cu.xml
+COPY configs/config_cucp.xml    /opt/dev/configs/config_cucp.xml
+COPY configs/config_cuup.xml    /opt/dev/configs/config_cuup.xml
 COPY configs/config_du.xml      /opt/dev/configs/config_du.xml
 COPY configs/config_ru.xml      /opt/dev/configs/config_ru.xml
 
-COPY scripts/sysrepo_common.sh scripts/setup_cu.sh scripts/setup_du.sh scripts/setup_ru.sh scripts/setup_cudu.sh entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/sysrepo_common.sh /usr/local/bin/setup_cu.sh /usr/local/bin/setup_du.sh /usr/local/bin/setup_ru.sh /usr/local/bin/setup_cudu.sh /usr/local/bin/entrypoint.sh
+COPY scripts/sysrepo_common.sh scripts/setup_gnb.sh scripts/setup_cu.sh scripts/setup_cucp.sh scripts/setup_cuup.sh scripts/setup_du.sh scripts/setup_ru.sh entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/sysrepo_common.sh /usr/local/bin/setup_gnb.sh /usr/local/bin/setup_cu.sh /usr/local/bin/setup_cucp.sh /usr/local/bin/setup_cuup.sh /usr/local/bin/setup_du.sh /usr/local/bin/setup_ru.sh /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]

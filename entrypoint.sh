@@ -13,7 +13,7 @@ YANG_PROFILE=""
 usage() {
     cat <<EOF
 Usage:
-  $0 --config <cudu|cu|du|ru> [--running-config <path>]
+  $0 --config <gnb|cu|cucp|cuup|du|ru> [--running-config <path>]
 
 Options:
   --config          Select the built-in YANG/profile setup and bundled config.
@@ -24,15 +24,25 @@ EOF
 
 set_config_profile() {
     case "$1" in
-        cudu)
-            CONFIG_VARIANT=cudu
-            YANG_PROFILE=cudu
-            PRELOAD_CONFIG="$CONFIG_DIR/config_cudu.xml"
+        gnb)
+            CONFIG_VARIANT=gnb
+            YANG_PROFILE=gnb
+            PRELOAD_CONFIG="$CONFIG_DIR/config_gnb.xml"
             ;;
         cu)
             CONFIG_VARIANT=cu
             YANG_PROFILE=cu
             PRELOAD_CONFIG="$CONFIG_DIR/config_cu.xml"
+            ;;
+        cucp)
+            CONFIG_VARIANT=cucp
+            YANG_PROFILE=cucp
+            PRELOAD_CONFIG="$CONFIG_DIR/config_cucp.xml"
+            ;;
+        cuup)
+            CONFIG_VARIANT=cuup
+            YANG_PROFILE=cuup
+            PRELOAD_CONFIG="$CONFIG_DIR/config_cuup.xml"
             ;;
         du)
             CONFIG_VARIANT=du
@@ -45,7 +55,7 @@ set_config_profile() {
             PRELOAD_CONFIG="$CONFIG_DIR/config_ru.xml"
             ;;
         *)
-            echo "Error: Unsupported built-in config '$1'. Use one of: cudu, cu, du, ru." >&2
+            echo "Error: Unsupported built-in config '$1'. Use one of: gnb, cu, cucp, cuup, du, ru." >&2
             exit 1
             ;;
     esac
@@ -53,11 +63,17 @@ set_config_profile() {
 
 run_profile_setup() {
     case "$YANG_PROFILE" in
-        cudu)
-            /usr/local/bin/setup_cudu.sh
+        gnb)
+            /usr/local/bin/setup_gnb.sh
             ;;
         cu)
             /usr/local/bin/setup_cu.sh
+            ;;
+        cucp)
+            /usr/local/bin/setup_cucp.sh
+            ;;
+        cuup)
+            /usr/local/bin/setup_cuup.sh
             ;;
         du)
             /usr/local/bin/setup_du.sh
@@ -107,7 +123,7 @@ while [ $# -gt 0 ]; do
             exit 1
             ;;
         *)
-            echo "Error: Positional config files are not supported. Use --config <cudu|cu|du|ru>." >&2
+            echo "Error: Positional config files are not supported. Use --config <gnb|cu|cucp|cuup|du|ru>." >&2
             usage
             exit 1
             ;;
@@ -116,7 +132,7 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "$CONFIG_VARIANT" ]; then
-    echo "Error: Missing required --config <cudu|cu|du|ru> option." >&2
+    echo "Error: Missing required --config <gnb|cu|cucp|cuup|du|ru> option." >&2
     usage
     exit 1
 fi
