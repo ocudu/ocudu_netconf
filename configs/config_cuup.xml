@@ -1,0 +1,52 @@
+<!--
+SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+-->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Main CU-UP base config -->
+<RRMPolicyRatio xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-rrmpolicy">
+  <id>rrm_policy1</id>
+  <attributes>
+    <resourceType>PRB</resourceType>
+    <rRMPolicyMemberList>
+      <mcc>001</mcc>
+      <mnc>01</mnc>
+      <sd>ffffff</sd>
+      <sst>1</sst>
+    </rRMPolicyMemberList>
+    <rRMPolicyMaxRatio>100</rRMPolicyMaxRatio>
+    <rRMPolicyMinRatio>0</rRMPolicyMinRatio>
+    <rRMPolicyDedicatedRatio>0</rRMPolicyDedicatedRatio>
+  </attributes>
+</RRMPolicyRatio>
+
+<ManagedElement xmlns="urn:3gpp:sa5:_3gpp-common-managed-element">
+  <id>ran1</id>
+  <attributes>
+    <priorityLabel>1</priorityLabel>
+  </attributes>
+
+  <GNBCUUPFunction xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-gnbcuupfunction">
+    <id>cuup1</id>
+    <attributes>
+      <priorityLabel>1</priorityLabel>
+      <resourceType>DRB</resourceType>
+      <rRMPolicyMemberList>
+        <mcc>001</mcc>
+        <mnc>01</mnc>
+        <sd>ffffff</sd>
+        <sst>1</sst>
+      </rRMPolicyMemberList>
+      <gNBId>1</gNBId>
+      <gNBIdLength>24</gNBIdLength>
+      <pLMNInfoList>
+        <mcc>001</mcc>
+        <mnc>01</mnc>
+        <sd>ffffff</sd>
+        <sst>1</sst>
+      </pLMNInfoList>
+    </attributes>
+  </GNBCUUPFunction>
+</ManagedElement>
