@@ -13,10 +13,11 @@ YANG_PROFILE=""
 usage() {
     cat <<EOF
 Usage:
-  $0 --config <gnb|cu|cucp|cuup|du|ru> [--running-config <path>]
+  $0 --config <gnb|cu|cucp|cuup|du|ru> [--custom-config <path>] [--running-config <path>]
 
 Options:
   --config          Select the built-in YANG/profile setup and bundled config.
+  --custom-config   Override the initial config XML loaded on first start (must be compatible with --config profile).
   --running-config  Override the internal persisted running-config path.
   -h, --help        Show this help message.
 EOF
@@ -103,6 +104,15 @@ while [ $# -gt 0 ]; do
                 exit 1
             fi
             set_config_profile "$1"
+            ;;
+        --custom-config)
+            shift
+            if [ -z "$1" ]; then
+                echo "Error: Missing value for --custom-config." >&2
+                usage
+                exit 1
+            fi
+            PRELOAD_CONFIG="$1"
             ;;
         --running-config)
             shift
