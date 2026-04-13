@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
-: "${YANG_REPO_3GPP_TAG:="Tag_Rel16_SA104"}"
+: "${YANG_REPO_3GPP_TAG:="Tag_Rel18_SA111"}"
 
 YANG_MODEL_DIR=${1:-"/opt/dev"}
 mkdir -p "${YANG_MODEL_DIR}"

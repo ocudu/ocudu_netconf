@@ -45,7 +45,7 @@ FROM base AS builder
 
 ARG OS_VERSION
 # Check tag here https://forge.3gpp.org/rep/sa5/MnS/-/tree/Tag_Rel16_SA102?ref_type=tags
-ARG YANG_REPO_3GPP_TAG=Tag_Rel16_SA104
+ARG YANG_REPO_3GPP_TAG=Tag_Rel18_SA111
 ARG NETOPEER2_TAG=v2.7.0
 ARG LIBNETCONF2_TAG=v4.1.2
 ARG LIBYANG_TAG=v4.2.2
@@ -210,31 +210,34 @@ RUN cd /opt/dev/MnS/yang-models && \
     sysrepoctl -i _3gpp-common-yang-extensions.yang && \
     sysrepoctl -i _3gpp-common-yang-types.yang && \
     sysrepoctl -i _3gpp-common-top.yang && \
+    sysrepoctl -i _3gpp-common-files.yang && \
     sysrepoctl -i _3gpp-common-measurements.yang && \
     sysrepoctl -i _3gpp-common-ep-rp.yang && \
     sysrepoctl -i _3gpp-common-trace.yang && \
     sysrepoctl -i _3gpp-common-managed-function.yang && \
     sysrepoctl -i _3gpp-common-subscription-control.yang && \
     sysrepoctl -i _3gpp-common-fm.yang && \
+    sysrepoctl -i _3gpp-5gc-nrm-configurable5qiset.yang && \
+    sysrepoctl -i _3gpp-5gc-nrm-ecmconnectioninfo.yang && \
+    sysrepoctl -i _3gpp-5g-common-yang-types.yang && \
+    sysrepoctl -i _3gpp-nr-nrm-ecmappingrule.yang && \
     sysrepoctl -i _3gpp-common-subnetwork.yang && \
     sysrepoctl -i _3gpp-common-managed-element.yang && \
-    sysrepoctl -i _3gpp-5gc-nrm-configurable5qiset.yang && \
-    sysrepoctl -i _3gpp-5g-common-yang-types.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-rrmpolicy.yang && \
     sysrepoctl -i _3gpp-nr-nrm-gnbdufunction.yang && \
     sysrepoctl -i _3gpp-nr-nrm-bwp.yang && \
     sysrepoctl -i _3gpp-nr-nrm-nrcelldu.yang && \
     sysrepoctl -i _3gpp-nr-nrm-gnbcucpfunction.yang && \
     sysrepoctl -i _3gpp-nr-nrm-nrcellcu.yang && \
     sysrepoctl -i _3gpp-nr-nrm-nrsectorcarrier.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-gnbdufunction.yang && \
     sysrepoctl -i _3gpp-nr-nrm-gnbcuupfunction.yang && \
-    sysrepoctl -i _3gpp-nr-nrm-ep.yang
+    sysrepoctl -i _3gpp-nr-nrm-ep.yang && \
+    sysrepoctl -i _3gpp-nr-nrm-rrmpolicy.yang
 
 RUN cd /opt/dev/MnS/yang-models && \
     sysrepoctl -c _3gpp-common-managed-function -e MeasurementsUnderManagedFunction && \
     sysrepoctl -c _3gpp-common-managed-element -e FmUnderManagedElement && \
     sysrepoctl -c _3gpp-nr-nrm-ep -e EPClassesUnderGNBDUFunction && \
+    sysrepoctl -c _3gpp-nr-nrm-ep -e EPClassesUnderGNBCUUPFunction && \
     sysrepoctl -c _3gpp-nr-nrm-ep -e EPClassesUnderGNBCUCPFunction
 
 COPY custom_yangs/*.yang /opt/dev/
