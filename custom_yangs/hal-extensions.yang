@@ -17,6 +17,94 @@ module hal-extensions {
         description "OCUDU Extension for Hardware Abstraction Layer";
 
         container ocudu_hal_extensions {
+            container bbdev_hwacc {
+                description "BBDEV-based hardware-acceleration configuration parameters";
+
+                leaf hwacc_type {
+                    description "Type of BBDEV hardware-accelerator (acc100, acc200, vrb1)";
+                    type enumeration {
+                        enum acc100;
+                        enum acc200;
+                        enum vrb1;
+                    }
+                }
+
+                leaf id {
+                    description "ID of the BBDEV-based hardware-accelerator";
+                    type uint16;
+                }
+
+                container pdsch_enc {
+                    description "Hardware-accelerated PDSCH encoding functions configuration";
+
+                    leaf nof_hwacc {
+                        description "Number of hardware-accelerated PDSCH encoding functions";
+                        type uint8 {
+                            range "0..64";
+                        }
+                    }
+
+                    leaf cb_mode {
+                        description "Operation mode of the PDSCH encoder (CB = true, TB = false)";
+                        type boolean;
+                        default false;
+                    }
+
+                    leaf max_buffer_size {
+                        description "Maximum supported buffer size in bytes (CB mode forced for larger TBs)";
+                        type uint32;
+                    }
+
+                    leaf dedicated_queue {
+                        description "Use dedicated hardware queues (true) or shared queues (false)";
+                        type boolean;
+                        default true;
+                    }
+                }
+
+                container pusch_dec {
+                    description "Hardware-accelerated PUSCH decoding functions configuration";
+
+                    leaf nof_hwacc {
+                        description "Number of hardware-accelerated PUSCH decoding functions";
+                        type uint8 {
+                            range "0..64";
+                        }
+                    }
+
+                    leaf harq_context_size {
+                        description "Size of the HARQ context repository";
+                        type uint32;
+                    }
+
+                    leaf force_local_harq {
+                        description "Force using host memory for the HARQ buffer";
+                        type boolean;
+                        default false;
+                    }
+
+                    leaf dedicated_queue {
+                        description "Use dedicated hardware queues (true) or shared queues (false)";
+                        type boolean;
+                        default true;
+                    }
+                }
+
+                leaf msg_mbuf_size {
+                    description "Size of mbufs for unencoded and unrate-matched messages (in bytes)";
+                    type uint32;
+                }
+
+                leaf rm_mbuf_size {
+                    description "Size of mbufs for encoded and rate-matched messages (in bytes)";
+                    type uint32;
+                }
+
+                leaf nof_mbuf {
+                    description "Number of mbufs in each memory pool";
+                    type uint32;
+                }
+            }
 
             leaf eal_args {
                 description "EAL configuration parameters used to initialize DPDK";
