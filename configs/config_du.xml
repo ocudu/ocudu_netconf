@@ -3,25 +3,7 @@ SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 -->
 
-<?xml version="1.0" encoding="UTF-8"?>
-
 <!-- Main DU base config -->
-<RRMPolicyRatio xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-rrmpolicy">
-  <id>rrm_policy1</id>
-  <attributes>
-    <resourceType>PRB</resourceType>
-    <rRMPolicyMemberList>
-      <mcc>001</mcc>
-      <mnc>01</mnc>
-      <sd>ffffff</sd>
-      <sst>1</sst>
-    </rRMPolicyMemberList>
-    <rRMPolicyMaxRatio>100</rRMPolicyMaxRatio>
-    <rRMPolicyMinRatio>0</rRMPolicyMinRatio>
-    <rRMPolicyDedicatedRatio>0</rRMPolicyDedicatedRatio>
-  </attributes>
-</RRMPolicyRatio>
-
 <ManagedElement xmlns="urn:3gpp:sa5:_3gpp-common-managed-element">
   <id>ran1</id>
   <attributes>
@@ -31,43 +13,77 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
   <GNBDUFunction xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-gnbdufunction">
     <id>du1</id>
     <attributes>
-      <resourceType>PRB</resourceType>
-      <rRMPolicyMemberList>
-          <mcc>001</mcc>
-          <mnc>01</mnc>
-          <sd>ffffff</sd>
-          <sst>1</sst>
-      </rRMPolicyMemberList>
       <gNBId>411</gNBId>
       <gNBIdLength>23</gNBIdLength>
       <gNBDUId>3</gNBDUId>
       <priorityLabel>1</priorityLabel>
     </attributes>
-    <NRCellDU xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-nrcelldu">
-      <id>nrcelldu1</id>
+    <RRMPolicyRatio xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-rrmpolicy">
+      <id>rrm_policy1</id>
       <attributes>
         <resourceType>PRB</resourceType>
         <rRMPolicyMemberList>
           <mcc>001</mcc>
           <mnc>01</mnc>
-          <sd>ffffff</sd>
+          <sd>ff:ff:ff</sd>
           <sst>1</sst>
         </rRMPolicyMemberList>
+        <rRMPolicyMaxRatio>100</rRMPolicyMaxRatio>
+        <rRMPolicyMinRatio>0</rRMPolicyMinRatio>
+        <rRMPolicyDedicatedRatio>0</rRMPolicyDedicatedRatio>
+      </attributes>
+    </RRMPolicyRatio>
+    <NRCellDU xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-nrcelldu">
+      <id>nrcelldu1</id>
+      <RRMPolicyRatio xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-rrmpolicy">
+        <id>rrm_policy1</id>
+        <attributes>
+          <resourceType>PRB</resourceType>
+          <rRMPolicyMemberList>
+            <mcc>001</mcc>
+            <mnc>01</mnc>
+            <sd>ff:ff:ff</sd>
+            <sst>1</sst>
+          </rRMPolicyMemberList>
+          <rRMPolicyMaxRatio>100</rRMPolicyMaxRatio>
+          <rRMPolicyMinRatio>0</rRMPolicyMinRatio>
+          <rRMPolicyDedicatedRatio>0</rRMPolicyDedicatedRatio>
+        </attributes>
+      </RRMPolicyRatio>
+      <attributes>
         <priorityLabel>1</priorityLabel>
         <cellLocalId>0</cellLocalId>
         <administrativeState>UNLOCKED</administrativeState>
         <pLMNInfoList>
           <mcc>001</mcc>
           <mnc>01</mnc>
-          <sd>ffffff</sd>
+          <sd>ff:ff:ff</sd>
           <sst>1</sst>
         </pLMNInfoList>
+        <nPNIdentityList>
+          <idx>0</idx>
+          <plmnid>
+            <mcc>001</mcc>
+            <mnc>01</mnc>
+          </plmnid>
+          <cAGIdList>unused</cAGIdList>
+          <nIDList>unused</nIDList>
+        </nPNIdentityList>
         <nRPCI>1</nRPCI>
         <nRTAC>7</nRTAC>
         <arfcnDL>640000</arfcnDL>
         <arfcnUL>640000</arfcnUL>
         <bSChannelBwDL>100</bSChannelBwDL>
         <bSChannelBwUL>100</bSChannelBwUL>
+        <rimRSMonitoringStartTime>1970-01-01T00:00:00Z</rimRSMonitoringStartTime>
+        <rimRSMonitoringStopTime>1970-01-01T00:00:00Z</rimRSMonitoringStopTime>
+        <rimRSMonitoringWindowDuration>1</rimRSMonitoringWindowDuration>
+        <rimRSMonitoringWindowStartingOffset>0</rimRSMonitoringWindowStartingOffset>
+        <rimRSMonitoringWindowPeriodicity>24</rimRSMonitoringWindowPeriodicity>
+        <rimRSMonitoringOccasionInterval>1</rimRSMonitoringOccasionInterval>
+        <rimRSMonitoringOccasionStartingOffset>0</rimRSMonitoringOccasionStartingOffset>
+        <victimSetRef>RimRSSet=unused</victimSetRef>
+        <aggressorSetRef>RimRSSet=unused</aggressorSetRef>
         <ssbFrequency>3000000</ssbFrequency>
         <ssbPeriodicity>10</ssbPeriodicity>
         <ssbSubCarrierSpacing>30</ssbSubCarrierSpacing>
@@ -134,7 +150,7 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <rRMPolicyMemberList>
           <mcc>001</mcc>
           <mnc>01</mnc>
-          <sd>ffffff</sd>
+          <sd>ff:ff:ff</sd>
           <sst>1</sst>
         </rRMPolicyMemberList>
         <priorityLabel>1</priorityLabel>
@@ -143,7 +159,7 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <pLMNInfoList>
           <mcc>001</mcc>
           <mnc>01</mnc>
-          <sd>ffffff</sd>
+          <sd>ff:ff:ff</sd>
           <sst>1</sst>
         </pLMNInfoList>
         <nRPCI>2</nRPCI>
