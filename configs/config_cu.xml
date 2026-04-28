@@ -88,6 +88,19 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <remoteAddress>10.53.1.2</remoteAddress>
         </attributes>
       </EP_NgC>
+
+      <EP_F1C xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-ep">
+        <id>f1c1</id>
+        <attributes>
+          <!-- f1ap bind addresss -->
+          <localAddress>
+            <ipAddress>127.0.10.1</ipAddress>
+            <vlanId>0</vlanId>
+          </localAddress>
+          <!-- f1ap DU peer address -->
+          <remoteAddress>127.0.10.2</remoteAddress>
+        </attributes>
+      </EP_F1C>
   </GNBCUCPFunction>
 
   <GNBCUUPFunction xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-gnbcuupfunction">
@@ -119,5 +132,31 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <rRMPolicyDedicatedRatio>0</rRMPolicyDedicatedRatio>
       </attributes>
     </RRMPolicyRatio>
+
+    <EP_NgU xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-ep">
+      <id>ngu1</id>
+      <attributes>
+        <!-- NG-U bind addresss -->
+        <localAddress>
+          <ipAddress>127.0.0.1</ipAddress>
+          <vlanId>0</vlanId>
+        </localAddress>
+        <!-- NG-U UPF peer address -->
+        <remoteAddress>127.0.0.2</remoteAddress>
+      </attributes>
+    </EP_NgU>
+
+    <EP_F1U xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-ep">
+      <id>f1u1</id>
+      <attributes>
+        <!-- f1u bind addresss -->
+        <localAddress>
+          <ipAddress>127.0.10.1</ipAddress>
+          <vlanId>0</vlanId>
+        </localAddress>
+        <!-- f1u DU peer address -->
+        <remoteAddress>127.0.10.2</remoteAddress>
+      </attributes>
+    </EP_F1U>
   </GNBCUUPFunction>
 </ManagedElement>
