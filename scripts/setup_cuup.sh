@@ -8,6 +8,7 @@ set -euo pipefail
 source /usr/local/bin/sysrepo_common.sh
 
 YANG_3GPP_DIR=/opt/dev/MnS/yang-models
+CUSTOM_YANG_DIR=/opt/dev
 
 echo "Installing CU-UP YANG modules ..."
 
@@ -38,3 +39,8 @@ ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-rrmpolicy.yang"
 ensure_feature "_3gpp-common-managed-function" "MeasurementsUnderManagedFunction"
 ensure_feature "_3gpp-common-managed-element" "FmUnderManagedElement"
 ensure_feature "_3gpp-nr-nrm-ep" "EPClassesUnderGNBCUUPFunction"
+
+ensure_module "$CUSTOM_YANG_DIR/function-log-extensions.yang"
+ensure_module "$CUSTOM_YANG_DIR/metrics-extensions.yang"
+ensure_module "$CUSTOM_YANG_DIR/pcap-extensions.yang"
+ensure_module "$CUSTOM_YANG_DIR/gnbcuupfunction-extensions.yang"
