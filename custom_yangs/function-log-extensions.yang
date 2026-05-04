@@ -1,14 +1,15 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
-module gnbdufunction-log-extensions {
+module function-log-extensions {
     yang-version 1.1;
-    namespace "urn:ocudu-gnbdufunction-log-extension:1.0";
-    prefix "ocudu-gnbdufunction-log";
+    namespace "urn:ocudu-function-log-extension:1.0";
+    prefix "ocudu-function-log";
 
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-04-30 { description "Renamed module to function-log-extensions for reuse across DU/CU/CUCP/CUUP"; }
     revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
 
@@ -36,9 +37,9 @@ module gnbdufunction-log-extensions {
     }
 
     grouping log_extensions_subtree {
-        description "OCUDU Extension of GNBDUFunction";
+        description "OCUDU log extensions reusable across DU/CU/CUCP/CUUP functions";
 
-        container ocudu_gnbdufunction_log_extensions {
+        container ocudu_function_log_extensions {
 
             leaf filename {
                 description "Path of the log file";
