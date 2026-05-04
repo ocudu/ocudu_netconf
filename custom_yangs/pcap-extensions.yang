@@ -1,0 +1,240 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module pcap-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-pcap-extension:1.0";
+    prefix "ocudu-pcap";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU PCAP configuration
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-04-30 { description "Initial version"; }
+
+    typedef rlc_rb_type {
+        type enumeration {
+            enum all {
+                value 0;
+                description "Capture both SRBs and DRBs";
+            }
+            enum srb {
+                value 1;
+                description "Capture SRBs only";
+            }
+            enum drb {
+                value 2;
+                description "Capture DRBs only";
+            }
+        }
+        description "RLC PCAP RB type selector";
+    }
+
+    typedef mac_pcap_type {
+        type enumeration {
+            enum dlt {
+                value 0;
+                description "DLT-based MAC PCAP encapsulation";
+            }
+            enum udp {
+                value 1;
+                description "UDP-based MAC PCAP encapsulation";
+            }
+        }
+        description "MAC PCAP encapsulation type";
+    }
+
+    grouping pcap_extensions_subtree {
+        description "OCUDU PCAP extensions reusable across DU/CU/CUCP/CUUP functions";
+
+        container ocudu_pcap_extensions {
+
+            container ngap {
+                description "N2 NGAP PCAP configuration (CU-CP)";
+
+                leaf filename {
+                    description "NGAP PCAP file output path";
+                    type string;
+                    default "/tmp/gnb_ngap.pcap";
+                }
+
+                leaf enable {
+                    description "Enable NGAP packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container xnap {
+                description "XnAP PCAP configuration (CU-CP)";
+
+                leaf filename {
+                    description "XNAP PCAP file output path";
+                    type string;
+                    default "/tmp/cu_xnap.pcap";
+                }
+
+                leaf enable {
+                    description "Enable XNAP packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container e2ap_cu_cp {
+                description "E2AP PCAP configuration for CU-CP";
+
+                leaf filename {
+                    description "E2AP CU-CP PCAP file output path";
+                    type string;
+                    default "/tmp/cu_cp_e2ap.pcap";
+                }
+
+                leaf enable {
+                    description "Enable E2AP CU-CP packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container e2ap_cu_up {
+                description "E2AP PCAP configuration for CU-UP";
+
+                leaf filename {
+                    description "E2AP CU-UP PCAP file output path";
+                    type string;
+                    default "/tmp/cu_up_e2ap.pcap";
+                }
+
+                leaf enable {
+                    description "Enable E2AP CU-UP packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container e2ap_du {
+                description "E2AP PCAP configuration for DU";
+
+                leaf filename {
+                    description "E2AP DU PCAP file output path";
+                    type string;
+                    default "/tmp/du_e2ap.pcap";
+                }
+
+                leaf enable {
+                    description "Enable E2AP DU packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container n3 {
+                description "N3 GTP-U PCAP configuration (CU-UP)";
+
+                leaf filename {
+                    description "N3 GTP-U PCAP file output path";
+                    type string;
+                    default "/tmp/gnb_n3.pcap";
+                }
+
+                leaf enable {
+                    description "Enable N3 GTP-U packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container e1ap {
+                description "E1AP PCAP configuration (CU-CP/CU-UP)";
+
+                leaf filename {
+                    description "E1AP PCAP file output path";
+                    type string;
+                    default "/tmp/gnb_e1ap.pcap";
+                }
+
+                leaf enable {
+                    description "Enable E1AP packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container f1ap {
+                description "F1AP PCAP configuration (DU/CU-CP)";
+
+                leaf filename {
+                    description "F1AP PCAP file output path";
+                    type string;
+                    default "/tmp/gnb_f1ap.pcap";
+                }
+
+                leaf enable {
+                    description "Enable F1AP packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container f1u {
+                description "F1-U PCAP configuration (DU/CU-UP)";
+
+                leaf filename {
+                    description "F1-U PCAP file output path";
+                    type string;
+                    default "/tmp/gnb_f1u.pcap";
+                }
+
+                leaf enable {
+                    description "Enable F1-U packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container rlc {
+                description "RLC PCAP configuration (DU)";
+
+                leaf filename {
+                    description "RLC PCAP file output path";
+                    type string;
+                    default "/tmp/gnb_rlc.pcap";
+                }
+
+                leaf rb_type {
+                    description "RLC PCAP RB type filter (all, srb, drb)";
+                    type rlc_rb_type;
+                    default all;
+                }
+
+                leaf enable {
+                    description "Enable RLC packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container mac {
+                description "MAC PCAP configuration (DU)";
+
+                leaf filename {
+                    description "MAC PCAP file output path";
+                    type string;
+                    default "/tmp/gnb_mac.pcap";
+                }
+
+                leaf type {
+                    description "MAC PCAP encapsulation type (dlt or udp)";
+                    type mac_pcap_type;
+                    default udp;
+                }
+
+                leaf enable {
+                    description "Enable MAC packet capture";
+                    type boolean;
+                    default false;
+                }
+            }
+        }
+    }
+}
