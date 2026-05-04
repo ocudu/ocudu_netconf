@@ -1,0 +1,35 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module gnbcucpfunction-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-gnbcucpfunction-extension:1.0";
+    prefix "ocudu-gnbcucpfunction";
+
+    import _3gpp-common-managed-element { prefix me3gpp; }
+    import _3gpp-nr-nrm-gnbcucpfunction { prefix gnbcucp3gpp; }
+
+    import function-log-extensions { prefix ocudu-function-log; }
+    import metrics-extensions { prefix ocudu-metrics; }
+    import pcap-extensions { prefix ocudu-pcap; }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-04-30 { description "Initial version"; }
+
+    grouping gnbcucpfunction_extensions_subtree {
+
+        container ocudu_gnbcucpfunction_extensions {
+            description "OCUDU extension of GNBCUCPFunction";
+
+            uses ocudu-function-log:log_extensions_subtree;
+            uses ocudu-metrics:metrics_extensions_subtree;
+            uses ocudu-pcap:pcap_extensions_subtree;
+        }
+    }
+
+    augment /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction {
+        uses gnbcucpfunction_extensions_subtree;
+    }
+}
