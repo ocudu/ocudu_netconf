@@ -9,7 +9,7 @@ module gnbcuupfunction-extensions {
     import _3gpp-common-managed-element { prefix me3gpp; }
     import _3gpp-nr-nrm-gnbcuupfunction { prefix gnbcuup3gpp; }
 
-    import function-log-extensions { prefix ocudu-function-log; }
+    import log-extensions { prefix ocudu-log; }
     import metrics-extensions { prefix ocudu-metrics; }
     import pcap-extensions { prefix ocudu-pcap; }
 
@@ -23,7 +23,7 @@ module gnbcuupfunction-extensions {
         container ocudu_gnbcuupfunction_extensions {
             description "OCUDU extension of GNBCUUPFunction";
 
-            uses ocudu-function-log:log_extensions_subtree;
+            uses ocudu-log:log_extensions_subtree;
             uses ocudu-metrics:metrics_extensions_subtree;
             uses ocudu-pcap:pcap_extensions_subtree;
         }

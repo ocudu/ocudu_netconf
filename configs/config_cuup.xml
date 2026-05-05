@@ -80,10 +80,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
     </EP_F1U>
 
     <ocudu_gnbcuupfunction_extensions xmlns="urn:ocudu-gnbcuupfunction-extension:1.0">
-      <ocudu_function_log_extensions>
+      <ocudu_log_extensions>
         <filename>/tmp/cuup.log</filename>
         <all_level>warning</all_level>
-      </ocudu_function_log_extensions>
+      </ocudu_log_extensions>
 
       <ocudu_metrics_extensions>
         <autostart_stdout_metrics>true</autostart_stdout_metrics>

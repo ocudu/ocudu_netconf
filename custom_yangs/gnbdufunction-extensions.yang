@@ -10,7 +10,7 @@ module gnbdufunction-extensions {
     import _3gpp-nr-nrm-gnbdufunction { prefix gnbdu3gpp; }
     
     import gnbdufunction-testmode-extensions { prefix ocudu-gnbdufunction-testmode; }
-    import function-log-extensions { prefix ocudu-function-log; }
+    import log-extensions { prefix ocudu-log; }
     import hal-extensions { prefix ocudu-hal; }
     import metrics-extensions { prefix ocudu-metrics; }
     import pcap-extensions { prefix ocudu-pcap; }
@@ -29,7 +29,7 @@ module gnbdufunction-extensions {
             description "OCUDU extension of GNBDUFunction";
 
             uses ocudu-gnbdufunction-testmode:testmode_extensions_subtree;
-            uses ocudu-function-log:log_extensions_subtree;
+            uses ocudu-log:log_extensions_subtree;
             uses ocudu-hal:hal_extensions_subtree;
             uses ocudu-metrics:metrics_extensions_subtree;
             uses ocudu-pcap:pcap_extensions_subtree;

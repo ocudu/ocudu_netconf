@@ -43,7 +43,7 @@ ensure_feature "_3gpp-common-managed-element" "FmUnderManagedElement"
 ensure_feature "_3gpp-nr-nrm-ep" "EPClassesUnderGNBCUCPFunction"
 ensure_feature "_3gpp-nr-nrm-ep" "EPClassesUnderGNBCUUPFunction"
 
-ensure_module "$CUSTOM_YANG_DIR/function-log-extensions.yang"
+ensure_module "$CUSTOM_YANG_DIR/log-extensions.yang"
 ensure_module "$CUSTOM_YANG_DIR/metrics-extensions.yang"
 ensure_module "$CUSTOM_YANG_DIR/pcap-extensions.yang"
 ensure_module "$CUSTOM_YANG_DIR/gnbcucpfunction-extensions.yang"

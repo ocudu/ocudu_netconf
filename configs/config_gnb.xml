@@ -397,10 +397,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <pdsch_active>true</pdsch_active>
         <pusch_active>true</pusch_active>
       </ocudu_gnbdufunction_testmode_extensions>
-      <ocudu_function_log_extensions>
+      <ocudu_log_extensions>
         <filename>/tmp/gnb.log</filename>
         <all_level>warning</all_level>
-      </ocudu_function_log_extensions>
+      </ocudu_log_extensions>
       <ocudu_hal_extensions>
         <eal_args>--lcores (0-1)@(0-11)</eal_args>
       </ocudu_hal_extensions>
