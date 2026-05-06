@@ -9,6 +9,7 @@ module pcap-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU PCAP configuration
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-05 { description "Move E2AP enable to a single shared container"; }
     revision 2026-04-30 { description "Initial version"; }
 
     typedef rlc_rb_type {
@@ -81,48 +82,40 @@ module pcap-extensions {
             }
 
             container e2ap_cu_cp {
-                description "E2AP PCAP configuration for CU-CP";
+                description "E2AP CU-CP PCAP file output path. Enable is shared across roles (see e2ap container).";
 
                 leaf filename {
                     description "E2AP CU-CP PCAP file output path";
                     type string;
                     default "/tmp/cu_cp_e2ap.pcap";
                 }
-
-                leaf enable {
-                    description "Enable E2AP CU-CP packet capture";
-                    type boolean;
-                    default false;
-                }
             }
 
             container e2ap_cu_up {
-                description "E2AP PCAP configuration for CU-UP";
+                description "E2AP CU-UP PCAP file output path. Enable is shared across roles (see e2ap container).";
 
                 leaf filename {
                     description "E2AP CU-UP PCAP file output path";
                     type string;
                     default "/tmp/cu_up_e2ap.pcap";
                 }
-
-                leaf enable {
-                    description "Enable E2AP CU-UP packet capture";
-                    type boolean;
-                    default false;
-                }
             }
 
             container e2ap_du {
-                description "E2AP PCAP configuration for DU";
+                description "E2AP DU PCAP file output path. Enable is shared across roles (see e2ap container).";
 
                 leaf filename {
                     description "E2AP DU PCAP file output path";
                     type string;
                     default "/tmp/du_e2ap.pcap";
                 }
+            }
+
+            container e2ap {
+                description "Shared E2AP capture switch. Per-role filenames live in e2ap_cu_cp / e2ap_cu_up / e2ap_du.";
 
                 leaf enable {
-                    description "Enable E2AP DU packet capture";
+                    description "Enable E2AP packet capture";
                     type boolean;
                     default false;
                 }
