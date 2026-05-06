@@ -86,7 +86,6 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
       </ocudu_log_extensions>
 
       <ocudu_metrics_extensions>
-        <autostart_stdout_metrics>true</autostart_stdout_metrics>
         <enable_json>false</enable_json>
         <enable_log>true</enable_log>
         <periodicity>
@@ -105,8 +104,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         </n3>
         <e2ap_cu_up>
           <filename>/tmp/cuup_e2ap.pcap</filename>
-          <enable>false</enable>
         </e2ap_cu_up>
+        <e2ap>
+          <enable>false</enable>
+        </e2ap>
         <e1ap>
           <filename>/tmp/cuup_e1ap.pcap</filename>
           <enable>false</enable>

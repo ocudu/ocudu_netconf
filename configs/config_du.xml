@@ -308,8 +308,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         </f1u>
         <e2ap_du>
           <filename>/tmp/du_e2ap.pcap</filename>
-          <enable>false</enable>
         </e2ap_du>
+        <e2ap>
+          <enable>false</enable>
+        </e2ap>
       </ocudu_pcap_extensions>
 
     </ocudu_gnbdufunction_extensions>

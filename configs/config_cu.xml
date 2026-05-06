@@ -119,8 +119,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           </xnap>
           <e2ap_cu_cp>
             <filename>/tmp/cucp_e2ap.pcap</filename>
-            <enable>false</enable>
           </e2ap_cu_cp>
+          <e2ap>
+            <enable>false</enable>
+          </e2ap>
           <f1ap>
             <filename>/tmp/cucp_f1ap.pcap</filename>
             <enable>false</enable>
@@ -192,7 +194,6 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
     <ocudu_gnbcuupfunction_extensions xmlns="urn:ocudu-gnbcuupfunction-extension:1.0">
 
       <ocudu_metrics_extensions>
-        <autostart_stdout_metrics>true</autostart_stdout_metrics>
         <enable_json>false</enable_json>
         <enable_log>true</enable_log>
         <periodicity>
@@ -212,7 +213,6 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         </n3>
         <e2ap_cu_up>
           <filename>/tmp/cuup_e2ap.pcap</filename>
-          <enable>false</enable>
         </e2ap_cu_up>
         <f1u>
           <filename>/tmp/cuup_f1u.pcap</filename>
