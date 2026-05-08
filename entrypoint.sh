@@ -9,16 +9,21 @@ PROFILE_STATE=""
 PRELOAD_CONFIG=""
 CONFIG_VARIANT=""
 YANG_PROFILE=""
+TLS_ENABLED=0
+TLS_CERT_DIR=/etc/netconf-tls
 
 usage() {
     cat <<EOF
 Usage:
   $0 --config <gnb|cu|cucp|cuup|du|ru> [--custom-config <path>] [--running-config <path>]
+     [--enable-tls] [--tls-cert-dir <path>]
 
 Options:
   --config          Select the built-in YANG/profile setup and bundled config.
   --custom-config   Override the initial config XML loaded on first start (must be compatible with --config profile).
   --running-config  Override the internal persisted running-config path.
+  --enable-tls      Enable a NETCONF-over-TLS listen endpoint on port 6513 alongside the default SSH endpoint.
+  --tls-cert-dir    Directory containing ca.crt, server.crt, server.key, client.crt (default: /etc/netconf-tls).
   -h, --help        Show this help message.
 EOF
 }
@@ -123,6 +128,18 @@ while [ $# -gt 0 ]; do
             fi
             RUNNING_CONFIG="$1"
             ;;
+        --enable-tls)
+            TLS_ENABLED=1
+            ;;
+        --tls-cert-dir)
+            shift
+            if [ -z "$1" ]; then
+                echo "Error: Missing value for --tls-cert-dir." >&2
+                usage
+                exit 1
+            fi
+            TLS_CERT_DIR="$1"
+            ;;
         -h|--help)
             usage
             exit 0
@@ -190,6 +207,10 @@ else
 fi
 
 merge_selected_config
+
+if [ "$TLS_ENABLED" = "1" ]; then
+    /usr/local/bin/setup_tls.sh "$TLS_CERT_DIR"
+fi
 
 echo "Starting netconf server .."
 netopeer2-server -v3 -d
