@@ -53,7 +53,6 @@ yang validation:
     - if: $ON_MR
   variables:
     DEBIAN_FRONTEND: noninteractive
-    YANG_REPO_3GPP_TAG: Tag_Rel16_SA104
   script:
     - apt update && apt install -y --no-install-recommends git ca-certificates python3-pip wget unzip
     - wget -q -O /usr/local/share/ca-certificates/GeoTrustTLSRSACAG1.crt https://cacerts.digicert.com/GeoTrustTLSRSACAG1.crt.pem
