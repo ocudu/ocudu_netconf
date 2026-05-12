@@ -1,0 +1,337 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module gnbcucpfunction-mobility-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-gnbcucpfunction-mobility-extension:1.0";
+    prefix "ocudu-gnbcucpfunction-mobility";
+
+    import _3gpp-common-managed-element { prefix me3gpp; }
+    import _3gpp-common-yang-types { prefix types3gpp; }
+    import _3gpp-nr-nrm-gnbcucpfunction { prefix gnbcucp3gpp; }
+    import _3gpp-nr-nrm-nrcellcu { prefix nrcellcu3gpp; }
+    import _3gpp-nr-nrm-nrcellrelation { prefix nrcellrel3gpp; }
+    import ietf-yang-types { prefix yang; }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-11 { description "Initial version"; }
+
+    typedef report_type {
+        type enumeration {
+            enum periodical;
+            enum event_triggered;
+            enum cond_trigger;
+        }
+    }
+
+    typedef event_triggered_report_type {
+        description "RRC measurement event types accepted by the gNB. A1..A6 are
+                     standard RRC measurement events; D1, D2, T1 are location-/time-based
+                     events valid only for cond_trigger report type.";
+        type enumeration {
+            enum a1;
+            enum a2;
+            enum a3;
+            enum a4;
+            enum a5;
+            enum a6;
+            enum d1;
+            enum d2;
+            enum t1;
+        }
+    }
+
+    typedef meas_trigger_quantity {
+        type enumeration {
+            enum rsrp;
+            enum rsrq;
+            enum sinr;
+        }
+    }
+
+    grouping report_config_grp {
+        description "Parameters of a single RRC measurement report config.";
+
+        leaf report_cfg_id {
+            description "Identifier of the report config, referenced by NRCellCU and NRCellRelation.";
+            type uint32 { range "1..64"; }
+        }
+
+        leaf report_type {
+            description "Periodical, event-triggered or conditional-trigger reporting.";
+            type report_type;
+            mandatory true;
+        }
+
+        leaf report_interval_ms {
+            description "Reporting interval in milliseconds. Used for periodical reports and as the
+                         inter-report interval for event-triggered reports. Not used for cond_trigger.
+                         Restricted to the discrete set accepted by the gNB.";
+            when "../report_type = 'periodical' or ../report_type = 'event_triggered'";
+            mandatory true;
+            type uint32 {
+                range "120 | 240 | 480 | 640 | 1024 | 2048 | 5120 | 10240 | 20480 | 40960 | 60000 | 360000 | 720000 | 1800000";
+            }
+        }
+
+        leaf periodic_ho_rsrp_offset_db {
+            description "Offset used to trigger handover from periodic RSRP measurement reports.
+                         A value of -1 disables handover triggering from periodic reports.";
+            when "../report_type = 'periodical'";
+            type int8 { range "-1..30"; }
+            default -1;
+        }
+
+        leaf event_triggered_report_type {
+            description "RRC event type. Used only when report_type is event_triggered or cond_trigger.";
+            when "../report_type = 'event_triggered' or ../report_type = 'cond_trigger'";
+            mandatory true;
+            must "../report_type = 'cond_trigger' or "
+               + "(. != 'd1' and . != 'd2' and . != 't1')" {
+                error-message "Events d1, d2 and t1 are valid only when report_type is cond_trigger.";
+            }
+            must "../report_type != 'cond_trigger' or "
+               + "(. = 'a3' or . = 'a4' or . = 'a5' or . = 'd1' or . = 'd2' or . = 't1')" {
+                error-message "cond_trigger supports only events a3, a4, a5, d1, d2 and t1.";
+            }
+            type event_triggered_report_type;
+        }
+
+        leaf meas_trigger_quantity {
+            description "Measurement quantity used to evaluate the event trigger.";
+            when "../event_triggered_report_type = 'a1' or "
+               + "../event_triggered_report_type = 'a2' or "
+               + "../event_triggered_report_type = 'a3' or "
+               + "../event_triggered_report_type = 'a4' or "
+               + "../event_triggered_report_type = 'a5' or "
+               + "../event_triggered_report_type = 'a6'";
+            mandatory true;
+            type meas_trigger_quantity;
+        }
+
+        leaf meas_trigger_quantity_threshold_db {
+            description "Absolute measurement trigger threshold in dB/dBm. Used by A1, A2, A4 and A5.";
+            when "../event_triggered_report_type = 'a1' or "
+               + "../event_triggered_report_type = 'a2' or "
+               + "../event_triggered_report_type = 'a4' or "
+               + "../event_triggered_report_type = 'a5'";
+            mandatory true;
+            must "not(../meas_trigger_quantity = 'rsrp') or (. >= -156 and . <= -31)" {
+                error-message "RSRP threshold must be in range -156..-31 dBm.";
+            }
+            must "not(../meas_trigger_quantity = 'rsrq') or (. >= -43 and . <= 20)" {
+                error-message "RSRQ threshold must be in range -43..20 dB.";
+            }
+            must "not(../meas_trigger_quantity = 'sinr') or (. >= -23 and . <= 40)" {
+                error-message "SINR threshold must be in range -23..40 dB.";
+            }
+            type int16 { range "-156..40"; }
+        }
+
+        leaf meas_trigger_quantity_threshold_2_db {
+            description "Second absolute measurement trigger threshold in dB/dBm. Used by A5.";
+            when "../event_triggered_report_type = 'a5'";
+            mandatory true;
+            must "not(../meas_trigger_quantity = 'rsrp') or (. >= -156 and . <= -31)" {
+                error-message "RSRP threshold 2 must be in range -156..-31 dBm.";
+            }
+            must "not(../meas_trigger_quantity = 'rsrq') or (. >= -43 and . <= 20)" {
+                error-message "RSRQ threshold 2 must be in range -43..20 dB.";
+            }
+            must "not(../meas_trigger_quantity = 'sinr') or (. >= -23 and . <= 40)" {
+                error-message "SINR threshold 2 must be in range -23..40 dB.";
+            }
+            type int16 { range "-156..40"; }
+        }
+
+        leaf meas_trigger_quantity_offset_db {
+            description "Offset applied to the measurement quantity, in dB. A3/A6 events only.";
+            when "../event_triggered_report_type = 'a3' or ../event_triggered_report_type = 'a6'";
+            mandatory true;
+            type int8 { range "-15..15"; }
+        }
+
+        leaf hysteresis_db {
+            description "Hysteresis applied to event entry/leaving condition, in dB.";
+            when "../event_triggered_report_type = 'a1' or "
+               + "../event_triggered_report_type = 'a2' or "
+               + "../event_triggered_report_type = 'a3' or "
+               + "../event_triggered_report_type = 'a4' or "
+               + "../event_triggered_report_type = 'a5' or "
+               + "../event_triggered_report_type = 'a6'";
+            mandatory true;
+            type uint8 { range "0..15"; }
+        }
+
+        leaf time_to_trigger_ms {
+            description "Time-to-trigger in milliseconds. Restricted to the discrete set accepted by the gNB.";
+            when "../event_triggered_report_type = 'a1' or "
+               + "../event_triggered_report_type = 'a2' or "
+               + "../event_triggered_report_type = 'a3' or "
+               + "../event_triggered_report_type = 'a4' or "
+               + "../event_triggered_report_type = 'a5' or "
+               + "../event_triggered_report_type = 'a6' or "
+               + "../event_triggered_report_type = 'd1' or "
+               + "../event_triggered_report_type = 'd2'";
+            mandatory true;
+            type uint16 {
+                range "0 | 40 | 64 | 80 | 100 | 128 | 160 | 256 | 320 | 480 | 512 | 640 | 1024 | 1280 | 2560 | 5120";
+            }
+        }
+
+        leaf t312 {
+            description "T312 timer in milliseconds. Used only by event-triggered reports.";
+            when "../report_type = 'event_triggered'";
+            type uint16 {
+                range "0 | 50 | 100 | 200 | 300 | 400 | 500 | 1000";
+            }
+        }
+
+        leaf distance_thresh_from_ref1_km {
+            description "D1/D2 distance threshold 1 in kilometres.";
+            when "../event_triggered_report_type = 'd1' or ../event_triggered_report_type = 'd2'";
+            mandatory true;
+            type decimal64 {
+                fraction-digits 2;
+                range "0..3276.75";
+            }
+        }
+
+        leaf distance_thresh_from_ref2_km {
+            description "D1/D2 distance threshold 2 in kilometres.";
+            when "../event_triggered_report_type = 'd1' or ../event_triggered_report_type = 'd2'";
+            mandatory true;
+            type decimal64 {
+                fraction-digits 2;
+                range "0..3276.75";
+            }
+        }
+
+        leaf hysteresis_location_km {
+            description "D1/D2 location hysteresis in kilometres.";
+            when "../event_triggered_report_type = 'd1' or ../event_triggered_report_type = 'd2'";
+            mandatory true;
+            type decimal64 {
+                fraction-digits 2;
+                range "0..327.68";
+            }
+        }
+
+        container ref_location1 {
+            description "D1 reference location for the serving cell.";
+            when "../event_triggered_report_type = 'd1'";
+            uses types3gpp:GeographicalCoordinates;
+        }
+
+        container ref_location2 {
+            description "D1 reference location for the target cell.";
+            when "../event_triggered_report_type = 'd1'";
+            uses types3gpp:GeographicalCoordinates;
+        }
+
+        leaf t1_thres {
+            description "T1 time threshold. Either an RFC 3339 / ISO 8601 timestamp or Unix milliseconds.";
+            when "../event_triggered_report_type = 't1'";
+            mandatory true;
+            type union {
+                type yang:date-and-time;
+                type uint64;
+            }
+        }
+
+        leaf duration_s {
+            description "T1 duration in seconds.";
+            when "../event_triggered_report_type = 't1'";
+            mandatory true;
+            type decimal64 {
+                fraction-digits 1;
+                range "0.1..600.0";
+            }
+        }
+    }
+
+    grouping gnbcucpfunction_mobility_extensions_subtree {
+        container ocudu_gnbcucpfunction_mobility_extensions {
+            description "OCUDU CU-CP mobility extension: pool of report configs and global mobility toggles.";
+
+            leaf trigger_handover_from_measurements {
+                description "If true, CU-CP triggers handover decisions from UE measurement reports.";
+                type boolean;
+                default false;
+            }
+
+            leaf trigger_cho_on_ue_setup {
+                description "If true, CU-CP auto-triggers conditional handover after UE setup when readiness checks pass.";
+                type boolean;
+                default false;
+            }
+
+            leaf cho_timeout_ms {
+                description "Timeout used for auto-triggered CHO and as default timeout for manual CHO commands.";
+                type uint32 { range "1..600000"; }
+                default 10000;
+            }
+
+            list report_configs {
+                description "Pool of RRC measurement report configurations, addressable by report_cfg_id.";
+                key "report_cfg_id";
+                max-elements 64;
+                uses report_config_grp;
+            }
+        }
+    }
+
+    grouping nrcellcu_mobility_extensions_subtree {
+        container ocudu_nrcellcu_mobility_extensions {
+            description "OCUDU per-source-cell mobility configuration.";
+
+            leaf periodic_report_cfg_id {
+                description "Reference to a report config in the CU-CP report_configs pool, used for periodic reporting from this source cell.";
+                type leafref {
+                    path "/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ocudu-gnbcucpfunction-mobility:ocudu_gnbcucpfunction_mobility_extensions/ocudu-gnbcucpfunction-mobility:report_configs/ocudu-gnbcucpfunction-mobility:report_cfg_id";
+                }
+                must "/me3gpp:ManagedElement"
+                   + "/gnbcucp3gpp:GNBCUCPFunction"
+                   + "/ocudu-gnbcucpfunction-mobility:ocudu_gnbcucpfunction_mobility_extensions"
+                   + "/ocudu-gnbcucpfunction-mobility:report_configs[ocudu-gnbcucpfunction-mobility:report_cfg_id = current()]"
+                   + "/ocudu-gnbcucpfunction-mobility:report_type = 'periodical'" {
+                    error-message "periodic_report_cfg_id must reference a report_config with report_type = 'periodical'.";
+                }
+            }
+        }
+    }
+
+    grouping nrcellrelation_mobility_extensions_subtree {
+        container ocudu_nrcellrelation_mobility_extensions {
+            description "OCUDU per-relation mobility configuration.";
+
+            leaf-list report_config_refs {
+                description "References to report configs in the CU-CP report_configs pool that apply to this neighbour relation.";
+                type leafref {
+                    path "/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ocudu-gnbcucpfunction-mobility:ocudu_gnbcucpfunction_mobility_extensions/ocudu-gnbcucpfunction-mobility:report_configs/ocudu-gnbcucpfunction-mobility:report_cfg_id";
+                }
+                must "/me3gpp:ManagedElement"
+                   + "/gnbcucp3gpp:GNBCUCPFunction"
+                   + "/ocudu-gnbcucpfunction-mobility:ocudu_gnbcucpfunction_mobility_extensions"
+                   + "/ocudu-gnbcucpfunction-mobility:report_configs[ocudu-gnbcucpfunction-mobility:report_cfg_id = current()]"
+                   + "/ocudu-gnbcucpfunction-mobility:report_type != 'periodical'" {
+                    error-message "report_config_refs must not reference report_configs with report_type = 'periodical'.";
+                }
+            }
+        }
+    }
+
+    augment /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction {
+        uses gnbcucpfunction_mobility_extensions_subtree;
+    }
+
+    augment /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/nrcellcu3gpp:NRCellCU/nrcellcu3gpp:attributes {
+        uses nrcellcu_mobility_extensions_subtree;
+    }
+
+    augment /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/nrcellcu3gpp:NRCellCU/nrcellrel3gpp:NRCellRelation/nrcellrel3gpp:attributes {
+        uses nrcellrelation_mobility_extensions_subtree;
+    }
+}
