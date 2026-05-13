@@ -262,6 +262,16 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <all_level>warning</all_level>
         </ocudu_log_extensions>
 
+        <ocudu_metrics_extensions>
+          <periodicity>
+            <cu_cp_report_period>1000</cu_cp_report_period>
+          </periodicity>
+          <layers>
+            <enable_rrc>true</enable_rrc>
+            <enable_ngap>true</enable_ngap>
+          </layers>
+        </ocudu_metrics_extensions>
+
         <ocudu_pcap_extensions>
           <ngap>
             <filename>/tmp/cucp_ngap.pcap</filename>
@@ -352,11 +362,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <enable_log>true</enable_log>
         <periodicity>
           <cu_up_report_period>1000</cu_up_report_period>
-          <cu_cp_report_period>1000</cu_cp_report_period>
         </periodicity>
         <layers>
-          <enable_rrc>true</enable_rrc>
-          <enable_ngap>true</enable_ngap>
+          <enable_pdcp>true</enable_pdcp>
+          <enable_e1ap>true</enable_e1ap>
         </layers>
       </ocudu_metrics_extensions>
 
