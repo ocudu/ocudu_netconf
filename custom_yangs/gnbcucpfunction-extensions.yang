@@ -24,7 +24,7 @@ module gnbcucpfunction-extensions {
             description "OCUDU extension of GNBCUCPFunction";
 
             uses ocudu-log:log_extensions_subtree;
-            uses ocudu-metrics:metrics_extensions_subtree;
+            uses ocudu-metrics:metrics_extensions_cucp_subtree;
             uses ocudu-pcap:pcap_extensions_subtree;
         }
     }

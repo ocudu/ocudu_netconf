@@ -9,62 +9,146 @@ module metrics-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-13 {
+        description "Split metrics_extensions_subtree into per-function subtrees
+                     (cucp/cuup/du). Each function only carries the periodicity and
+                     layer keys its CLI11 schema actually registers, so per-function
+                     extension data can no longer hold keys the target app would
+                     reject at startup.";
+    }
     revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
 
+    typedef report_period_ms {
+        type uint32;
+        default 1000;
+        description "Metrics report period, in milliseconds.";
+    }
 
-    grouping metrics_extensions_subtree {
-        description "OCUDU Extension for metrics configuration";
+    grouping metrics_extensions_common_leaves {
+        description "Top-level metrics keys accepted by every ocudu app (cu_cp, cu_up,
+                     cu, du, gnb) via the shared apps/helpers/metrics CLI11 schema.";
+
+        leaf enable_json {
+            description "Enable metrics reporting in JSON format";
+            type boolean;
+        }
+
+        leaf enable_log {
+            description "Enable metrics reporting through log file";
+            type boolean;
+        }
+    }
+
+    grouping metrics_extensions_cucp_subtree {
+        description "OCUDU metrics extensions valid under GNBCUCPFunction. The
+                     periodicity and layer keys here are exactly the ones the cu_cp
+                     unit registers (apps/units/o_cu_cp/cu_cp/cu_cp_unit_config_cli11_schema.cpp).";
 
         container ocudu_metrics_extensions {
 
-            leaf autostart_stdout_metrics {
-                description "Autostart stdout metrics reporting";
-                type boolean;
-            }
-
-            leaf enable_json {
-                description "Enable metrics reporting in JSON format";
-                type boolean;
-            }
-
-            leaf enable_log {
-                description "Enable metrics reporting through log file";
-                type boolean;
-            }
+            uses metrics_extensions_common_leaves;
 
             container periodicity {
-                description "Configure metrics reporting periodicity per component";
-
-                leaf du_report_period {
-                    description "Report period in milliseconds for DU metrics";
-                    type uint32;
-                    default 1000;
-                }
-
-                leaf cu_up_report_period {
-                    description "Report period in milliseconds for CU-UP metrics";
-                    type uint32;
-                    default 1000;
-                }
+                description "Configure metrics reporting periodicity for CU-CP.";
 
                 leaf cu_cp_report_period {
-                    description "Report period in milliseconds for CU-CP metrics";
-                    type uint32;
-                    default 1000;
+                    description "Report period for CU-CP metrics.";
+                    type report_period_ms;
                 }
             }
 
             container layers {
-                description "Enable metrics reporting per layer";
+                description "Enable per-layer metrics reporting for CU-CP layers.";
+
+                leaf enable_pdcp {
+                    description "Enable PDCP layer metrics reporting (CU-CP side)";
+                    type boolean;
+                }
+
+                leaf enable_rrc {
+                    description "Enable RRC layer metrics reporting";
+                    type boolean;
+                }
+
+                leaf enable_ngap {
+                    description "Enable NGAP layer metrics reporting";
+                    type boolean;
+                }
+            }
+        }
+    }
+
+    grouping metrics_extensions_cuup_subtree {
+        description "OCUDU metrics extensions valid under GNBCUUPFunction. The
+                     periodicity and layer keys here are exactly the ones the cu_up
+                     unit registers (apps/units/o_cu_up/cu_up/cu_up_unit_config_cli11_schema.cpp).";
+
+        container ocudu_metrics_extensions {
+
+            uses metrics_extensions_common_leaves;
+
+            container periodicity {
+                description "Configure metrics reporting periodicity for CU-UP.";
+
+                leaf cu_up_report_period {
+                    description "Report period for CU-UP metrics.";
+                    type report_period_ms;
+                }
+            }
+
+            container layers {
+                description "Enable per-layer metrics reporting for CU-UP layers.";
+
+                leaf enable_e1ap {
+                    description "Enable E1AP layer metrics reporting";
+                    type boolean;
+                }
+
+                leaf enable_pdcp {
+                    description "Enable PDCP layer metrics reporting (CU-UP side)";
+                    type boolean;
+                }
+            }
+        }
+    }
+
+    grouping metrics_extensions_du_subtree {
+        description "OCUDU metrics extensions valid under GNBDUFunction. The
+                     periodicity and layer keys here are the ones the du_high and
+                     split-7.2 RU units register, plus autostart_stdout_metrics
+                     which is a du/gnb-app-level option
+                     (apps/du/du_appconfig_cli11_schema.cpp,
+                     apps/gnb/gnb_appconfig_cli11_schema.cpp).";
+
+        container ocudu_metrics_extensions {
+
+            uses metrics_extensions_common_leaves;
+
+            leaf autostart_stdout_metrics {
+                description "Autostart stdout metrics reporting (du/gnb app option)";
+                type boolean;
+            }
+
+            container periodicity {
+                description "Configure metrics reporting periodicity for DU.";
+
+                leaf du_report_period {
+                    description "Report period for DU metrics.";
+                    type report_period_ms;
+                }
+            }
+
+            container layers {
+                description "Enable per-layer metrics reporting for DU layers.";
 
                 leaf enable_ru {
-                    description "Enable RU layer metrics reporting";
+                    description "Enable RU (OFH) layer metrics reporting";
                     type boolean;
                 }
 
                 leaf enable_du_low {
-                    description "Enable DU low metrics reporting";
+                    description "Enable DU low (upper PHY) metrics reporting";
                     type boolean;
                 }
 
@@ -82,32 +166,7 @@ module metrics-extensions {
                     description "Enable RLC layer metrics reporting";
                     type boolean;
                 }
-
-                leaf enable_pdcp {
-                    description "Enable PDCP layer metrics reporting";
-                    type boolean;
-                }
-
-                leaf enable_app_usage {
-                    description "Enable application metrics reporting";
-                    type boolean;
-                }
-
-                leaf enable_e1ap {
-                    description "Enable E1AP layer metrics reporting";
-                    type boolean;
-                }
-
-                leaf enable_rrc {
-                    description "Enable RRC layer metrics reporting";
-                    type boolean;
-                }
-                
-                leaf enable_ngap {
-                    description "Enable NGAP layer metrics reporting";
-                    type boolean;
-                }
             }
-       }
+        }
     }
 }

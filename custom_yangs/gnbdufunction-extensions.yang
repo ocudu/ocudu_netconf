@@ -31,7 +31,7 @@ module gnbdufunction-extensions {
             uses ocudu-gnbdufunction-testmode:testmode_extensions_subtree;
             uses ocudu-log:log_extensions_subtree;
             uses ocudu-hal:hal_extensions_subtree;
-            uses ocudu-metrics:metrics_extensions_subtree;
+            uses ocudu-metrics:metrics_extensions_du_subtree;
             uses ocudu-pcap:pcap_extensions_subtree;
             uses ocudu-remote-control:remote_control_extensions_subtree;
         }          
