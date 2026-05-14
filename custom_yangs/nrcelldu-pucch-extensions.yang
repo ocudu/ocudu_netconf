@@ -1,0 +1,40 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module nrcelldu-pucch-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-nrcelldu-pucch-extension:1.0";
+    prefix "ocudu-nrcelldu-pucch";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-13 { description "Initial version"; }
+
+    grouping pucch_extensions_subtree {
+        description "OCUDU Extension of 3gpp PUCCH config";
+
+        container ocudu_nrcelldu_pucch_extensions {
+            leaf sr_period_ms {
+                description "Scheduling Request period in milliseconds";
+                type decimal64 {
+                    fraction-digits 1;
+                    range "1 | 2 | 2.5 | 4 | 5 | 8 | 10 | 16 | 20 | 40 | 80 | 160 | 320";
+                }
+                default "20.0";
+            }
+
+            leaf min_k1 {
+                description "Minimum K1 value (slots between PDSCH and HARQ-ACK)";
+                type int32 { range 1..4; }
+                default "4";
+            }
+
+            leaf p0_nominal {
+                description "Target power for PUCCH receiver, in dBm. Must be a multiple of 2.";
+                type int32 { range -202..24; }
+                default "-90";
+            }
+        }
+    }
+}

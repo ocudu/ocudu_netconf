@@ -9,6 +9,7 @@ module nrcelldu-pdsch-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-13 { description "Added olla_target_bler and dc_offset leaves"; }
     revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
 
@@ -40,6 +41,16 @@ module nrcelldu-pdsch-extensions {
                 type mcs_table_enum;
                 default qam64;
             }
-        }        
+            leaf olla_target_bler {
+                description "Target BLER for the outer-loop link adaptation algorithm";
+                type decimal64 { fraction-digits 4; range "0..0.5"; }
+                default "0.05";
+            }
+            leaf dc_offset {
+                description "PDSCH DC offset; either 'center', 'undefined' or a subcarrier index";
+                type string;
+                default "center";
+            }
+        }
     }
 }

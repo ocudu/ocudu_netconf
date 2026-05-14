@@ -1,0 +1,57 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module nrcelldu-pusch-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-nrcelldu-pusch-extension:1.0";
+    prefix "ocudu-nrcelldu-pusch";
+
+    import nrcelldu-pdsch-extensions { prefix ocudu-nrcelldu-pdsch; }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-13 { description "Initial version"; }
+
+    grouping pusch_extensions_subtree {
+        description "OCUDU Extension of 3gpp PUSCH config";
+
+        container ocudu_nrcelldu_pusch_extensions {
+            leaf mcs_table {
+                description "MCS table to use for PUSCH";
+                type ocudu-nrcelldu-pdsch:mcs_table_enum;
+                default qam64;
+            }
+
+            leaf olla_target_bler {
+                description "Target BLER for the outer-loop link adaptation algorithm";
+                type decimal64 { fraction-digits 4; range "0..0.5"; }
+                default "0.05";
+            }
+
+            leaf olla_snr_inc_step {
+                description "SNR adjustment step size for the outer-loop link adaptation algorithm";
+                type decimal64 { fraction-digits 4; range "0..1.0"; }
+                default "0.05";
+            }
+
+            leaf olla_max_snr_offset {
+                description "Maximum SNR offset applied by the outer-loop link adaptation algorithm";
+                type int32 { range 1..100; }
+                default "30";
+            }
+
+            leaf p0_nominal_with_grant {
+                description "Target power for PUSCH receiver with grant, in dBm. Must be a multiple of 2.";
+                type int32 { range -202..24; }
+                default "-76";
+            }
+
+            leaf min_k2 {
+                description "Minimum K2 value (slots between UL grant and PUSCH)";
+                type int32 { range 1..4; }
+                default "2";
+            }
+        }
+    }
+}

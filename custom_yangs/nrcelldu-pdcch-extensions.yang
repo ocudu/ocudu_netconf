@@ -1,0 +1,31 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module nrcelldu-pdcch-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-nrcelldu-pdcch-extension:1.0";
+    prefix "ocudu-nrcelldu-pdcch";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-13 { description "Initial version"; }
+
+    grouping pdcch_extensions_subtree {
+        description "OCUDU Extension of 3gpp PDCCH config";
+
+        container ocudu_nrcelldu_pdcch_extensions {
+            container common {
+                description "Common PDCCH search-space configuration";
+
+                leaf ss1_n_candidates {
+                    description "Number of candidates per aggregation level for SS1, in
+                                 the order [AL1, AL2, AL4, AL8, AL16]. Encoded as a
+                                 bracketed YAML inline list, e.g. '[0, 0, 2, 0, 0]'.";
+                    type string;
+                    default "[0, 0, 1, 0, 0]";
+                }
+            }
+        }
+    }
+}

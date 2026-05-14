@@ -1,0 +1,25 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module nrcelldu-csi-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-nrcelldu-csi-extension:1.0";
+    prefix "ocudu-nrcelldu-csi";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-13 { description "Initial version"; }
+
+    grouping csi_extensions_subtree {
+        description "OCUDU Extension of 3gpp CSI config";
+
+        container ocudu_nrcelldu_csi_extensions {
+            leaf csi_rs_period {
+                description "CSI-RS scheduling period in milliseconds";
+                type uint16 { range "10 | 20 | 40 | 80"; }
+                default "40";
+            }
+        }
+    }
+}
