@@ -52,14 +52,14 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
       <PerfMetricJob>
         <id>defaulttrace</id>
         <attributes>
-          <administrativeState>UNLOCKED</administrativeState>
+          <administrativeState>LOCKED</administrativeState>
           <performanceMetrics>DRB.MaxActiveUeDl</performanceMetrics>
           <granularityPeriod>1</granularityPeriod>
           <!--
           <fileReportingPeriod>10</fileReportingPeriod>
           <fileLocation>/tmp/metrics.json</fileLocation>
           -->
-          <streamTarget>http://192.168.2.42:9560/json</streamTarget>
+          <streamTarget>http://ocudu-mock-smo:9560/json</streamTarget>
         </attributes>
       </PerfMetricJob>
 
