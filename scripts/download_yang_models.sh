@@ -93,9 +93,18 @@ if ! wget -q -O "${YANG_MISC_MODEL_DIR}/ietf-system.yang" "${IETF_SYSTEM_YANG_UR
   exit 1
 fi
 
-# Downloading 3GPP YANG models
-if ! git ls-remote --exit-code "${GPP_YANG_URL}" > /dev/null 2>&1; then
-  echo "ERROR: 3GPP YANG repository is not reachable: ${GPP_YANG_URL}" >&2
-  exit 1
-fi
-cd "${YANG_MODEL_DIR}" && git clone --branch "${YANG_REPO_3GPP_TAG}" "${GPP_YANG_URL}"
+# Downloading 3GPP YANG models — forge.3gpp.org penalises first connections from
+# a new source IP with a ~25s TLS handshake that races their HTTP idle timeout; retry covers it
+for attempt in 1 2 3 4 5; do
+  rm -rf "${YANG_MODEL_DIR}/MnS"
+  if (cd "${YANG_MODEL_DIR}" && git clone --branch "${YANG_REPO_3GPP_TAG}" "${GPP_YANG_URL}"); then
+    break
+  fi
+  if [ "${attempt}" -eq 5 ]; then
+    echo "ERROR: 3GPP YANG repository is not reachable after ${attempt} attempts: ${GPP_YANG_URL}" >&2
+    exit 1
+  fi
+  backoff=$((attempt * 10))
+  echo "WARN: 3GPP clone failed (attempt ${attempt}); retrying in ${backoff}s..." >&2
+  sleep "${backoff}"
+done
