@@ -56,3 +56,17 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
     </switching-points>
   </configurable-tdd-patterns>
 </user-plane-configuration>
+
+<!-- NACM for MVP-SEC-O-DU-05. User must not be sysrepo's recovery user ("root") or NACM is bypassed. -->
+<nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm">
+  <enable-nacm>true</enable-nacm>
+  <read-default>permit</read-default>
+  <write-default>deny</write-default>
+  <exec-default>deny</exec-default>
+  <groups>
+    <group>
+      <name>mplane-ro</name>
+      <user-name>mplane</user-name>
+    </group>
+  </groups>
+</nacm>
