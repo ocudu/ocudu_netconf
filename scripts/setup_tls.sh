@@ -6,6 +6,8 @@
 set -euo pipefail
 
 CERT_DIR="${1:-/etc/netconf-tls}"
+# Client cert CN becomes the NETCONF username (cert-to-name). Override to escape sysrepo's NACM-recovery user.
+CLIENT_CN="${CLIENT_CN:-root}"
 
 SERVER_CRT="$CERT_DIR/server.crt"
 SERVER_KEY="$CERT_DIR/server.key"
@@ -33,12 +35,12 @@ if [ ! -e "$CA_CRT" ]; then
         -CA "$CA_CRT" -CAkey "$CERT_DIR/ca.key" -CAcreateserial \
         -out "$SERVER_CRT" -days 30 -sha256 >/dev/null 2>&1
 
-    # Client: generate key + CSR (CN=root, drives the cert-to-name mapping).
+    # Client: generate key + CSR (CN=$CLIENT_CN, drives the cert-to-name mapping).
     # When connecting to the netconf server, the client authenticates as this
     # username — the cert-to-name uses map-type=common-name to derive it.
     openssl req -new -newkey rsa:2048 -nodes \
         -keyout "$CERT_DIR/client.key" -out "$CERT_DIR/client.csr" \
-        -subj "/CN=root" >/dev/null 2>&1
+        -subj "/CN=$CLIENT_CN" >/dev/null 2>&1
         
     # Client: sign the client CSR with the CA.
     openssl x509 -req -in "$CERT_DIR/client.csr" \
