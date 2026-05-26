@@ -297,6 +297,25 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
       </ocudu_log_extensions>
       <ocudu_hal_extensions>
         <eal_args>--lcores (0-1)@(0-11)</eal_args>
+        <bbdev_hwacc>
+          <hwacc_type>acc100</hwacc_type>
+          <id>0</id>
+          <msg_mbuf_size>32768</msg_mbuf_size>
+          <rm_mbuf_size>3000</rm_mbuf_size>
+          <nof_mbuf>1024</nof_mbuf>
+          <pdsch_enc>
+            <nof_hwacc>4</nof_hwacc>
+            <cb_mode>true</cb_mode>
+            <max_buffer_size>65536</max_buffer_size>
+            <dedicated_queue>true</dedicated_queue>
+          </pdsch_enc>
+          <pusch_dec>
+            <nof_hwacc>4</nof_hwacc>
+            <harq_context_size>1048576</harq_context_size>
+            <force_local_harq>false</force_local_harq>
+            <dedicated_queue>true</dedicated_queue>
+          </pusch_dec>
+        </bbdev_hwacc>
       </ocudu_hal_extensions>
 
       <ocudu_remote_control_extensions>
