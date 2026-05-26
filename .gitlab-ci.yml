@@ -34,8 +34,8 @@ variables:
 
 stages:
   - ci
-  - test
   - build
+  - test
   - publish
 
 headers:
@@ -80,6 +80,9 @@ o1 integration tests downstream:
   stage: test
   inherit:
     variables: false
+  needs:
+    - job: netconf image
+      optional: true
   rules:
     # here we can not use the predefined variables ON_MR and ON_MR_TRAIN because
     # inheriting them in the parent pipeline will also pass them to the child pipeline
@@ -107,31 +110,26 @@ o1 integration tests downstream:
 
 .publish:
   stage: publish
-  rules:
-    - if: $CI_PIPELINE_SCHEDULE_DESCRIPTION =~ /Nightly/
   retry: 2
   interruptible: false
 
 netconf image:
+  stage: build
   extends:
     - .docker-builder
     - .publish
+  rules:
+    - if: $ON_MR
   variables: &netconf-image-variables
     # Docker
     REGISTRY_URI: ${CI_REGISTRY_IMAGE}
     CONTEXT: ${CI_PROJECT_DIR}
     MODE: publish
+    OVERWRITE: "false"
+    NAME: "netconf_${SUFFIX}"
+    VERSION: ${CI_COMMIT_SHA}
   tags:
     - saas-linux-medium-${PLATFORM}
-  before_script:
-    # Set variables
-    - |
-      export NAME="netconf_nightly_${SUFFIX}"
-      export VERSION="$(git show -s --date=format:%Y%m%d --format=%cd ${CI_COMMIT_SHA})_${CI_COMMIT_SHORT_SHA}"
-      echo "CI_SHARED_NETCONF_IMAGE_VERSION=${VERSION}" >> variables.env
-  artifacts:
-    reports:
-      dotenv: variables.env
   parallel: &matrix-netconf-image-variants
     matrix:
       # AMD
@@ -150,17 +148,36 @@ netconf image update latest:
   extends:
     - .docker manifest
     - .publish
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   variables:
     <<: *netconf-image-variables
-
   script:
     - |
-      export NAME="netconf_nightly_${SUFFIX}"
-      export VERSION="${CI_SHARED_NETCONF_IMAGE_VERSION}"
-      docker manifest create ${REGISTRY_URI}/${NAME}:latest --amend ${REGISTRY_URI}/${NAME}:${VERSION}
+      export NAME="netconf_${SUFFIX}"
+      docker manifest create ${REGISTRY_URI}/${NAME}:latest --amend ${REGISTRY_URI}/${NAME}:${CI_COMMIT_SHA}
       docker manifest push ${REGISTRY_URI}/${NAME}:latest
-      echo "Image ${RETINA_REGISTRY_URI}/${NAME}:latest pushed"
+      echo "Image ${REGISTRY_URI}/${NAME}:latest pushed"
   parallel: *matrix-netconf-image-variants
-  needs:
-    - job: netconf image
-      artifacts: true
+
+netconf image update nightly:
+  extends:
+    - .docker manifest
+    - .publish
+  rules:
+    - if: $CI_PIPELINE_SCHEDULE_DESCRIPTION =~ /Nightly/
+  variables:
+    <<: *netconf-image-variables
+    GIT_STRATEGY: fetch
+  script:
+    - |
+      export NAME="netconf_${SUFFIX}"
+      export NIGHTLY_VERSION="$(git show -s --date=format:%Y%m%d --format=%cd ${CI_COMMIT_SHA})_${CI_COMMIT_SHORT_SHA}"
+      # _nightly:<date>_<commit> tagged manifest
+      docker manifest create ${REGISTRY_URI}/netconf_nightly_${SUFFIX}:${NIGHTLY_VERSION} --amend ${REGISTRY_URI}/${NAME}:${CI_COMMIT_SHA}
+      docker manifest push ${REGISTRY_URI}/netconf_nightly_${SUFFIX}:${NIGHTLY_VERSION}
+      # _nightly:latest tagged manifest
+      docker manifest create ${REGISTRY_URI}/netconf_nightly_${SUFFIX}:latest --amend ${REGISTRY_URI}/${NAME}:${CI_COMMIT_SHA}
+      docker manifest push ${REGISTRY_URI}/netconf_nightly_${SUFFIX}:latest
+      echo "Images ${REGISTRY_URI}/netconf_nightly_${SUFFIX}:${NIGHTLY_VERSION} and ${REGISTRY_URI}/netconf_nightly_${SUFFIX}:latest pushed"
+  parallel: *matrix-netconf-image-variants
