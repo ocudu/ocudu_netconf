@@ -117,6 +117,11 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <enable>false</enable>
         </f1u>
       </ocudu_pcap_extensions>
+
+      <ocudu_remote_control_extensions>
+        <enabled>true</enabled>
+        <bind_addr>0.0.0.0</bind_addr>
+      </ocudu_remote_control_extensions>
     </ocudu_gnbcuupfunction_extensions>
   </GNBCUUPFunction>
 </ManagedElement>
