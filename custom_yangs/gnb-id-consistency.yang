@@ -1,0 +1,54 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module gnb-id-consistency {
+    yang-version 1.1;
+    namespace "urn:ocudu-gnb-id-consistency:1.0";
+    prefix "ocudu-gnb-id-consistency";
+
+    import _3gpp-common-managed-element { prefix me3gpp; }
+    import _3gpp-nr-nrm-gnbcucpfunction { prefix gnbcucp3gpp; }
+    import _3gpp-nr-nrm-gnbcuupfunction { prefix gnbcuup3gpp; }
+    import _3gpp-nr-nrm-gnbdufunction   { prefix gnbdu3gpp; }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-28 { description "Initial version"; }
+
+    deviation "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/gnbdu3gpp:attributes/gnbdu3gpp:gNBId" {
+        deviate add {
+            must "not(/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction) "
+               + "or current() = /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/gnbcucp3gpp:attributes/gnbcucp3gpp:gNBId" {
+                error-message "GNBDUFunction/attributes/gNBId must equal GNBCUCPFunction/attributes/gNBId.";
+            }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/gnbdu3gpp:attributes/gnbdu3gpp:gNBIdLength" {
+        deviate add {
+            must "not(/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction) "
+               + "or current() = /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/gnbcucp3gpp:attributes/gnbcucp3gpp:gNBIdLength" {
+                error-message "GNBDUFunction/attributes/gNBIdLength must equal GNBCUCPFunction/attributes/gNBIdLength.";
+            }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/gnbcuup3gpp:GNBCUUPFunction/gnbcuup3gpp:attributes/gnbcuup3gpp:gNBId" {
+        deviate add {
+            must "not(/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction) "
+               + "or current() = /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/gnbcucp3gpp:attributes/gnbcucp3gpp:gNBId" {
+                error-message "GNBCUUPFunction/attributes/gNBId must equal GNBCUCPFunction/attributes/gNBId.";
+            }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/gnbcuup3gpp:GNBCUUPFunction/gnbcuup3gpp:attributes/gnbcuup3gpp:gNBIdLength" {
+        deviate add {
+            must "not(/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction) "
+               + "or current() = /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/gnbcucp3gpp:attributes/gnbcucp3gpp:gNBIdLength" {
+                error-message "GNBCUUPFunction/attributes/gNBIdLength must equal GNBCUCPFunction/attributes/gNBIdLength.";
+            }
+        }
+    }
+}
