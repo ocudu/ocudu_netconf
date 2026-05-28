@@ -12,10 +12,12 @@ module gnbcuupfunction-extensions {
     import log-extensions { prefix ocudu-log; }
     import metrics-extensions { prefix ocudu-metrics; }
     import pcap-extensions { prefix ocudu-pcap; }
+    import remote-control-extensions { prefix ocudu-remote-control; }
 
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-28 { description "Add remote-control-extensions subtree"; }
     revision 2026-04-30 { description "Initial version"; }
 
     grouping gnbcuupfunction_extensions_subtree {
@@ -26,6 +28,7 @@ module gnbcuupfunction-extensions {
             uses ocudu-log:log_extensions_subtree;
             uses ocudu-metrics:metrics_extensions_cuup_subtree;
             uses ocudu-pcap:pcap_extensions_subtree;
+            uses ocudu-remote-control:remote_control_extensions_subtree;
         }
     }
 
