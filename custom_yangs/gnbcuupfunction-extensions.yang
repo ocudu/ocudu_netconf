@@ -17,6 +17,7 @@ module gnbcuupfunction-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-29 { description "Make gNBCUUPId config true so it can be set via NETCONF <edit-config>"; }
     revision 2026-05-28 { description "Add remote-control-extensions subtree"; }
     revision 2026-04-30 { description "Initial version"; }
 
@@ -34,5 +35,12 @@ module gnbcuupfunction-extensions {
 
     augment /me3gpp:ManagedElement/gnbcuup3gpp:GNBCUUPFunction {
         uses gnbcuupfunction_extensions_subtree;
+    }
+
+    deviation /me3gpp:ManagedElement/gnbcuup3gpp:GNBCUUPFunction/gnbcuup3gpp:attributes/gnbcuup3gpp:gNBCUUPId {
+        deviate replace { config true; }
+        description "3GPP marks gNBCUUPId as 'config false' (operational state), but OCUDU
+                     provisions the CU-UP ID via NETCONF <edit-config> so it must be writable
+                     in the running datastore.";
     }
 }
