@@ -5,10 +5,15 @@ module nrcelldu-prach-extensions {
     yang-version 1.1;
     namespace "urn:ocudu-nrcelldu-prach-extension:1.0";
     prefix "ocudu-nrcelldu-prach";
-    
+
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-05-28 { description "Add zero_correlation_zone, fixed_msg3_mcs, max_msg3_harq_retx,
+                                       total_nof_ra_preambles, cfra_enabled, prach_frequency_start,
+                                       preamble_rx_target_pw, preamble_trans_max, power_ramping_step_db,
+                                       ports, nof_ssb_per_ro, nof_cb_preambles_per_ssb, ra_resp_window,
+                                       nof_prach_guardbands_rbs leaves."; }
     revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
 
@@ -17,19 +22,104 @@ module nrcelldu-prach-extensions {
 
         container ocudu_nrcelldu_prach_extensions {
             leaf prach_config_index {
-                type int32 { range 0..255; }
                 description "PRACH configuration index. If not set, the value is derived, so that the PRACH fits in an UL slot.";
+                type int32 { range 0..255; }
             }
 
             leaf prach_root_sequence_index {
                 description "PRACH root sequence index, see TS 38.211, clause 6.3.3.1.";
-                type prach_root_seq_index_value;
+                type int32 { range 0..837; }
                 default "1";
             }
-        }        
-    }
 
-    typedef prach_root_seq_index_value {
-        type int32 { range 1..839; }
+            leaf zero_correlation_zone {
+                description "PRACH zero correlation zone configuration (NCS), see TS 38.211, clause 6.3.3.1.";
+                type uint8 { range 0..15; }
+                default "0";
+            }
+
+            leaf fixed_msg3_mcs {
+                description "Fixed message 3 MCS.";
+                type uint8 { range 0..28; }
+                default "0";
+            }
+
+            leaf max_msg3_harq_retx {
+                description "Maximum number of message 3 HARQ retransmissions.";
+                type uint8 { range 0..4; }
+                default "4";
+            }
+
+            leaf total_nof_ra_preambles {
+                description "Number of different contention-based PRACH preambles per occasion. If less than 64
+                             preambles are used, the remaining preambles can be used for contention-free PRACHs.";
+                type uint8 { range 1..64; }
+                default "64";
+            }
+
+            leaf cfra_enabled {
+                description "Whether to enable Contention-free Random Access (CFRA). If enabled,
+                             total_nof_ra_preambles must be lower than 64.";
+                type boolean;
+                default "false";
+            }
+
+            leaf prach_frequency_start {
+                description "PRACH message frequency offset in PRBs. Optional; OCUDU derives a default when not set.";
+                type uint16 { range 0..274; }
+            }
+
+            leaf preamble_rx_target_pw {
+                description "Target power level at the network receiver side, in dBm. Must be a multiple of 2.";
+                type int16 { range -202..-60; }
+                must "current() mod 2 = 0" {
+                    error-message "preamble_rx_target_pw must be a multiple of 2.";
+                }
+                default "-100";
+            }
+
+            leaf preamble_trans_max {
+                description "Max number of RA preamble transmissions performed before declaring a failure.";
+                type uint8 { range "3..8 | 10 | 20 | 50 | 100 | 200"; }
+                default "7";
+            }
+
+            leaf power_ramping_step_db {
+                description "Power ramping steps for PRACH, in dB.";
+                type uint8 { range "0 | 2 | 4 | 6"; }
+                default "4";
+            }
+
+            leaf-list ports {
+                description "List of antenna ports used for PRACH reception.";
+                type uint8;
+                default "0";
+            }
+
+            leaf nof_ssb_per_ro {
+                description "Number of SSBs per RACH occasion (L1 parameter 'SSB-per-rach-occasion').
+                             OCUDU currently supports only the value 1.";
+                type uint8 { range "1"; }
+                default "1";
+            }
+
+            leaf nof_cb_preambles_per_ssb {
+                description "Number of Contention Based preambles per SSB. Valid range depends on nof_ssb_per_ro.";
+                type uint8 { range 1..64; }
+                default "64";
+            }
+
+            leaf ra_resp_window {
+                description "RA-Response (MSG2) window length in number of slots.";
+                type uint8 { range "1 | 2 | 4 | 8 | 10 | 20 | 40 | 80"; }
+                default "10";
+            }
+
+            leaf nof_prach_guardbands_rbs {
+                description "Number of RBs used as guardband on each side of the PRACH RBs interval for short PRACH formats.";
+                type uint8 { range 1..10; }
+                default "3";
+            }
+        }
     }
 }
