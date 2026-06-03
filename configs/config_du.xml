@@ -458,6 +458,13 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <pdsch_active>true</pdsch_active>
         <pusch_active>true</pusch_active>
       </ocudu_gnbdufunction_testmode_extensions>
+      <ocudu_expert_phy_extensions>
+        <max_proc_delay>5</max_proc_delay>
+        <pusch_dec_max_iterations>4</pusch_dec_max_iterations>
+        <pusch_channel_estimator_td_strategy>interpolate</pusch_channel_estimator_td_strategy>
+        <pusch_channel_estimator_cfo_compensation>false</pusch_channel_estimator_cfo_compensation>
+        <pusch_channel_equalizer_algorithm>mmse</pusch_channel_equalizer_algorithm>
+      </ocudu_expert_phy_extensions>
       <ocudu_log_extensions>
         <filename>/tmp/du.log</filename>
         <all_level>warning</all_level>
