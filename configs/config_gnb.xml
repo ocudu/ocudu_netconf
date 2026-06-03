@@ -528,6 +528,32 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
             </ocudu_nrcelldu_prach_extensions>
             <ocudu_nrcelldu_pdsch_extensions>
               <mcs_table>qam64</mcs_table>
+              <min_ue_mcs>0</min_ue_mcs>
+              <max_ue_mcs>28</max_ue_mcs>
+              <fixed_rar_mcs>0</fixed_rar_mcs>
+              <fixed_sib1_mcs>5</fixed_sib1_mcs>
+              <nof_harqs>16</nof_harqs>
+              <harq_feedback_disabled>false</harq_feedback_disabled>
+              <max_nof_harq_retxs>4</max_nof_harq_retxs>
+              <harq_retx_timeout>100</harq_retx_timeout>
+              <max_consecutive_kos>100</max_consecutive_kos>
+              <rv_sequence>0</rv_sequence>
+              <rv_sequence>2</rv_sequence>
+              <rv_sequence>3</rv_sequence>
+              <rv_sequence>1</rv_sequence>
+              <min_rb_size>1</min_rb_size>
+              <max_rb_size>275</max_rb_size>
+              <start_rb>0</start_rb>
+              <end_rb>275</end_rb>
+              <max_pdschs_per_slot>35</max_pdschs_per_slot>
+              <max_alloc_attempts>35</max_alloc_attempts>
+              <olla_cqi_inc_step>0.001</olla_cqi_inc_step>
+              <olla_max_cqi_offset>4.0</olla_max_cqi_offset>
+              <harq_la_cqi_drop_threshold>3</harq_la_cqi_drop_threshold>
+              <harq_la_ri_drop_threshold>1</harq_la_ri_drop_threshold>
+              <dmrs_additional_position>2</dmrs_additional_position>
+              <interleaving_bundle_size>0</interleaving_bundle_size>
+              <enable_csi_rs_pdsch_multiplexing>true</enable_csi_rs_pdsch_multiplexing>
             </ocudu_nrcelldu_pdsch_extensions>
             <ocudu_nrcelldu_pucch_extensions>
               <sr_period_ms>20</sr_period_ms>
