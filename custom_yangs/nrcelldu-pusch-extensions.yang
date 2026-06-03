@@ -11,6 +11,11 @@ module nrcelldu-pusch-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Added MCS limits, HARQ config, rv_sequence, max_rank, msg3 delta
+                                       preamble/power, max_puschs_per_slot, UCI-on-PUSCH beta offsets, dc_offset,
+                                       DMRS additional position, RB allocation bounds, closed-loop power control
+                                       (target SINR / ref path-loss / PL compensation factor), PHR BW adaptation
+                                       transform precoding, nof_harqs, harq_mode_b and ema_alpha_cl_pw_control_sinr."; }
     revision 2026-05-13 { description "Initial version"; }
 
     grouping pusch_extensions_subtree {
@@ -51,6 +56,178 @@ module nrcelldu-pusch-extensions {
                 description "Minimum K2 value (slots between UL grant and PUSCH)";
                 type int32 { range 1..4; }
                 default "2";
+            }
+            leaf min_ue_mcs {
+                description "Minimum PUSCH MCS for C-RNTI allocations. Set equal to max_ue_mcs for a fixed MCS.";
+                type uint8 { range "0..28"; }
+                default 0;
+            }
+            leaf max_ue_mcs {
+                description "Maximum PUSCH MCS for C-RNTI allocations.";
+                type uint8 { range "0..28"; }
+                default 28;
+            }
+            leaf nof_harqs {
+                description "Number of UL HARQ processes. Value 32 applies only to NTN cells when supported by the UE.";
+                type uint8 { range "16 | 32"; }
+                default 16;
+            }
+            leaf harq_mode_b {
+                description "UL HARQ mode B mask for NTN cells (uplinkHARQ-mode, TS 38.331). Use 'true'/'false' to
+                             enable/disable mode B for all but the first four HARQ processes, or a 32-bit bitmap
+                             ('0x...'/'0b...') selecting which processes use mode B (leftmost bit = HARQ process 0).";
+                type string;
+                default "false";
+            }
+            leaf max_nof_harq_retxs {
+                description "Maximum number of UL HARQ retransmissions before the process is discarded.";
+                type uint8 { range "0..64"; }
+                default 4;
+            }
+            leaf harq_retx_timeout {
+                description "Maximum time in milliseconds between a CRC=KO and the scheduler allocating the HARQ for
+                             retransmission. If exceeded, the HARQ process is discarded.";
+                type uint16 { range "10..500"; }
+                default 100;
+            }
+            leaf max_consecutive_kos {
+                description "Maximum number of consecutive CRC KOs before a Radio Link Failure is reported.";
+                type uint32;
+                default 100;
+            }
+            leaf-list rv_sequence {
+                description "Redundancy version sequence used for PUSCH. First entry is used for the initial
+                             transmission, subsequent entries for retransmissions.";
+                ordered-by user;
+                type uint8 { range "0..3"; }
+                max-elements 4;
+                default 0;
+            }
+            leaf max_rank {
+                description "Maximum number of PUSCH transmission layers. The actual maximum is limited by the
+                             number of receive ports and UE capabilities.";
+                type uint8 { range "1..4"; }
+                default 4;
+            }
+            leaf msg3_delta_preamble {
+                description "msg3-DeltaPreamble (TS 38.331): power offset between msg3 and the RACH preamble.";
+                type int8 { range "-1..6"; }
+                default 6;
+            }
+            leaf msg3_delta_power {
+                description "Power level corresponding to the MSG3 TPC command in dB (TS 38.213, Table 8.2-2).
+                             Must be a multiple of 2.";
+                type int8 { range "-6..8"; }
+                must "current() mod 2 = 0" {
+                    error-message "msg3_delta_power must be a multiple of 2.";
+                }
+                default 8;
+            }
+            leaf max_puschs_per_slot {
+                description "Maximum number of PUSCH grants per slot.";
+                type uint8 { range "1..16"; }
+                default 16;
+            }
+            leaf beta_offset_ack_idx_1 {
+                description "betaOffsetACK-Index1 part of UCI-OnPUSCH.";
+                type uint8 { range "0..31"; }
+                default 11;
+            }
+            leaf beta_offset_ack_idx_2 {
+                description "betaOffsetACK-Index2 part of UCI-OnPUSCH.";
+                type uint8 { range "0..31"; }
+                default 6;
+            }
+            leaf beta_offset_ack_idx_3 {
+                description "betaOffsetACK-Index3 part of UCI-OnPUSCH.";
+                type uint8 { range "0..31"; }
+                default 4;
+            }
+            leaf beta_offset_csi_p1_idx_1 {
+                description "betaOffsetCSI-Part1-Index1 part of UCI-OnPUSCH.";
+                type uint8 { range "0..31"; }
+                default 13;
+            }
+            leaf beta_offset_csi_p1_idx_2 {
+                description "betaOffsetCSI-Part1-Index2 part of UCI-OnPUSCH.";
+                type uint8 { range "0..31"; }
+                default 10;
+            }
+            leaf beta_offset_csi_p2_idx_1 {
+                description "betaOffsetCSI-Part2-Index1 part of UCI-OnPUSCH.";
+                type uint8 { range "0..31"; }
+                default 13;
+            }
+            leaf beta_offset_csi_p2_idx_2 {
+                description "betaOffsetCSI-Part2-Index2 part of UCI-OnPUSCH.";
+                type uint8 { range "0..31"; }
+                default 10;
+            }
+            leaf dc_offset {
+                description "PUSCH DC offset; either 'center', 'outside', 'undetermined' or a subcarrier index.";
+                type string;
+                default "center";
+            }
+            leaf dmrs_additional_position {
+                description "PUSCH additional DM-RS position, see TS 38.211 clause 6.4.1.1.3.";
+                type uint8 { range "0..3"; }
+                default 2;
+            }
+            leaf min_rb_size {
+                description "Minimum number of RBs for UE PUSCH resource allocation.";
+                type uint16 { range "1..275"; }
+                default 1;
+            }
+            leaf max_rb_size {
+                description "Maximum number of RBs for UE PUSCH resource allocation.";
+                type uint16 { range "1..275"; }
+                default 275;
+            }
+            leaf start_rb {
+                description "Start RB for UE PUSCH resource allocation.";
+                type uint16 { range "0..275"; }
+                default 0;
+            }
+            leaf end_rb {
+                description "End RB for UE PUSCH resource allocation.";
+                type uint16 { range "0..275"; }
+                default 275;
+            }
+            leaf enable_cl_loop_pw_control {
+                description "Enable closed-loop power control for PUSCH.";
+                type boolean;
+                default false;
+            }
+            leaf enable_phr_bw_adaptation {
+                description "Enable bandwidth adaptation to prevent a negative PHR.";
+                type boolean;
+                default false;
+            }
+            leaf target_sinr {
+                description "Target PUSCH SINR in dB. Only relevant when enable_cl_loop_pw_control is true.";
+                type decimal64 { fraction-digits 1; range "-5.0..30.0"; }
+                default "10.0";
+            }
+            leaf ref_path_loss {
+                description "Reference path-loss in dB at which the target PUSCH SINR is expected to be achieved.";
+                type decimal64 { fraction-digits 1; range "50.0..120.0"; }
+                default "70.0";
+            }
+            leaf pl_compensation_factor {
+                description "Fractional path-loss compensation factor (alpha) for PUSCH power control.";
+                type decimal64 { fraction-digits 1; range "0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 1.0"; }
+                default "1.0";
+            }
+            leaf ema_alpha_cl_pw_control_sinr {
+                description "Smoothing factor (alpha) for the EMA filter of the PUSCH closed-loop power-control SINR.
+                             Must be in the open interval (0, 1).";
+                type decimal64 { fraction-digits 2; range "0.01..0.99"; }
+                default "0.5";
+            }
+            leaf enable_transform_precoding {
+                description "Enable transform precoding for PUSCH.";
+                type boolean;
+                default false;
             }
         }
     }
