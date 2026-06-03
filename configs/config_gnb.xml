@@ -450,7 +450,6 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <iq_scaling>5.0</iq_scaling>
             </ocudu_nrcelldu_ofh_extensions>
             <ocudu_nrcelldu_base_extensions>
-              <band>78</band>
               <nof_antennas_dl>2</nof_antennas_dl>
               <nof_antennas_ul>2</nof_antennas_ul>
               <common_scs>KHZ_30</common_scs>
