@@ -641,6 +641,46 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <pwr_ctrl_offset>0</pwr_ctrl_offset>
               <report_type>periodic</report_type>
             </ocudu_nrcelldu_csi_extensions>
+            <ocudu_nrcelldu_pusch_extensions>
+              <mcs_table>qam256</mcs_table>
+              <olla_target_bler>0.05</olla_target_bler>
+              <olla_snr_inc_step>0.05</olla_snr_inc_step>
+              <olla_max_snr_offset>30</olla_max_snr_offset>
+              <p0_nominal_with_grant>-76</p0_nominal_with_grant>
+              <min_k2>2</min_k2>
+              <min_ue_mcs>0</min_ue_mcs>
+              <max_ue_mcs>28</max_ue_mcs>
+              <nof_harqs>16</nof_harqs>
+              <harq_mode_b>false</harq_mode_b>
+              <max_nof_harq_retxs>4</max_nof_harq_retxs>
+              <harq_retx_timeout>100</harq_retx_timeout>
+              <max_consecutive_kos>100</max_consecutive_kos>
+              <rv_sequence>0</rv_sequence>
+              <max_rank>4</max_rank>
+              <msg3_delta_preamble>6</msg3_delta_preamble>
+              <msg3_delta_power>8</msg3_delta_power>
+              <max_puschs_per_slot>16</max_puschs_per_slot>
+              <beta_offset_ack_idx_1>11</beta_offset_ack_idx_1>
+              <beta_offset_ack_idx_2>6</beta_offset_ack_idx_2>
+              <beta_offset_ack_idx_3>4</beta_offset_ack_idx_3>
+              <beta_offset_csi_p1_idx_1>13</beta_offset_csi_p1_idx_1>
+              <beta_offset_csi_p1_idx_2>10</beta_offset_csi_p1_idx_2>
+              <beta_offset_csi_p2_idx_1>13</beta_offset_csi_p2_idx_1>
+              <beta_offset_csi_p2_idx_2>10</beta_offset_csi_p2_idx_2>
+              <dc_offset>center</dc_offset>
+              <dmrs_additional_position>2</dmrs_additional_position>
+              <min_rb_size>1</min_rb_size>
+              <max_rb_size>275</max_rb_size>
+              <start_rb>0</start_rb>
+              <end_rb>275</end_rb>
+              <enable_cl_loop_pw_control>false</enable_cl_loop_pw_control>
+              <enable_phr_bw_adaptation>false</enable_phr_bw_adaptation>
+              <target_sinr>10.0</target_sinr>
+              <ref_path_loss>70.0</ref_path_loss>
+              <pl_compensation_factor>1.0</pl_compensation_factor>
+              <ema_alpha_cl_pw_control_sinr>0.5</ema_alpha_cl_pw_control_sinr>
+              <enable_transform_precoding>false</enable_transform_precoding>
+            </ocudu_nrcelldu_pusch_extensions>
           </ocudu_nrcelldu_extensions>
       </attributes>
     </NRCellDU>
