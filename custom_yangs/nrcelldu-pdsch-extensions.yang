@@ -9,6 +9,10 @@ module nrcelldu-pdsch-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Added MCS limits, HARQ config, rv_sequence, RB allocation bounds, per-slot/alloc
+                                       limits, OLLA increment/max-offset, HARQ LA drop thresholds, DMRS additional
+                                       position, interleaving bundle size, harq_feedback_disabled, max_rank and
+                                       enable_csi_rs_pdsch_multiplexing."; }
     revision 2026-05-13 { description "Added olla_target_bler and dc_offset leaves"; }
     revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
@@ -50,6 +54,140 @@ module nrcelldu-pdsch-extensions {
                 description "PDSCH DC offset; either 'center', 'undefined' or a subcarrier index";
                 type string;
                 default "center";
+            }
+            leaf min_ue_mcs {
+                description "Minimum PDSCH MCS for C-RNTI allocations. Set equal to max_ue_mcs for a fixed MCS.";
+                type uint8 { range "0..28"; }
+                default 0;
+            }
+            leaf max_ue_mcs {
+                description "Maximum PDSCH MCS for C-RNTI allocations.";
+                type uint8 { range "0..28"; }
+                default 28;
+            }
+            leaf fixed_rar_mcs {
+                description "Fixed MCS used for RAR PDSCH.";
+                type uint8 { range "0..28"; }
+                default 0;
+            }
+            leaf fixed_sib1_mcs {
+                description "Fixed MCS used for SIB1 PDSCH.";
+                type uint8 { range "0..28"; }
+                default 5;
+            }
+            leaf nof_harqs {
+                description "Number of DL HARQ processes. Value 32 applies only to NTN cells when supported by the UE.";
+                type uint8 { range "2 | 4 | 6 | 8 | 10 | 12 | 16 | 32"; }
+                default 16;
+            }
+            leaf harq_feedback_disabled {
+                description "Disable DL HARQ feedback for specific HARQ processes in an NTN cell
+                             (downlinkHARQ-FeedbackDisabled, TS 38.331). Use 'true'/'false' to disable/enable for all
+                             but the first four HARQ processes, or a 32-bit bitmap ('0x...'/'0b...') selecting the
+                             processes with feedback disabled (leftmost bit = HARQ process 0).";
+                type string;
+                default "false";
+            }
+            leaf max_nof_harq_retxs {
+                description "Maximum number of DL HARQ retransmissions before the process is discarded.";
+                type uint8 { range "0..64"; }
+                default 4;
+            }
+            leaf harq_retx_timeout {
+                description "Maximum time in milliseconds between a HARQ NACK and the scheduler allocating the HARQ for
+                             retransmission. If exceeded, the HARQ process is discarded.";
+                type uint16 { range "10..500"; }
+                default 100;
+            }
+            leaf max_consecutive_kos {
+                description "Maximum number of consecutive HARQ-ACK KOs before a Radio Link Failure is reported.";
+                type uint32;
+                default 100;
+            }
+            leaf-list rv_sequence {
+                description "Redundancy version sequence used for PDSCH. First entry is used for the initial
+                             transmission, subsequent entries for retransmissions.";
+                ordered-by user;
+                type uint8 { range "0..3"; }
+                max-elements 4;
+                default 0;
+                default 2;
+                default 3;
+                default 1;
+            }
+            leaf min_rb_size {
+                description "Minimum number of RBs for UE PDSCH resource allocation.";
+                type uint16 { range "1..275"; }
+                default 1;
+            }
+            leaf max_rb_size {
+                description "Maximum number of RBs for UE PDSCH resource allocation.";
+                type uint16 { range "1..275"; }
+                default 275;
+            }
+            leaf start_rb {
+                description "Start RB for UE PDSCH resource allocation.";
+                type uint16 { range "0..275"; }
+                default 0;
+            }
+            leaf end_rb {
+                description "End RB for UE PDSCH resource allocation.";
+                type uint16 { range "0..275"; }
+                default 275;
+            }
+            leaf max_pdschs_per_slot {
+                description "Maximum number of PDSCH grants per slot, including SIB, RAR, Paging and UE data grants.";
+                type uint8 { range "1..35"; }
+                default 35;
+            }
+            leaf max_alloc_attempts {
+                description "Maximum number of DL/UL PDCCH grant allocation attempts per slot before the scheduler
+                             skips the slot.";
+                type uint8 { range "1..35"; }
+                default 35;
+            }
+            leaf olla_cqi_inc_step {
+                description "OLLA CQI offset increment. A value of 0 disables OLLA.";
+                type decimal64 { fraction-digits 4; range "0..1.0"; }
+                default "0.001";
+            }
+            leaf olla_max_cqi_offset {
+                description "Maximum CQI offset the OLLA algorithm may apply to the reported CQI. Must be positive.";
+                type decimal64 { fraction-digits 2; range "0.01..max"; }
+                default "4.0";
+            }
+            leaf harq_la_cqi_drop_threshold {
+                description "Threshold for the drop in CQI of the first HARQ transmission above which HARQ
+                             retransmissions are cancelled. 0 disables the feature.";
+                type uint8 { range "0..15"; }
+                default 3;
+            }
+            leaf harq_la_ri_drop_threshold {
+                description "Threshold for the drop in number of layers of the first HARQ transmission above which HARQ
+                             retransmission is cancelled. 0 disables the feature.";
+                type uint8 { range "0..4"; }
+                default 1;
+            }
+            leaf dmrs_additional_position {
+                description "PDSCH additional DM-RS position, see TS 38.211 Tables 7.4.1.1.2-3/4.";
+                type uint8 { range "0..3"; }
+                default 2;
+            }
+            leaf interleaving_bundle_size {
+                description "VRB-to-PRB interleaving bundle size for PDSCH on dedicated search spaces.
+                             0 disables interleaving.";
+                type uint8 { range "0 | 2 | 4"; }
+                default 0;
+            }
+            leaf max_rank {
+                description "Maximum number of PDSCH transmission layers. If unset, the maximum is limited by the
+                             number of DL antennas.";
+                type uint8;
+            }
+            leaf enable_csi_rs_pdsch_multiplexing {
+                description "Enable multiplexing of CSI-RS and PDSCH.";
+                type boolean;
+                default true;
             }
         }
     }
