@@ -1,0 +1,167 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module expert-phy-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-expert-phy-extension:1.0";
+    prefix "ocudu-expert-phy";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Initial version"; }
+
+
+    typedef pusch_sinr_calc_method {
+        type enumeration {
+            enum channel_estimator {
+                value 0;
+                description "SINR is calculated by the channel estimator using the DM-RS";
+            }
+            enum post_equalization {
+                value 1;
+                description "SINR is calculated using the post-equalization noise variances of the equalized RE";
+            }
+            enum evm {
+                value 2;
+                description "SINR is obtained from the EVM of the PUSCH symbols";
+            }
+        }
+        description "PUSCH SINR calculation method";
+    }
+
+    typedef pusch_channel_estimator_fd_strategy {
+        type enumeration {
+            enum filter {
+                value 0;
+                description "Apply a low pass filter to the channel estimates";
+            }
+            enum mean {
+                value 1;
+                description "Average the channel estimates";
+            }
+            enum none {
+                value 2;
+                description "Do not apply any smoothing strategy";
+            }
+        }
+        description "PUSCH channel estimator frequency-domain smoothing strategy";
+    }
+
+    typedef pusch_channel_estimator_td_strategy {
+        type enumeration {
+            enum average {
+                value 0;
+                description "Average the DM-RS in time domain";
+            }
+            enum interpolate {
+                value 1;
+                description "Perform linear interpolation between the OFDM symbols containing DM-RS";
+            }
+        }
+        description "PUSCH channel estimator time-domain interpolation strategy";
+    }
+
+    typedef pusch_channel_equalizer_algorithm {
+        type enumeration {
+            enum zf {
+                value 0;
+                description "Zero-forcing algorithm";
+            }
+            enum mmse {
+                value 1;
+                description "Minimum mean square error algorithm";
+            }
+        }
+        description "PUSCH channel equalizer algorithm";
+    }
+
+    grouping expert_phy_extensions_subtree {
+        description "OCUDU Extension for the expert upper physical layer configuration";
+
+        container ocudu_expert_phy_extensions {
+
+            leaf max_proc_delay {
+                description "Maximum allowed downlink processing delay in slots. Higher values increase the
+                             downlink processing pipeline length, improving performance and stability for
+                             demanding cell configurations at the cost of higher radio link round-trip latency.";
+                type uint32 { range "1..30"; }
+                default "5";
+            }
+
+            leaf pusch_dec_max_iterations {
+                description "Maximum number of PUSCH LDPC decoder iterations.";
+                type uint32 { range "1..max"; }
+                default "6";
+            }
+
+            leaf pusch_dec_enable_early_stop {
+                description "Enable the PUSCH LDPC decoder early stop.";
+                type boolean;
+                default true;
+            }
+
+            leaf pusch_decoder_force_decoding {
+                description "Force the PUSCH LDPC decoder to decode even if the number of soft bits is insufficient.";
+                type boolean;
+                default false;
+            }
+
+            leaf pusch_sinr_calc_method {
+                description "PUSCH SINR calculation method.";
+                type pusch_sinr_calc_method;
+                default post_equalization;
+            }
+
+            leaf pusch_channel_estimator_fd_strategy {
+                description "PUSCH channel estimator frequency-domain smoothing strategy.";
+                type pusch_channel_estimator_fd_strategy;
+                default filter;
+            }
+
+            leaf pusch_channel_estimator_td_strategy {
+                description "PUSCH channel estimator time-domain interpolation strategy.";
+                type pusch_channel_estimator_td_strategy;
+                default average;
+            }
+
+            leaf pusch_channel_estimator_cfo_compensation {
+                description "Enable PUSCH channel estimator CFO compensation.";
+                type boolean;
+                default true;
+            }
+
+            leaf pusch_channel_equalizer_algorithm {
+                description "PUSCH channel equalizer algorithm.";
+                type pusch_channel_equalizer_algorithm;
+                default zf;
+            }
+
+            leaf max_request_headroom_slots {
+                description "Maximum request headroom size in slots. The number of delayed slots the upper
+                             physical layer will accept: if the current slot is M, the upper PHY considers
+                             slot M - max_request_headroom_slots as valid and processes it.";
+                type uint32 { range "0..30"; }
+                default "0";
+            }
+
+            leaf allow_request_on_empty_uplink_slot {
+                description "Allow resource grid requests on empty uplink slots. An uplink slot is considered
+                             empty when it does not contain PUCCH/PUSCH/SRS PDUs.";
+                type boolean;
+                default false;
+            }
+
+            leaf enable_phy_tap {
+                description "Enable the PHY tap plugin if present.";
+                type boolean;
+                default false;
+            }
+
+            leaf phy_tap_arguments {
+                description "PHY tap plugin argument string passed during construction.";
+                type string;
+            }
+        }
+    }
+}
