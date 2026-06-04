@@ -465,6 +465,40 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
             <ocudu_nrcelldu_pdsch_extensions>
               <mcs_table>qam64</mcs_table>
             </ocudu_nrcelldu_pdsch_extensions>
+            <ocudu_nrcelldu_pucch_extensions>
+              <sr_period_ms>20</sr_period_ms>
+              <min_k1>2</min_k1>
+              <p0_nominal>-90</p0_nominal>
+              <pucch_resource_common>11</pucch_resource_common>
+              <formats>f1_and_f2</formats>
+              <resource_set_size>8</resource_set_size>
+              <nof_cell_res_set_configs>2</nof_cell_res_set_configs>
+              <nof_cell_sr_res>8</nof_cell_sr_res>
+              <nof_cell_csi_res>8</nof_cell_csi_res>
+              <f0_intraslot_freq_hop>false</f0_intraslot_freq_hop>
+              <f1_enable_occ>false</f1_enable_occ>
+              <f1_nof_cyclic_shifts>2</f1_nof_cyclic_shifts>
+              <f1_intraslot_freq_hop>false</f1_intraslot_freq_hop>
+              <f2_max_nof_rbs>1</f2_max_nof_rbs>
+              <f2_max_code_rate>dot35</f2_max_code_rate>
+              <f2_intraslot_freq_hop>false</f2_intraslot_freq_hop>
+              <f3_max_nof_rbs>1</f3_max_nof_rbs>
+              <f3_max_code_rate>dot35</f3_max_code_rate>
+              <f3_intraslot_freq_hop>false</f3_intraslot_freq_hop>
+              <f3_additional_dmrs>false</f3_additional_dmrs>
+              <f3_pi2_bpsk>false</f3_pi2_bpsk>
+              <f4_max_code_rate>dot35</f4_max_code_rate>
+              <f4_intraslot_freq_hop>false</f4_intraslot_freq_hop>
+              <f4_additional_dmrs>false</f4_additional_dmrs>
+              <f4_pi2_bpsk>false</f4_pi2_bpsk>
+              <f4_occ_length>2</f4_occ_length>
+              <f4_enable_occ>false</f4_enable_occ>
+              <max_consecutive_kos>100</max_consecutive_kos>
+              <enable_cl_loop_pw_control>false</enable_cl_loop_pw_control>
+              <target_sinr_f0>10.0</target_sinr_f0>
+              <target_sinr_f2>6.0</target_sinr_f2>
+              <target_sinr_f3>1.0</target_sinr_f3>
+            </ocudu_nrcelldu_pucch_extensions>
           </ocudu_nrcelldu_extensions>
       </attributes>
     </NRCellDU>
