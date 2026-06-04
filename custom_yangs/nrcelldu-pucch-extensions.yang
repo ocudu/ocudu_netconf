@@ -9,6 +9,10 @@ module nrcelldu-pucch-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Added pucch_resource_common, formats, resource-set sizing
+                                       (resource_set_size, nof_cell_res_set_configs, nof_cell_sr_res,
+                                       nof_cell_csi_res), per-format F0/F1/F2/F3/F4 config, max_consecutive_kos
+                                       and closed-loop power control (enable + per-format target SINR)."; }
     revision 2026-05-13 { description "Initial version"; }
 
     grouping pucch_extensions_subtree {
@@ -34,6 +38,198 @@ module nrcelldu-pucch-extensions {
                 description "Target power for PUCCH receiver, in dBm. Must be a multiple of 2.";
                 type int32 { range -202..24; }
                 default "-90";
+            }
+
+            leaf pucch_resource_common {
+                description "Index of the PUCCH resource set used for the common configuration.";
+                type uint8 { range "0..15"; }
+                default 11;
+            }
+            leaf formats {
+                description "PUCCH format combination to use.";
+                type enumeration {
+                    enum f0_and_f2;
+                    enum f1_and_f2;
+                    enum f1_and_f3;
+                    enum f1_and_f4;
+                }
+                default f1_and_f2;
+            }
+
+            leaf resource_set_size {
+                description "Number of PUCCH resources per UE in each PUCCH resource set (HARQ-ACK).";
+                type uint8 { range "1..8"; }
+                default 8;
+            }
+            leaf nof_cell_res_set_configs {
+                description "Number of PUCCH resource-set configurations available per cell.";
+                type uint8 { range "1..10"; }
+                default 2;
+            }
+            leaf nof_cell_sr_res {
+                description "Number of PUCCH F0/F1 resources available per cell for SR.";
+                type uint8 { range "1..100"; }
+                default 8;
+            }
+            leaf nof_cell_csi_res {
+                description "Number of PUCCH F2/F3/F4 resources available per cell for CSI.";
+                type uint8 { range "0..100"; }
+                default 8;
+            }
+
+            leaf f0_intraslot_freq_hop {
+                description "Enable intra-slot frequency hopping for PUCCH F0.";
+                type boolean;
+                default false;
+            }
+
+            leaf f1_enable_occ {
+                description "Enable Orthogonal Cover Code for PUCCH F1.";
+                type boolean;
+                default false;
+            }
+            leaf f1_nof_cyclic_shifts {
+                description "Number of cyclic shifts available for PUCCH F1 resources.";
+                type uint8 { range "1 | 2 | 3 | 4 | 6 | 12"; }
+                default 2;
+            }
+            leaf f1_intraslot_freq_hop {
+                description "Enable intra-slot frequency hopping for PUCCH F1.";
+                type boolean;
+                default false;
+            }
+
+            leaf f2_max_nof_rbs {
+                description "Maximum number of RBs for PUCCH F2 resources.";
+                type uint8 { range "1..16"; }
+                default 1;
+            }
+            leaf f2_max_payload {
+                description "Minimum required payload capacity in bits for PUCCH F2. If set, f2_max_nof_rbs is ignored.";
+                type uint8 { range "4..40"; }
+            }
+            leaf f2_max_code_rate {
+                description "Maximum code rate for PUCCH F2.";
+                type enumeration {
+                    enum dot08;
+                    enum dot15;
+                    enum dot25;
+                    enum dot35;
+                    enum dot45;
+                    enum dot60;
+                    enum dot80;
+                }
+                default dot35;
+            }
+            leaf f2_intraslot_freq_hop {
+                description "Enable intra-slot frequency hopping for PUCCH F2.";
+                type boolean;
+                default false;
+            }
+
+            leaf f3_max_nof_rbs {
+                description "Maximum number of RBs for PUCCH F3 resources.";
+                type uint8 { range "1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 12 | 15 | 16"; }
+                default 1;
+            }
+            leaf f3_max_payload {
+                description "Minimum required payload capacity in bits for PUCCH F3. If set, f3_max_nof_rbs is ignored.";
+                type uint8 { range "4..40"; }
+            }
+            leaf f3_max_code_rate {
+                description "Maximum code rate for PUCCH F3.";
+                type enumeration {
+                    enum dot08;
+                    enum dot15;
+                    enum dot25;
+                    enum dot35;
+                    enum dot45;
+                    enum dot60;
+                    enum dot80;
+                }
+                default dot35;
+            }
+            leaf f3_intraslot_freq_hop {
+                description "Enable intra-slot frequency hopping for PUCCH F3.";
+                type boolean;
+                default false;
+            }
+            leaf f3_additional_dmrs {
+                description "Enable additional DM-RS for PUCCH F3.";
+                type boolean;
+                default false;
+            }
+            leaf f3_pi2_bpsk {
+                description "Enable pi/2-BPSK modulation for PUCCH F3.";
+                type boolean;
+                default false;
+            }
+
+            leaf f4_max_code_rate {
+                description "Maximum code rate for PUCCH F4.";
+                type enumeration {
+                    enum dot08;
+                    enum dot15;
+                    enum dot25;
+                    enum dot35;
+                    enum dot45;
+                    enum dot60;
+                    enum dot80;
+                }
+                default dot35;
+            }
+            leaf f4_intraslot_freq_hop {
+                description "Enable intra-slot frequency hopping for PUCCH F4.";
+                type boolean;
+                default false;
+            }
+            leaf f4_additional_dmrs {
+                description "Enable additional DM-RS for PUCCH F4.";
+                type boolean;
+                default false;
+            }
+            leaf f4_pi2_bpsk {
+                description "Enable pi/2-BPSK modulation for PUCCH F4.";
+                type boolean;
+                default false;
+            }
+            leaf f4_occ_length {
+                description "OCC length for PUCCH F4.";
+                type uint8 { range "2 | 4"; }
+                default 2;
+            }
+            leaf f4_enable_occ {
+                description "Enable OCC multiplexing for PUCCH F4.";
+                type boolean;
+                default false;
+            }
+
+            leaf max_consecutive_kos {
+                description "Maximum number of consecutive undecoded PUCCH F2-for-CSI before a Radio Link Failure
+                             is reported.";
+                type uint32;
+                default 100;
+            }
+
+            leaf enable_cl_loop_pw_control {
+                description "Enable closed-loop power control for PUCCH.";
+                type boolean;
+                default false;
+            }
+            leaf target_sinr_f0 {
+                description "Target PUCCH F0 SINR in dB. Only relevant when enable_cl_loop_pw_control is true.";
+                type decimal64 { fraction-digits 1; range "-10.0..20.0"; }
+                default "10.0";
+            }
+            leaf target_sinr_f2 {
+                description "Target PUCCH F2 SINR in dB. Only relevant when enable_cl_loop_pw_control is true.";
+                type decimal64 { fraction-digits 1; range "-10.0..20.0"; }
+                default "6.0";
+            }
+            leaf target_sinr_f3 {
+                description "Target PUCCH F3 SINR in dB. Only relevant when enable_cl_loop_pw_control is true.";
+                type decimal64 { fraction-digits 1; range "-15.0..10.0"; }
+                default "1.0";
             }
         }
     }
