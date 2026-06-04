@@ -240,7 +240,15 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
             <ocudu_nrcelldu_pdcch_extensions>
               <common>
                 <ss1_n_candidates>[0, 0, 2, 0, 0]</ss1_n_candidates>
+                <ss0_index>0</ss0_index>
               </common>
+              <dedicated>
+                <coreset1_rb_start>1</coreset1_rb_start>
+                <ss2_n_candidates>[0, 0, 0, 0, 0]</ss2_n_candidates>
+                <dci_format_0_1_and_1_1>true</dci_format_0_1_and_1_1>
+                <ss2_type>ue_dedicated</ss2_type>
+                <al_cqi_offset>0</al_cqi_offset>
+              </dedicated>
             </ocudu_nrcelldu_pdcch_extensions>
             <ocudu_nrcelldu_csi_extensions>
               <csi_rs_period>40</csi_rs_period>
