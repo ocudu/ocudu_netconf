@@ -9,6 +9,9 @@ module nrcelldu-pdcch-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Added common coreset0_index/ss0_index/max_coreset0_duration and the
+                                       dedicated sub-container (coreset1 rb_start/l_crb/duration, ss2_n_candidates,
+                                       dci_format_0_1_and_1_1, ss2_type, al_cqi_offset)."; }
     revision 2026-05-13 { description "Initial version"; }
 
     grouping pdcch_extensions_subtree {
@@ -24,6 +27,63 @@ module nrcelldu-pdcch-extensions {
                                  bracketed YAML inline list, e.g. '[0, 0, 2, 0, 0]'.";
                     type string;
                     default "[0, 0, 1, 0, 0]";
+                }
+
+                leaf coreset0_index {
+                    description "CORESET#0 index per TS 38.213 clause 13. If unset, OCUDU derives it.";
+                    type uint8 { range "0..15"; }
+                }
+                leaf ss0_index {
+                    description "SearchSpace#0 index per TS 38.213 clause 13.";
+                    type uint8 { range "0..15"; }
+                    default 0;
+                }
+                leaf max_coreset0_duration {
+                    description "Maximum CORESET#0 duration in OFDM symbols to consider when deriving the
+                                 CORESET#0 index. If unset, OCUDU derives it.";
+                    type uint8 { range "1..2"; }
+                }
+            }
+
+            container dedicated {
+                description "UE-dedicated PDCCH search-space configuration";
+
+                leaf coreset1_rb_start {
+                    description "Starting CRB for CORESET 1, relative to CRB0. If unset, defaults to CRB0.";
+                    type uint16 { range "0..275"; }
+                }
+                leaf coreset1_l_crb {
+                    description "Length of CORESET 1 in CRBs. If unset, spans the entire cell bandwidth.";
+                    type uint16 { range "0..275"; }
+                }
+                leaf coreset1_duration {
+                    description "Duration of CORESET 1 in OFDM symbols. If unset, defaults to max(2, CORESET#0 symbols).";
+                    type uint8 { range "1..2"; }
+                }
+                leaf ss2_n_candidates {
+                    description "Number of candidates per aggregation level for SS2, in the order
+                                 [AL1, AL2, AL4, AL8, AL16]. Encoded as a bracketed YAML inline list,
+                                 e.g. '[0, 0, 0, 0, 0]'. An all-zero array lets the gNB decide.";
+                    type string;
+                    default "[0, 0, 0, 0, 0]";
+                }
+                leaf dci_format_0_1_and_1_1 {
+                    description "Use non-fallback (true) or fallback (false) DCI format in UE SearchSpace#2.";
+                    type boolean;
+                    default true;
+                }
+                leaf ss2_type {
+                    description "SearchSpace type for UE-dedicated SearchSpace#2.";
+                    type enumeration {
+                        enum common;
+                        enum ue_dedicated;
+                    }
+                    default ue_dedicated;
+                }
+                leaf al_cqi_offset {
+                    description "Offset applied to the CQI used in the PDCCH aggregation-level calculation.";
+                    type decimal64 { fraction-digits 1; range "-15.0..15.0"; }
+                    default "0.0";
                 }
             }
         }
