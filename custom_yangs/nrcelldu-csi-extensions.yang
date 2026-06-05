@@ -9,6 +9,8 @@ module nrcelldu-csi-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Added csi_rs_enabled, meas/tracking/zp CSI-RS slot offsets,
+                                       pwr_ctrl_offset and report_type."; }
     revision 2026-05-13 { description "Initial version"; }
 
     grouping csi_extensions_subtree {
@@ -19,6 +21,39 @@ module nrcelldu-csi-extensions {
                 description "CSI-RS scheduling period in milliseconds";
                 type uint16 { range "10 | 20 | 40 | 80"; }
                 default "40";
+            }
+            leaf csi_rs_enabled {
+                description "Enable CSI-RS resources and CSI reporting in the cell.";
+                type boolean;
+                default true;
+            }
+            leaf meas_csi_rs_slot_offset {
+                description "Slot offset of the first CSI-RS resource used for measurement. If unset, OCUDU derives
+                             it to avoid SSB/SIB1 collisions.";
+                type uint16;
+            }
+            leaf tracking_csi_rs_slot_offset {
+                description "Slot offset of the first CSI-RS resource used for tracking. If unset, OCUDU derives it
+                             to avoid SSB/SIB1 collisions.";
+                type uint16;
+            }
+            leaf zp_csi_rs_slot_offset {
+                description "Slot offset for the ZP CSI-RS resources. If unset, OCUDU derives it to avoid SSB/SIB1
+                             collisions.";
+                type uint16;
+            }
+            leaf pwr_ctrl_offset {
+                description "powerControlOffset: power offset of PDSCH RE to NZP CSI-RS RE, in dB.";
+                type int8 { range "-8..15"; }
+                default 0;
+            }
+            leaf report_type {
+                description "Type of CSI reporting configuration to use.";
+                type enumeration {
+                    enum periodic;
+                    enum aperiodic;
+                }
+                default periodic;
             }
         }
     }
