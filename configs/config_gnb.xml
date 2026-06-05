@@ -556,6 +556,12 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <cyclic_shift_reuse>1</cyclic_shift_reuse>
               <sequence_id_reuse>1</sequence_id_reuse>
             </ocudu_nrcelldu_srs_extensions>
+            <ocudu_nrcelldu_csi_extensions>
+              <csi_rs_period>40</csi_rs_period>
+              <csi_rs_enabled>true</csi_rs_enabled>
+              <pwr_ctrl_offset>0</pwr_ctrl_offset>
+              <report_type>periodic</report_type>
+            </ocudu_nrcelldu_csi_extensions>
           </ocudu_nrcelldu_extensions>
       </attributes>
     </NRCellDU>
