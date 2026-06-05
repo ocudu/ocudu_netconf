@@ -359,6 +359,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
     </EP_F1U>
 
     <ocudu_gnbdufunction_extensions xmlns="urn:ocudu-gnbdufunction-extension:1.0">
+      <ocudu_ru_dummy_extensions>
+        <dl_processing_delay>1</dl_processing_delay>
+        <time_scaling>1.0</time_scaling>
+      </ocudu_ru_dummy_extensions>
       <ocudu_gnbdufunction_testmode_extensions>
         <enabled>true</enabled>
         <rnti>44</rnti>
