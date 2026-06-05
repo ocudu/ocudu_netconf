@@ -1,0 +1,66 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module nrcelldu-mac-cell-group-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-nrcelldu-mac-cell-group-extension:1.0";
+    prefix "ocudu-nrcelldu-mac-cell-group";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Initial version: bsr_cfg, phr_cfg and sr_cfg timers."; }
+
+    grouping mac_cell_group_extensions_subtree {
+        description "OCUDU extension of the MAC cell-group config.";
+
+        container ocudu_nrcelldu_mac_cell_group_extensions {
+            container bsr_cfg {
+                description "Buffer Status Report configuration.";
+
+                leaf periodic_bsr_timer {
+                    description "Periodic BSR timer in number of subframes. Value 0 equates to infinity.";
+                    type uint16 {
+                        range "0 | 1 | 5 | 10 | 16 | 20 | 32 | 40 | 64 | 80 | 128 | 160 | 320 | 640 | 1280 | 2560";
+                    }
+                    default 10;
+                }
+                leaf retx_bsr_timer {
+                    description "Retransmission BSR timer in number of subframes.";
+                    type uint16 {
+                        range "10 | 20 | 40 | 80 | 160 | 320 | 640 | 1280 | 2560 | 5120 | 10240";
+                    }
+                    default 80;
+                }
+                leaf lc_sr_delay_timer {
+                    description "Logical Channel SR delay timer in number of subframes. If unset, it is not configured.";
+                    type uint16 { range "20 | 40 | 64 | 128 | 512 | 1024 | 2560"; }
+                }
+            }
+
+            container phr_cfg {
+                description "Power Headroom Report configuration.";
+
+                leaf phr_prohibit_timer {
+                    description "PHR prohibit timer in number of subframes.";
+                    type uint16 { range "0 | 10 | 20 | 50 | 100 | 200 | 500 | 1000"; }
+                    default 10;
+                }
+            }
+
+            container sr_cfg {
+                description "Scheduling Request configuration.";
+
+                leaf sr_trans_max {
+                    description "Maximum number of SR transmissions.";
+                    type uint8 { range "4 | 8 | 16 | 32 | 64"; }
+                    default 64;
+                }
+                leaf sr_prohibit_timer {
+                    description "SR prohibit timer (SR transmission on PUCCH) in ms. If unset, the UE applies 0.";
+                    type uint8 { range "1 | 2 | 4 | 8 | 16 | 32 | 64 | 128"; }
+                }
+            }
+        }
+    }
+}
