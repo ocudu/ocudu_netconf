@@ -499,6 +499,18 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <target_sinr_f2>6.0</target_sinr_f2>
               <target_sinr_f3>1.0</target_sinr_f3>
             </ocudu_nrcelldu_pucch_extensions>
+            <ocudu_nrcelldu_mac_cell_group_extensions>
+              <bsr_cfg>
+                <periodic_bsr_timer>10</periodic_bsr_timer>
+                <retx_bsr_timer>80</retx_bsr_timer>
+              </bsr_cfg>
+              <phr_cfg>
+                <phr_prohibit_timer>10</phr_prohibit_timer>
+              </phr_cfg>
+              <sr_cfg>
+                <sr_trans_max>64</sr_trans_max>
+              </sr_cfg>
+            </ocudu_nrcelldu_mac_cell_group_extensions>
           </ocudu_nrcelldu_extensions>
       </attributes>
     </NRCellDU>
