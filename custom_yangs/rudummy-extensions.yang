@@ -1,0 +1,33 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module rudummy-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-rudummy-extension:1.0";
+    prefix "ocudu-rudummy";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Initial version: dl_processing_delay and time_scaling."; }
+
+    grouping rudummy_extensions_subtree {
+        description "OCUDU dummy RU configuration. Only takes effect when the DU is configured without
+                     an OFH or SDR Radio Unit.";
+
+        container ocudu_ru_dummy_extensions {
+            leaf dl_processing_delay {
+                description "Downlink processing delay in number of slots. The RU expects the DL resource grid
+                             this many slots in advance to have enough processing time margin.";
+                type uint16;
+                default 1;
+            }
+            leaf time_scaling {
+                description "Time scaling factor applied to the slot duration. Must be greater than zero. A value
+                             above one slows the RU down; a value between zero and one speeds it up.";
+                type decimal64 { fraction-digits 2; range "0..max"; }
+                default "1.0";
+            }
+        }
+    }
+}
