@@ -9,6 +9,8 @@ module nrcelldu-srs-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Added type_enabled, max_nof_sym_per_slot, nof_sym_per_resource, c_srs,
+                                       freq_domain_shift, tx_comb, cyclic_shift_reuse and sequence_id_reuse."; }
     revision 2026-05-13 { description "Initial version"; }
 
     grouping srs_extensions_subtree {
@@ -22,6 +24,51 @@ module nrcelldu-srs-extensions {
                     range "1 | 2 | 2.5 | 4 | 5 | 8 | 10 | 16 | 20 | 32 | 40 | 64 | 80 | 160 | 320 | 640 | 1280 | 2560";
                 }
                 default "80.0";
+            }
+            leaf type_enabled {
+                description "Enable SRS and set the resource type.";
+                type enumeration {
+                    enum disabled;
+                    enum periodic;
+                    enum aperiodic;
+                }
+                default disabled;
+            }
+            leaf max_nof_sym_per_slot {
+                description "Number of UL-slot symbols reserved for the cell SRS resources.";
+                type uint8 { range "1..6"; }
+                default 2;
+            }
+            leaf nof_sym_per_resource {
+                description "Number of symbols per SRS resource.";
+                type uint8 { range "1 | 2 | 4"; }
+                default 1;
+            }
+            leaf c_srs {
+                description "C_SRS parameter for SRS. If unset, OCUDU computes it for the maximum SRS bandwidth.";
+                type uint8 { range "0..63"; }
+            }
+            leaf freq_domain_shift {
+                description "SRS frequency-domain shift (lowest CRB index of the SRS interval). Only applies if
+                             c_srs is set.";
+                type uint16 { range "0..268"; }
+                default 0;
+            }
+            leaf tx_comb {
+                description "SRS transmission comb size.";
+                type uint8 { range "2 | 4"; }
+                default 4;
+            }
+            leaf cyclic_shift_reuse {
+                description "SRS cyclic-shift reuse factor. Must be compatible with tx_comb and the number of UL
+                             antenna ports.";
+                type uint8 { range "1 | 2 | 3 | 4 | 6"; }
+                default 1;
+            }
+            leaf sequence_id_reuse {
+                description "Reuse factor for the SRS sequence ID across UEs in the cell.";
+                type uint8 { range "1 | 2 | 3 | 5 | 6 | 10 | 15 | 30"; }
+                default 1;
             }
         }
     }
