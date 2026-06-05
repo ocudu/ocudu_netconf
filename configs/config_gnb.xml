@@ -545,6 +545,17 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
                 <al_cqi_offset>0</al_cqi_offset>
               </dedicated>
             </ocudu_nrcelldu_pdcch_extensions>
+            <ocudu_nrcelldu_srs_extensions>
+              <period_ms>80</period_ms>
+              <type_enabled>disabled</type_enabled>
+              <max_nof_sym_per_slot>2</max_nof_sym_per_slot>
+              <nof_sym_per_resource>1</nof_sym_per_resource>
+              <c_srs>0</c_srs>
+              <freq_domain_shift>0</freq_domain_shift>
+              <tx_comb>4</tx_comb>
+              <cyclic_shift_reuse>1</cyclic_shift_reuse>
+              <sequence_id_reuse>1</sequence_id_reuse>
+            </ocudu_nrcelldu_srs_extensions>
           </ocudu_nrcelldu_extensions>
       </attributes>
     </NRCellDU>
