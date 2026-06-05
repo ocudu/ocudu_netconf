@@ -511,6 +511,27 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
                 <sr_trans_max>64</sr_trans_max>
               </sr_cfg>
             </ocudu_nrcelldu_mac_cell_group_extensions>
+            <ocudu_nrcelldu_sib_extensions>
+              <si_window_length>160</si_window_length>
+              <t300>1000</t300>
+              <t301>1000</t301>
+              <t310>1000</t310>
+              <n310>1</n310>
+              <t311>3000</t311>
+              <n311>1</n311>
+              <t319>1000</t319>
+              <etws>
+                <message_id>4356</message_id>
+                <serial_num>1288</serial_num>
+                <warning_type>2432</warning_type>
+                <data_coding_scheme>0</data_coding_scheme>
+              </etws>
+              <cmas>
+                <message_id>4370</message_id>
+                <serial_num>12291</serial_num>
+                <data_coding_scheme>0</data_coding_scheme>
+              </cmas>
+            </ocudu_nrcelldu_sib_extensions>
           </ocudu_nrcelldu_extensions>
       </attributes>
     </NRCellDU>
