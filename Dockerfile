@@ -175,4 +175,14 @@ COPY configs/config_ru.xml      /opt/dev/configs/config_ru.xml
 COPY scripts/*.sh entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.sh
 
+# Run as non-root uid 1000: join the sysrepo group (on connect sysrepo chgrp()s its
+# lock/datastore files to group "sysrepo", which a non-root process can only do as a
+# member of that group) and the shadow group (PAM password auth reads /etc/shadow
+# directly), and own the sysrepo repo + the writable /etc/netconf-{running,tls} dirs.
+RUN usermod -aG sysrepo,shadow ubuntu && \
+    mkdir -p /etc/netconf-running /etc/netconf-tls && \
+    chown -R 1000:1000 /etc/sysrepo /etc/netconf-running /etc/netconf-tls
+
+USER 1000
+
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]

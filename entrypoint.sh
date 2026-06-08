@@ -213,7 +213,8 @@ if [ "$TLS_ENABLED" = "1" ]; then
 fi
 
 echo "Starting netconf server .."
-netopeer2-server -v3 -d
+# Default pidfile lives under /run (root-owned) --> overwrite with /tmp
+netopeer2-server -v3 -d -p /tmp/netopeer2-server.pid
 
 # Wait for all child processes to terminate
 wait
