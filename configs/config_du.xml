@@ -375,7 +375,9 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <ipAddress>10.11.12.112</ipAddress>
           <vlanId>100</vlanId>
         </localAddress>
-        <!-- f1c connect ip4v/ipv6 address -->
+        <!-- f1c connect address (the gNB-CU-CP). An IPv4/IPv6 literal, or in Kubernetes
+             a DNS service name that the O1 adapter resolves before writing the gNB
+             config, e.g.: <remoteAddress>cucp.default.svc.cluster.local</remoteAddress> -->
         <remoteAddress>10.11.12.113</remoteAddress>
       </attributes>
     </EP_F1C>
@@ -387,8 +389,7 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <ipAddress>10.11.13.112</ipAddress>
           <vlanId>101</vlanId>
         </localAddress>
-        <!-- f1u connect ip4v/ipv6 address -->
-        <remoteAddress>10.11.13.113</remoteAddress>
+        <!-- no remoteAddress: the F1-U peer is learned via F1AP signaling -->
       </attributes>
     </EP_F1U>
 

@@ -44,8 +44,7 @@ module gnbcucpfunction-extensions {
         description "3GPP types EP_NgC remoteAddress as an IP address, but in Kubernetes
                      deployments the AMF is reached via a DNS service name (ClusterIPs
                      change across reinstalls). Widen to inet:host so an FQDN validates in
-                     the datastore; the O1 adapter resolves it to an IP before writing the
-                     gNB config.";
+                     the datastore;";
     }
 
     deviation /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ep3gpp:EP_F1C/ep3gpp:attributes/ep3gpp:remoteAddress {
