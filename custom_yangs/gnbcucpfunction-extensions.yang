@@ -8,6 +8,8 @@ module gnbcucpfunction-extensions {
 
     import _3gpp-common-managed-element { prefix me3gpp; }
     import _3gpp-nr-nrm-gnbcucpfunction { prefix gnbcucp3gpp; }
+    import _3gpp-nr-nrm-ep { prefix ep3gpp; }
+    import ietf-inet-types { prefix inet; }
 
     import log-extensions { prefix ocudu-log; }
     import metrics-extensions { prefix ocudu-metrics; }
@@ -17,6 +19,7 @@ module gnbcucpfunction-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-08 { description "Allow FQDN (remoteAddress -> inet:host) on EP_NgC; remove remoteAddress on EP_F1C and EP_E1 (CU-CP terminates F1-C/E1 as a server, so the connect address lives on the peer)"; }
     revision 2026-05-28 { description "Add remote-control-extensions subtree"; }
     revision 2026-04-30 { description "Initial version"; }
 
@@ -34,5 +37,31 @@ module gnbcucpfunction-extensions {
 
     augment /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction {
         uses gnbcucpfunction_extensions_subtree;
+    }
+
+    deviation /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ep3gpp:EP_NgC/ep3gpp:attributes/ep3gpp:remoteAddress {
+        deviate replace { type inet:host; }
+        description "3GPP types EP_NgC remoteAddress as an IP address, but in Kubernetes
+                     deployments the AMF is reached via a DNS service name (ClusterIPs
+                     change across reinstalls). Widen to inet:host so an FQDN validates in
+                     the datastore; the O1 adapter resolves it to an IP before writing the
+                     gNB config.";
+    }
+
+    deviation /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ep3gpp:EP_F1C/ep3gpp:attributes/ep3gpp:remoteAddress {
+        deviate not-supported;
+        description "The gNB-CU-CP terminates F1-C as a server: it only binds (localAddress)
+                     and never dials the peer, so a remote/connect address is meaningless
+                     here. The F1-C connect address is configured on the gNB-DU's EP_F1C
+                     instead. 3GPP marks remoteAddress mandatory, so remove it entirely from
+                     the CU-CP's EP_F1C to forbid it being set.";
+    }
+
+    deviation /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ep3gpp:EP_E1/ep3gpp:attributes/ep3gpp:remoteAddress {
+        deviate not-supported;
+        description "The gNB-CU-CP terminates E1 as a server: it only binds (localAddress) and
+                     never dials the peer. The E1 connect address is configured on the
+                     gNB-CU-UP's EP_E1 instead. 3GPP marks remoteAddress mandatory, so remove
+                     it from the CU-CP's EP_E1 to forbid it being set.";
     }
 }
