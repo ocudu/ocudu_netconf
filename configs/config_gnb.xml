@@ -532,6 +532,14 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
                 <data_coding_scheme>0</data_coding_scheme>
               </cmas>
             </ocudu_nrcelldu_sib_extensions>
+            <ocudu_nrcelldu_paging_extensions>
+              <pg_search_space_id>1</pg_search_space_id>
+              <default_pg_cycle_in_rf>128</default_pg_cycle_in_rf>
+              <nof_pf_per_paging_cycle>oneT</nof_pf_per_paging_cycle>
+              <pf_offset>0</pf_offset>
+              <nof_po_per_pf>1</nof_po_per_pf>
+              <edrx_enabled>false</edrx_enabled>
+            </ocudu_nrcelldu_paging_extensions>
             <ocudu_nrcelldu_pdcch_extensions>
               <common>
                 <ss1_n_candidates>[0, 0, 2, 0, 0]</ss1_n_candidates>
