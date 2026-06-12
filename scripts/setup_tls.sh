@@ -57,13 +57,12 @@ for f in "$SERVER_CRT" "$SERVER_KEY" "$CA_CRT"; do
     fi
 done
 
-# Strip PEM armor to produce the base64 body that ietf-keystore / ietf-truststore expect.
-strip_pem() { sed -e '/-----BEGIN/d' -e '/-----END/d' "$1"; }
-
-CA_CRT_B64="$(strip_pem "$CA_CRT")"
-SERVER_CRT_B64="$(strip_pem "$SERVER_CRT")"
-SERVER_KEY_B64="$(strip_pem "$SERVER_KEY")"
-SERVER_PUB_B64="$(openssl x509 -in "$SERVER_CRT" -noout -pubkey | sed -e '/-----BEGIN/d' -e '/-----END/d')"
+# Re-encode as DER + 64-col base64 (libyang rejects multi-object/odd-wrapped PEM,
+# leaving the TLS endpoint uninstalled). x509 takes the leaf/first cert.
+CA_CRT_B64="$(openssl x509 -in "$CA_CRT" -outform DER | openssl base64)"
+SERVER_CRT_B64="$(openssl x509 -in "$SERVER_CRT" -outform DER | openssl base64)"
+SERVER_KEY_B64="$(openssl pkey -in "$SERVER_KEY" -outform DER | openssl base64)"
+SERVER_PUB_B64="$(openssl x509 -in "$SERVER_CRT" -noout -pubkey | openssl pkey -pubin -outform DER | openssl base64)"
 
 TLS_XML="$(mktemp)"
 trap 'rm -f "$TLS_XML"' EXIT
