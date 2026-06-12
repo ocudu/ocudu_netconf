@@ -1,0 +1,56 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module nrcelldu-paging-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-nrcelldu-paging-extension:1.0";
+    prefix "ocudu-nrcelldu-paging";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Initial version: paging configuration (PCCH-Config, TS 38.331)."; }
+
+    grouping paging_extensions_subtree {
+        description "OCUDU extension of 3gpp paging (PCCH-Config) config";
+
+        container ocudu_nrcelldu_paging_extensions {
+            leaf pg_search_space_id {
+                description "SearchSpace to use for Paging.";
+                type uint8 { range "0 | 1"; }
+                default 1;
+            }
+            leaf default_pg_cycle_in_rf {
+                description "Default Paging cycle in number of radio frames.";
+                type uint16 { range "32 | 64 | 128 | 256"; }
+                default 128;
+            }
+            leaf nof_pf_per_paging_cycle {
+                description "Number of paging frames per DRX cycle.";
+                type enumeration {
+                    enum oneT;
+                    enum halfT;
+                    enum quarterT;
+                    enum oneEighthT;
+                    enum oneSixteethT;
+                }
+                default oneT;
+            }
+            leaf pf_offset {
+                description "Paging frame offset. Valid range is 0..(T / nof_pf_per_paging_cycle - 1).";
+                type uint16;
+                default 0;
+            }
+            leaf nof_po_per_pf {
+                description "Number of paging occasions per paging frame.";
+                type uint8 { range "1 | 2 | 4"; }
+                default 1;
+            }
+            leaf edrx_enabled {
+                description "Whether to enable extended DRX (eDRX) for paging.";
+                type boolean;
+                default false;
+            }
+        }
+    }
+}

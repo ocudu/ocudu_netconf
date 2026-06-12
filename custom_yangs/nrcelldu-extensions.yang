@@ -23,6 +23,7 @@ module nrcelldu-extensions {
     import nrcelldu-tdd-extensions { prefix ocudu-nrcelldu-tdd; }
     import nrcelldu-mac-cell-group-extensions { prefix ocudu-nrcelldu-mac-cell-group; }
     import nrcelldu-sib-extensions { prefix ocudu-nrcelldu-sib; }
+    import nrcelldu-paging-extensions { prefix ocudu-nrcelldu-paging; }
 
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
@@ -49,6 +50,7 @@ module nrcelldu-extensions {
             uses ocudu-nrcelldu-tdd:tdd_extensions_subtree;
             uses ocudu-nrcelldu-mac-cell-group:mac_cell_group_extensions_subtree;
             uses ocudu-nrcelldu-sib:sib_extensions_subtree;
+            uses ocudu-nrcelldu-paging:paging_extensions_subtree;
         }
     }
 
