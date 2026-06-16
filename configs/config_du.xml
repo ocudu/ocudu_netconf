@@ -347,6 +347,26 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <retx_timer_ul>0</retx_timer_ul>
               <long_cycle>0</long_cycle>
             </ocudu_nrcelldu_drx_extensions>
+            <ocudu_nrcelldu_scheduler_extensions>
+              <nof_preselected_newtx_ues>1024</nof_preselected_newtx_ues>
+              <policy>
+                <qos_sched>
+                  <combine_function>gbr_prioritized</combine_function>
+                  <pf_fairness_coeff>2.0</pf_fairness_coeff>
+                  <prio_enabled>true</prio_enabled>
+                  <pdb_enabled>true</pdb_enabled>
+                  <gbr_enabled>true</gbr_enabled>
+                </qos_sched>
+              </policy>
+            </ocudu_nrcelldu_scheduler_extensions>
+            <ocudu_nrcelldu_ta_extensions>
+              <ta_measurement_slot_period>80</ta_measurement_slot_period>
+              <ta_measurement_slot_prohibit_period>0</ta_measurement_slot_prohibit_period>
+              <ta_cmd_offset_threshold>1</ta_cmd_offset_threshold>
+              <ta_target>1.0</ta_target>
+              <ta_update_measurement_ul_sinr_threshold>0.0</ta_update_measurement_ul_sinr_threshold>
+              <ta_outlier_detection_zscore_threshold>1.75</ta_outlier_detection_zscore_threshold>
+            </ocudu_nrcelldu_ta_extensions>
           </ocudu_nrcelldu_extensions>
       </attributes>
     </NRCellDU>
