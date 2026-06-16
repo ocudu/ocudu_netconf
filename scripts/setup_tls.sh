@@ -59,10 +59,29 @@ done
 
 # Re-encode as DER + 64-col base64 (libyang rejects multi-object/odd-wrapped PEM,
 # leaving the TLS endpoint uninstalled). x509 takes the leaf/first cert.
-CA_CRT_B64="$(openssl x509 -in "$CA_CRT" -outform DER | openssl base64)"
 SERVER_CRT_B64="$(openssl x509 -in "$SERVER_CRT" -outform DER | openssl base64)"
 SERVER_KEY_B64="$(openssl pkey -in "$SERVER_KEY" -outform DER | openssl base64)"
 SERVER_PUB_B64="$(openssl x509 -in "$SERVER_CRT" -noout -pubkey | openssl pkey -pubin -outform DER | openssl base64)"
+
+# The CA file may be a chain (e.g. intermediate + root); emit one bag entry per cert
+CA_CERTS_XML=""
+ca_idx=0
+ca_pem=""
+while IFS= read -r line || [ -n "$line" ]; do
+    ca_pem="$ca_pem$line"$'\n'
+    case "$line" in
+        *"-----END CERTIFICATE-----"*)
+            ca_idx=$((ca_idx + 1))
+            CA_CERT_B64="$(printf '%s' "$ca_pem" | openssl x509 -outform DER | openssl base64)"
+            CA_CERTS_XML="$CA_CERTS_XML
+      <certificate>
+        <name>netconf-tls-ca-${ca_idx}</name>
+        <cert-data>${CA_CERT_B64}</cert-data>
+      </certificate>"
+            ca_pem=""
+            ;;
+    esac
+done < "$CA_CRT"
 
 TLS_XML="$(mktemp)"
 trap 'rm -f "$TLS_XML"' EXIT
@@ -88,11 +107,7 @@ cat >"$TLS_XML" <<EOF
 <truststore xmlns="urn:ietf:params:xml:ns:yang:ietf-truststore">
   <certificate-bags>
     <certificate-bag>
-      <name>netconf-tls-cacerts</name>
-      <certificate>
-        <name>netconf-tls-ca</name>
-        <cert-data>${CA_CRT_B64}</cert-data>
-      </certificate>
+      <name>netconf-tls-cacerts</name>${CA_CERTS_XML}
     </certificate-bag>
   </certificate-bags>
 </truststore>
