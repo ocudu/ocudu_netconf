@@ -1,0 +1,109 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module nrcelldu-scheduler-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-nrcelldu-scheduler-extension:1.0";
+    prefix "ocudu-nrcelldu-scheduler";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-03 { description "Initial version: scheduler expert config (nof_preselected_newtx_ues +
+                                       qos_sched/rr_sched policy) and Timing Advance (TA) scheduler control."; }
+
+    grouping scheduler_extensions_subtree {
+        description "OCUDU extension of the cell scheduler expert config.";
+
+        container ocudu_nrcelldu_scheduler_extensions {
+            leaf nof_preselected_newtx_ues {
+                description "Number of UEs pre-selected for PDSCH/PUSCH newTx scheduling per slot. The scheduling
+                             policy is applied only to the pre-selected UEs.";
+                type uint16 { range "1..8192"; }
+                default 1024;
+            }
+            container policy {
+                description "Scheduler policy. Exactly one of qos_sched or rr_sched applies.";
+                choice scheduler_policy {
+                    case qos_sched {
+                        container qos_sched {
+                            description "Time-domain QoS-aware scheduling policy.";
+                            leaf combine_function {
+                                description "Weight combining function for QoS-aware scheduling.";
+                                type enumeration {
+                                    enum gbr_prioritized;
+                                    enum geometric_mean;
+                                }
+                                default gbr_prioritized;
+                            }
+                            leaf pf_fairness_coeff {
+                                description "Fairness coefficient used in the Proportional Fair (PF) weight.";
+                                type decimal64 { fraction-digits 2; }
+                                default "2.0";
+                            }
+                            leaf prio_enabled {
+                                description "Take the QoS Flow priority into account in QoS-aware scheduling.";
+                                type boolean;
+                                default true;
+                            }
+                            leaf pdb_enabled {
+                                description "Take the QoS Flow Packet Delay Budget (PDB) into account.";
+                                type boolean;
+                                default true;
+                            }
+                            leaf gbr_enabled {
+                                description "Take the QoS Flow Guaranteed Bit Rate (GBR) into account.";
+                                type boolean;
+                                default true;
+                            }
+                        }
+                    }
+                    case rr_sched {
+                        container rr_sched {
+                            presence "Use the time-domain round-robin scheduling policy.";
+                            description "Time-domain round-robin scheduling policy (no parameters).";
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    grouping ta_extensions_subtree {
+        description "OCUDU extension of the cell Timing Advance (TA) scheduler control config.";
+
+        container ocudu_nrcelldu_ta_extensions {
+            leaf ta_measurement_slot_period {
+                description "Measurement periodicity in number of slots over which the new TA Command is computed.";
+                type uint16;
+                default 80;
+            }
+            leaf ta_measurement_slot_prohibit_period {
+                description "Delay in number of slots between issuing the TA_CMD and starting TA measurements.";
+                type uint16 { range "0..10000"; }
+                default 0;
+            }
+            leaf ta_cmd_offset_threshold {
+                description "TA Command (T_A) offset threshold above which a TA Command is triggered. A value below
+                             zero disables issuing TA Commands.";
+                type int8 { range "-1..31"; }
+                default 1;
+            }
+            leaf ta_target {
+                description "Timing Advance target in units of TA.";
+                type decimal64 { fraction-digits 1; range "-30.0..30.0"; }
+                default "1.0";
+            }
+            leaf ta_update_measurement_ul_sinr_threshold {
+                description "UL SINR threshold in dB above which a reported N_TA update measurement is considered valid.";
+                type decimal64 { fraction-digits 1; }
+                default "0.0";
+            }
+            leaf ta_outlier_detection_zscore_threshold {
+                description "Z-score threshold for outlier detection in N_TA measurements. 0.0 disables outlier detection.";
+                type decimal64 { fraction-digits 2; range "0.0..5.0"; }
+                default "1.75";
+            }
+        }
+    }
+}

@@ -26,6 +26,7 @@ module nrcelldu-extensions {
     import nrcelldu-paging-extensions { prefix ocudu-nrcelldu-paging; }
     import nrcelldu-drx-extensions { prefix ocudu-nrcelldu-drx; }
     import nrcelldu-ntn-extensions { prefix ocudu-nrcelldu-ntn; }
+    import nrcelldu-scheduler-extensions { prefix ocudu-nrcelldu-scheduler; }
 
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
@@ -56,6 +57,8 @@ module nrcelldu-extensions {
             uses ocudu-nrcelldu-paging:paging_extensions_subtree;
             uses ocudu-nrcelldu-drx:drx_extensions_subtree;
             uses ocudu-nrcelldu-ntn:ntn_extensions_subtree;
+            uses ocudu-nrcelldu-scheduler:scheduler_extensions_subtree;
+            uses ocudu-nrcelldu-scheduler:ta_extensions_subtree;
         }
     }
 
