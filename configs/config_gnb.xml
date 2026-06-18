@@ -526,6 +526,20 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <prach_root_sequence_index>1</prach_root_sequence_index>
               <zero_correlation_zone>0</zero_correlation_zone>
             </ocudu_nrcelldu_prach_extensions>
+            <ocudu_nrcelldu_tdd_extensions>
+              <dl_ul_tx_period>5</dl_ul_tx_period>
+              <nof_dl_slots>3</nof_dl_slots>
+              <nof_dl_symbols>6</nof_dl_symbols>
+              <nof_ul_slots>1</nof_ul_slots>
+              <nof_ul_symbols>4</nof_ul_symbols>
+              <pattern2>
+                <dl_ul_tx_period>10</dl_ul_tx_period>
+                <nof_dl_slots>6</nof_dl_slots>
+                <nof_dl_symbols>8</nof_dl_symbols>
+                <nof_ul_slots>3</nof_ul_slots>
+                <nof_ul_symbols>0</nof_ul_symbols>
+              </pattern2>
+            </ocudu_nrcelldu_tdd_extensions>
             <ocudu_nrcelldu_pdsch_extensions>
               <mcs_table>qam64</mcs_table>
               <min_ue_mcs>0</min_ue_mcs>

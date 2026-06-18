@@ -156,6 +156,13 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <nof_dl_symbols>6</nof_dl_symbols>
               <nof_ul_slots>1</nof_ul_slots>
               <nof_ul_symbols>4</nof_ul_symbols>
+              <pattern2>
+                <dl_ul_tx_period>10</dl_ul_tx_period>
+                <nof_dl_slots>6</nof_dl_slots>
+                <nof_dl_symbols>8</nof_dl_symbols>
+                <nof_ul_slots>3</nof_ul_slots>
+                <nof_ul_symbols>0</nof_ul_symbols>
+              </pattern2>
             </ocudu_nrcelldu_tdd_extensions>
             <ocudu_nrcelldu_mac_cell_group_extensions>
               <bsr_cfg>
