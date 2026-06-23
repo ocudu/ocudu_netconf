@@ -19,6 +19,7 @@ module gnbcuupfunction-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-23 { description "Add configurable F1-U (GTP-U) bind/peer UDP ports on EP_F1U"; }
     revision 2026-06-08 { description "Allow FQDN (remoteAddress -> inet:host) on EP_E1; remove remoteAddress on EP_F1U and EP_NgU (GTP-U peers are learned via signaling, not configured)"; }
     revision 2026-05-29 { description "Make gNBCUUPId config true so it can be set via NETCONF <edit-config>"; }
     revision 2026-05-28 { description "Add remote-control-extensions subtree"; }
@@ -67,5 +68,25 @@ module gnbcuupfunction-extensions {
         description "NG-U (N3) is GTP-U: the UPF transport address is provided by the core via
                      NGAP/SMF, not statically configured. 3GPP marks remoteAddress mandatory,
                      so remove it to forbid it being set.";
+    }
+
+    augment /me3gpp:ManagedElement/gnbcuup3gpp:GNBCUUPFunction/ep3gpp:EP_F1U/ep3gpp:attributes {
+        container ocudu_ep_f1u_extensions {
+            description "OCUDU F1-U transport extensions. 3GPP EP_F1U models only the local
+                         address (localAddress); these leaves add the GTP-U UDP ports.";
+
+            leaf bind_port {
+                type inet:port-number;
+                default 2152;
+                description "Local UDP port the F1-U (GTP-U) socket binds to.
+                             Defaults to 2152 per 3GPP TS 29.281 Sec. 4.4.2.3.";
+            }
+            leaf peer_port {
+                type inet:port-number;
+                default 2152;
+                description "Remote UDP port the F1-U (GTP-U) socket sends to.
+                             Defaults to 2152 per 3GPP TS 29.281 Sec. 4.4.2.3.";
+            }
+        }
     }
 }
