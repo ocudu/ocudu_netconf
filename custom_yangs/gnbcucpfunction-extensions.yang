@@ -19,6 +19,7 @@ module gnbcucpfunction-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-23 { description "Add configurable NG-C (NGAP/SCTP) AMF port on EP_NgC"; }
     revision 2026-06-08 { description "Allow FQDN (remoteAddress -> inet:host) on EP_NgC; remove remoteAddress on EP_F1C and EP_E1 (CU-CP terminates F1-C/E1 as a server, so the connect address lives on the peer)"; }
     revision 2026-05-28 { description "Add remote-control-extensions subtree"; }
     revision 2026-04-30 { description "Initial version"; }
@@ -62,5 +63,21 @@ module gnbcucpfunction-extensions {
                      never dials the peer. The E1 connect address is configured on the
                      gNB-CU-UP's EP_E1 instead. 3GPP marks remoteAddress mandatory, so remove
                      it from the CU-CP's EP_E1 to forbid it being set.";
+    }
+
+    augment /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ep3gpp:EP_NgC/ep3gpp:attributes {
+        container ocudu_ep_ngc_extensions {
+            description "OCUDU NG-C transport extensions. 3GPP EP_NgC models the AMF address
+                         (remoteAddress). This leave adds its SCTP port.";
+
+            leaf port {
+                type inet:port-number {
+                    range "20000..40000";
+                }
+                default 38412;
+                description "SCTP port of the AMF that the gNB-CU-CP connects to for NG-C/NGAP.
+                             Defaults to 38412 per 3GPP TS 38.412 Sec. 7.";
+            }
+        }
     }
 }
