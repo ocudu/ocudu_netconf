@@ -241,6 +241,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
             <vlanId>0</vlanId>
           </localAddress>
           <remoteAddress>10.53.1.2</remoteAddress>
+          <!-- ng-c AMF SCTP port (default 38412 per TS 38.412) -->
+          <ocudu_ep_ngc_extensions xmlns="urn:ocudu-gnbcucpfunction-extension:1.0">
+            <port>38412</port>
+          </ocudu_ep_ngc_extensions>
         </attributes>
       </EP_NgC>
 
@@ -731,6 +735,7 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
       <ocudu_remote_control_extensions>
         <enabled>true</enabled>
         <bind_addr>0.0.0.0</bind_addr>
+        <port>8001</port>
       </ocudu_remote_control_extensions>
 
       <ocudu_metrics_extensions>
