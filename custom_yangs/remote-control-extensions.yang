@@ -11,6 +11,7 @@ module remote-control-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-06-23 { description "Add configurable remote control server listen port"; }
     revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
 
@@ -30,6 +31,12 @@ module remote-control-extensions {
                 description "IP address that the remote control service binds to.";
                 type inet:ip-address;
                 default "0.0.0.0";
+            }
+
+            leaf port {
+                description "TCP port that the remote control service listens on for incoming connections.";
+                type inet:port-number;
+                default 8001;
             }
         }
     }
