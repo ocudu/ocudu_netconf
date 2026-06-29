@@ -274,6 +274,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
       </EP_F1C>
 
       <ocudu_gnbcucpfunction_extensions xmlns="urn:ocudu-gnbcucpfunction-extension:1.0">
+        <!-- Tracking Area Code advertised to the AMF in the NGAP supported-TA list. Needed on
+             a standalone CU-CP, where there is no co-located DU cell to source nRTAC from. -->
+        <nRTAC>7</nRTAC>
+
         <ocudu_log_extensions>
           <filename>/tmp/cucp.log</filename>
           <all_level>warning</all_level>
