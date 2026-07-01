@@ -348,6 +348,19 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <enable>false</enable>
         </n3>
       </ocudu_pcap_extensions>
+
+      <ocudu_gnbcuupfunction_testmode_extensions>
+        <enable>false</enable>
+        <integrity_enable>true</integrity_enable>
+        <ciphering_enable>true</ciphering_enable>
+        <nea_algo>2</nea_algo>
+        <nia_algo>2</nia_algo>
+        <ue_ambr>40000000000</ue_ambr>
+        <attach_detach_period>0</attach_detach_period>
+        <reestablish_period>0</reestablish_period>
+        <f1u_peer_address>127.0.10.2</f1u_peer_address>
+        <nof_ues>1</nof_ues>
+      </ocudu_gnbcuupfunction_testmode_extensions>
     </ocudu_gnbcuupfunction_extensions>
   </GNBCUUPFunction>
   
