@@ -18,10 +18,12 @@ module gnbdufunction-extensions {
     import pcap-extensions { prefix ocudu-pcap; }
     import remote-control-extensions { prefix ocudu-remote-control; }
     import rudummy-extensions { prefix ocudu-rudummy; }
+    import rusdr-extensions { prefix ocudu-rusdr; }
 
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-07-01 { description "Add rusdr-extensions subtree (SDR Radio Unit configuration)"; }
     revision 2026-06-23 { description "Add configurable F1-U (GTP-U) bind/peer UDP ports on EP_F1U"; }
     revision 2026-06-08 { description "Allow FQDN (remoteAddress -> inet:host) on EP_F1C; remove remoteAddress on EP_F1U (F1-U peer learned via F1AP signaling)"; }
     revision 2026-05-04 { description "Add pcap-extensions subtree";}
@@ -40,6 +42,7 @@ module gnbdufunction-extensions {
             uses ocudu-pcap:pcap_extensions_subtree;
             uses ocudu-remote-control:remote_control_extensions_subtree;
             uses ocudu-rudummy:rudummy_extensions_subtree;
+            uses ocudu-rusdr:rusdr_extensions_subtree;
         }
     }
 

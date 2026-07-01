@@ -1,0 +1,133 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module rusdr-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-rusdr-extension:1.0";
+    prefix "ocudu-rusdr";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-07-01 { description "Initial version: SDR (RF frontend) Radio Unit configuration."; }
+
+    grouping rusdr_extensions_subtree {
+        description "OCUDU SDR RU configuration. When present it selects an SDR (RF frontend)
+                     Radio Unit and maps to the gNB 'ru_sdr' config; it takes precedence over
+                     the OFH and dummy Radio Units.";
+
+        container ocudu_ru_sdr_extensions {
+            leaf device_driver {
+                description "Radio device driver (e.g. uhd, zmq).";
+                type string;
+                default "uhd";
+            }
+            leaf device_args {
+                description "Driver-specific device arguments string (e.g. type=b200,num_recv_frames=64).";
+                type string;
+                default "";
+            }
+            leaf srate {
+                description "Sampling rate in MHz.";
+                type decimal64 { fraction-digits 3; range "0..max"; }
+                default "61.440";
+            }
+            leaf otw_format {
+                description "Over-the-wire sample format (e.g. default, sc16, sc12, sc8).";
+                type string;
+                default "default";
+            }
+            leaf tx_gain {
+                description "Transmit gain in dB.";
+                type decimal64 { fraction-digits 3; }
+                default "50.0";
+            }
+            leaf rx_gain {
+                description "Receive gain in dB.";
+                type decimal64 { fraction-digits 3; }
+                default "60.0";
+            }
+            leaf clock {
+                description "Clock source (e.g. default, internal, external, gpsdo).";
+                type string;
+                default "default";
+            }
+            leaf sync {
+                description "Time synchronisation source (e.g. default, internal, external, gpsdo).";
+                type string;
+                default "default";
+            }
+            leaf freq_offset {
+                description "Center frequency offset in Hz applied to all radio channels.";
+                type decimal64 { fraction-digits 3; }
+                default "0.0";
+            }
+            leaf clock_ppm {
+                description "Clock calibration in PPM applied to the radio.";
+                type decimal64 { fraction-digits 3; }
+                default "0.0";
+            }
+            leaf lo_offset {
+                description "Local oscillator frequency offset in MHz.";
+                type decimal64 { fraction-digits 3; }
+                default "0.0";
+            }
+            leaf time_alignment_calibration {
+                description "Time-alignment calibration in samples, or 'auto' to let the driver decide.";
+                type union {
+                    type int32;
+                    type enumeration { enum auto; }
+                }
+                default "auto";
+            }
+            leaf dl_freq_Hz {
+                description "Optional override of the downlink center frequency in Hz. If unset it is "
+                          + "derived from the cell ARFCN.";
+                type decimal64 { fraction-digits 3; }
+            }
+            leaf ul_freq_Hz {
+                description "Optional override of the uplink center frequency in Hz. If unset it is "
+                          + "derived from the cell ARFCN.";
+                type decimal64 { fraction-digits 3; }
+            }
+
+            container amplitude_control {
+                description "Baseband amplitude control / clipping to limit PA distortion.";
+                leaf tx_gain_backoff {
+                    description "Gain backoff between the full-scale amplitude and the expected signal, in dB.";
+                    type decimal64 { fraction-digits 3; }
+                    default "12.0";
+                }
+                leaf enable_clipping {
+                    description "Enable clipping of the baseband samples.";
+                    type boolean;
+                    default false;
+                }
+                leaf ceiling {
+                    description "Clipping ceiling referenced to full scale, in dBFS.";
+                    type decimal64 { fraction-digits 3; }
+                    default "-0.1";
+                }
+            }
+
+            container expert_cfg {
+                description "Advanced SDR lower-PHY expert settings.";
+                leaf low_phy_dl_throttling {
+                    description "Lower-PHY downlink throttling factor. 0 disables throttling.";
+                    type decimal64 { fraction-digits 3; range "0..max"; }
+                    default "0.0";
+                }
+                leaf tx_mode {
+                    description "Transmitter mode (e.g. continuous, discontinuous, same-port).";
+                    type string;
+                    default "continuous";
+                }
+                leaf power_ramping_time_us {
+                    description "Power ramping time in microseconds before the start of the transmission.";
+                    type decimal64 { fraction-digits 3; range "0..max"; }
+                    default "0.0";
+                }
+            }
+        }
+    }
+}
