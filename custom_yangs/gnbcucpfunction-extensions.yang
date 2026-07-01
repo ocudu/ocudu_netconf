@@ -20,6 +20,7 @@ module gnbcucpfunction-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-07-01 { description "Add remaining cu_cp.amf configuration on EP_NgC: bind_interface, SCTP socket tuning, no_core, amf_reconnection_retry_time, procedure_timeout"; }
     revision 2026-06-29 { description "Add optional nRTAC leaf so a standalone gNB-CU-CP can set the Tracking Area Code advertised in the NGAP supported-TA list"; }
     revision 2026-06-23 { description "Add configurable NG-C (NGAP/SCTP) AMF port on EP_NgC"; }
     revision 2026-06-08 { description "Allow FQDN (remoteAddress -> inet:host) on EP_NgC; remove remoteAddress on EP_F1C and EP_E1 (CU-CP terminates F1-C/E1 as a server, so the connect address lives on the peer)"; }
@@ -77,8 +78,10 @@ module gnbcucpfunction-extensions {
 
     augment /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ep3gpp:EP_NgC/ep3gpp:attributes {
         container ocudu_ep_ngc_extensions {
-            description "OCUDU NG-C transport extensions. 3GPP EP_NgC models the AMF address
-                         (remoteAddress). This leave adds its SCTP port.";
+            description "OCUDU NG-C transport extensions. 3GPP EP_NgC models only the AMF
+                         address (remoteAddress) and local bind address (localAddress); these
+                         leaves add the remaining transport/behaviour knobs, mapped 1:1 to the
+                         gNB-CU-CP 'cu_cp.amf.*' config.";
 
             leaf port {
                 type inet:port-number {
@@ -87,6 +90,69 @@ module gnbcucpfunction-extensions {
                 default 38412;
                 description "SCTP port of the AMF that the gNB-CU-CP connects to for NG-C/NGAP.
                              Defaults to 38412 per 3GPP TS 38.412 Sec. 7.";
+            }
+            leaf bind_interface {
+                type string;
+                default "auto";
+                description "Network device the CU-CP binds for the N2 interface.
+                             'auto' lets the stack pick the interface.";
+            }
+            leaf no_core {
+                type boolean;
+                default false;
+                description "Allow the gNB-CU-CP to run without a 5G core (e.g. for test mode).";
+            }
+            leaf amf_reconnection_retry_time {
+                type uint32;
+                default 1000;
+                description "Time to wait after a failed AMF reconnection attempt, in milliseconds.";
+            }
+            leaf procedure_timeout {
+                type uint32;
+                default 5000;
+                description "Time the NGAP waits for a response from the AMF, in milliseconds.";
+            }
+
+            // SCTP socket tuning for the N2/NGAP association. -1 selects the system default.
+            leaf sctp_rto_initial {
+                type int32;
+                default 120;
+                description "SCTP initial RTO in milliseconds (-1 for system default).";
+            }
+            leaf sctp_rto_min {
+                type int32;
+                default 120;
+                description "SCTP minimum RTO in milliseconds (-1 for system default).";
+            }
+            leaf sctp_rto_max {
+                type int32;
+                default 500;
+                description "SCTP maximum RTO in milliseconds (-1 for system default).";
+            }
+            leaf sctp_init_max_attempts {
+                type int32;
+                default 3;
+                description "SCTP INIT maximum attempts (-1 for system default).";
+            }
+            leaf sctp_max_init_timeo {
+                type int32;
+                default 500;
+                description "SCTP maximum INIT timeout in milliseconds (-1 for system default).";
+            }
+            leaf sctp_hb_interval {
+                type int32;
+                default 30000;
+                description "SCTP heartbeat interval in milliseconds (-1 for system default).";
+            }
+            leaf sctp_assoc_max_retx {
+                type int32;
+                default 10;
+                description "SCTP association maximum retransmissions (-1 for system default).";
+            }
+            leaf sctp_nodelay {
+                type boolean;
+                default false;
+                description "Send SCTP messages immediately without any Nagle-like batching.";
             }
         }
     }
