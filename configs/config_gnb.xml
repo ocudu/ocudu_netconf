@@ -692,6 +692,20 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
     </EP_F1U>
 
     <ocudu_gnbdufunction_extensions xmlns="urn:ocudu-gnbdufunction-extension:1.0">
+      <ocudu_ru_sdr_extensions>
+        <device_driver>uhd</device_driver>
+        <device_args>type=b200,num_recv_frames=64,num_send_frames=64</device_args>
+        <srate>23.040</srate>
+        <otw_format>sc12</otw_format>
+        <tx_gain>80.0</tx_gain>
+        <rx_gain>40.0</rx_gain>
+        <clock>internal</clock>
+        <sync>internal</sync>
+        <amplitude_control>
+          <enable_clipping>false</enable_clipping>
+          <tx_gain_backoff>12.0</tx_gain_backoff>
+        </amplitude_control>
+      </ocudu_ru_sdr_extensions>
       <ocudu_ru_dummy_extensions>
         <dl_processing_delay>1</dl_processing_delay>
         <time_scaling>1.0</time_scaling>
