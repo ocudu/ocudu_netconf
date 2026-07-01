@@ -19,6 +19,7 @@ module gnbcuupfunction-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-07-01 { description "Add CU-UP test_mode extensions on GNBCUUPFunction"; }
     revision 2026-06-23 { description "Add configurable F1-U (GTP-U) bind/peer UDP ports on EP_F1U"; }
     revision 2026-06-08 { description "Allow FQDN (remoteAddress -> inet:host) on EP_E1; remove remoteAddress on EP_F1U and EP_NgU (GTP-U peers are learned via signaling, not configured)"; }
     revision 2026-05-29 { description "Make gNBCUUPId config true so it can be set via NETCONF <edit-config>"; }
@@ -34,6 +35,65 @@ module gnbcuupfunction-extensions {
             uses ocudu-metrics:metrics_extensions_cuup_subtree;
             uses ocudu-pcap:pcap_extensions_subtree;
             uses ocudu-remote-control:remote_control_extensions_subtree;
+
+            container ocudu_gnbcuupfunction_testmode_extensions {
+                description "OCUDU CU-UP test mode: generates synthetic DL/UL user-plane
+                             traffic without a real gNB-DU/core. Maps to the gNB-CU-UP
+                             'cu_up.test_mode' config.";
+
+                leaf enable {
+                    description "Enable or disable CU-UP test mode.";
+                    type boolean;
+                    default false;
+                }
+                leaf integrity_enable {
+                    description "Enable or disable PDCP integrity testing.";
+                    type boolean;
+                    default true;
+                }
+                leaf ciphering_enable {
+                    description "Enable or disable PDCP ciphering testing.";
+                    type boolean;
+                    default true;
+                }
+                leaf nea_algo {
+                    description "NEA (ciphering) algorithm to use for testing.";
+                    type uint16 { range 0..3; }
+                    default 2;
+                }
+                leaf nia_algo {
+                    description "NIA (integrity) algorithm to use for testing.";
+                    type uint16 { range 1..3; }
+                    default 2;
+                }
+                leaf ue_ambr {
+                    description "DL UE-AMBR used for testing, in bps.";
+                    type uint64;
+                    default 40000000000;
+                }
+                leaf attach_detach_period {
+                    description "Attach/detach period for test mode, in milliseconds.
+                                 0 means always attached.";
+                    type uint32;
+                    default 0;
+                }
+                leaf reestablish_period {
+                    description "Reestablishment period for test mode, in milliseconds.
+                                 0 means no re-establishments.";
+                    type uint32;
+                    default 0;
+                }
+                leaf f1u_peer_address {
+                    description "Destination address for DL F1-U packets in test mode.";
+                    type inet:ip-address;
+                    default "127.0.10.2";
+                }
+                leaf nof_ues {
+                    description "Number of UEs used for test mode.";
+                    type uint32;
+                    default 1;
+                }
+            }
         }
     }
 
