@@ -243,6 +243,18 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <!-- ng-c AMF SCTP port (default 38412 per TS 38.412) -->
           <ocudu_ep_ngc_extensions xmlns="urn:ocudu-gnbcucpfunction-extension:1.0">
             <port>38412</port>
+            <bind_interface>auto</bind_interface>
+            <no_core>false</no_core>
+            <amf_reconnection_retry_time>1000</amf_reconnection_retry_time>
+            <procedure_timeout>5000</procedure_timeout>
+            <sctp_rto_initial>120</sctp_rto_initial>
+            <sctp_rto_min>120</sctp_rto_min>
+            <sctp_rto_max>500</sctp_rto_max>
+            <sctp_init_max_attempts>3</sctp_init_max_attempts>
+            <sctp_max_init_timeo>500</sctp_max_init_timeo>
+            <sctp_hb_interval>30000</sctp_hb_interval>
+            <sctp_assoc_max_retx>10</sctp_assoc_max_retx>
+            <sctp_nodelay>false</sctp_nodelay>
           </ocudu_ep_ngc_extensions>
         </attributes>
       </EP_NgC>
