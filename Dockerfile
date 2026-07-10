@@ -45,7 +45,7 @@ FROM base AS builder
 
 ARG OS_VERSION
 # Check tag here https://forge.3gpp.org/rep/sa5/MnS/-/tree/Tag_Rel16_SA102?ref_type=tags
-ARG YANG_REPO_3GPP_TAG=Tag_Rel18_SA111
+ARG YANG_REPO_3GPP_TAG=Tag_Rel19_SA112
 ARG NETOPEER2_TAG=v2.8.2
 ARG LIBNETCONF2_TAG=v4.2.14
 ARG LIBYANG_TAG=v5.4.9
