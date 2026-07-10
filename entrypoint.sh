@@ -214,7 +214,7 @@ fi
 
 echo "Starting netconf server .."
 # Default pidfile lives under /run (root-owned) --> overwrite with /tmp
-netopeer2-server -v3 -d -p /tmp/netopeer2-server.pid
+netopeer2-server -v2 -d -p /tmp/netopeer2-server.pid
 
 # Wait for all child processes to terminate
 wait
