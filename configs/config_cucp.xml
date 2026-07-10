@@ -30,6 +30,29 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
             <mnc>01</mnc>
           </pLMNTarget>
         </qceIdMappingInfoList>
+        <mappingSetIDBackhaulAddressList>
+          <idx>0</idx>
+          <setId>0</setId>
+          <backhaulAddress>
+            <gNBId>1</gNBId>
+            <tAI>
+              <plmnId>
+                <mcc>001</mcc>
+                <mnc>01</mnc>
+              </plmnId>
+              <tac>0007</tac>
+            </tAI>
+          </backhaulAddress>
+        </mappingSetIDBackhaulAddressList>
+        <tceIDMappingInfoList>
+          <idx>0</idx>
+          <tceIPAddress>0.0.0.0</tceIPAddress>
+          <tceID>0</tceID>
+          <pLMNTarget>
+            <mcc>001</mcc>
+            <mnc>01</mnc>
+          </pLMNTarget>
+        </tceIDMappingInfoList>
       </attributes>
 
       <RRMPolicyRatio xmlns="urn:3gpp:sa5:_3gpp-nr-nrm-rrmpolicy">
@@ -82,6 +105,8 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <attributes>
             <nRFreqRelationRef>NRFreqRelation=intra-freq</nRFreqRelationRef>
             <adjacentNRCellRef>ManagedElement=ran1,GNBCUCPFunction=cucp1,NRCellCU=nrcellcu2</adjacentNRCellRef>
+            <isENDCAllowed>false</isENDCAllowed>
+            <isMLBAllowed>true</isMLBAllowed>
             <ocudu_nrcellrelation_mobility_extensions xmlns="urn:ocudu-gnbcucpfunction-mobility-extension:1.0">
               <report_config_refs>2</report_config_refs>
               <report_config_refs>3</report_config_refs>
@@ -95,6 +120,8 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <attributes>
             <nRFreqRelationRef>NRFreqRelation=intra-freq</nRFreqRelationRef>
             <adjacentNRCellRef>ManagedElement=ran1,GNBCUCPFunction=cucp1,NRCellCU=nrcellcu3</adjacentNRCellRef>
+            <isENDCAllowed>false</isENDCAllowed>
+            <isMLBAllowed>true</isMLBAllowed>
             <ocudu_nrcellrelation_mobility_extensions xmlns="urn:ocudu-gnbcucpfunction-mobility-extension:1.0">
               <report_config_refs>2</report_config_refs>
             </ocudu_nrcellrelation_mobility_extensions>
@@ -121,6 +148,8 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <attributes>
             <nRFreqRelationRef>NRFreqRelation=intra-freq</nRFreqRelationRef>
             <adjacentNRCellRef>ManagedElement=ran1,GNBCUCPFunction=cucp1,NRCellCU=nrcellcu1</adjacentNRCellRef>
+            <isENDCAllowed>false</isENDCAllowed>
+            <isMLBAllowed>true</isMLBAllowed>
             <ocudu_nrcellrelation_mobility_extensions xmlns="urn:ocudu-gnbcucpfunction-mobility-extension:1.0">
               <report_config_refs>2</report_config_refs>
             </ocudu_nrcellrelation_mobility_extensions>
@@ -131,6 +160,8 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <attributes>
             <nRFreqRelationRef>NRFreqRelation=intra-freq</nRFreqRelationRef>
             <adjacentNRCellRef>ManagedElement=ran1,GNBCUCPFunction=cucp1,NRCellCU=nrcellcu3</adjacentNRCellRef>
+            <isENDCAllowed>false</isENDCAllowed>
+            <isMLBAllowed>true</isMLBAllowed>
             <ocudu_nrcellrelation_mobility_extensions xmlns="urn:ocudu-gnbcucpfunction-mobility-extension:1.0">
               <report_config_refs>2</report_config_refs>
             </ocudu_nrcellrelation_mobility_extensions>
@@ -157,6 +188,8 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <attributes>
             <nRFreqRelationRef>NRFreqRelation=intra-freq</nRFreqRelationRef>
             <adjacentNRCellRef>ManagedElement=ran1,GNBCUCPFunction=cucp1,NRCellCU=nrcellcu1</adjacentNRCellRef>
+            <isENDCAllowed>false</isENDCAllowed>
+            <isMLBAllowed>true</isMLBAllowed>
             <ocudu_nrcellrelation_mobility_extensions xmlns="urn:ocudu-gnbcucpfunction-mobility-extension:1.0">
               <report_config_refs>2</report_config_refs>
             </ocudu_nrcellrelation_mobility_extensions>
@@ -167,6 +200,8 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <attributes>
             <nRFreqRelationRef>NRFreqRelation=intra-freq</nRFreqRelationRef>
             <adjacentNRCellRef>ManagedElement=ran1,GNBCUCPFunction=cucp1,NRCellCU=nrcellcu2</adjacentNRCellRef>
+            <isENDCAllowed>false</isENDCAllowed>
+            <isMLBAllowed>true</isMLBAllowed>
             <ocudu_nrcellrelation_mobility_extensions xmlns="urn:ocudu-gnbcucpfunction-mobility-extension:1.0">
               <report_config_refs>2</report_config_refs>
             </ocudu_nrcellrelation_mobility_extensions>

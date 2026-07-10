@@ -62,13 +62,13 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         </pLMNInfoList>
         <nPNIdentityList>
           <idx>0</idx>
-          <plmnid>
+          <plmnId>
             <mcc>001</mcc>
             <mnc>01</mnc>
-          </plmnid>
-          <cAGIdList>unused</cAGIdList>
-          <nIDList>unused</nIDList>
+          </plmnId>
         </nPNIdentityList>
+        <redCapAccessCriteriaRef>RedCapAccessCriteria=unused</redCapAccessCriteriaRef>
+        <nTNTAClist>7</nTNTAClist>
         <nRPCI>1</nRPCI>
         <nRTAC>7</nRTAC>
         <arfcnDL>640000</arfcnDL>
