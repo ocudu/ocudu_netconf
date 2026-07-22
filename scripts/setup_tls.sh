@@ -55,7 +55,8 @@ if [ ! -e "$CA_CRT" ]; then
     issue_client_cert "$CLIENT_CN" client
     issue_client_cert "$HYBRID_ODU_CN" client-hybrid-odu
 
-    chmod 0644 "$CERT_DIR"/*.crt "$CERT_DIR"/*.key
+    chmod 0644 "$CERT_DIR"/*.crt
+    chmod 0600 "$CERT_DIR"/*.key
 fi
 
 for f in "$SERVER_CRT" "$SERVER_KEY" "$CA_CRT"; do
