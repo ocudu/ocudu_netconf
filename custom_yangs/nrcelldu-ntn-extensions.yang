@@ -1,0 +1,164 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module nrcelldu-ntn-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-nrcelldu-ntn-extension:1.0";
+    prefix "ocudu-nrcelldu-ntn";
+
+    import _3gpp-common-yang-types { prefix types3gpp; }
+    import ietf-yang-types { prefix yang; }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU.
+
+                 Per-cell NTN serving-cell configuration (TS 38.331 SIB19). 3GPP TS 28.541 models
+                 nothing of this on NRCellDU beyond nTNTAClist, so the whole serving-cell parameter
+                 set lives here. The satellite's orbital state is not repeated per cell: the
+                 satellite_idx leaf references a 3GPP NTNFunction/EphemerisInfoSet/EphemerisInfos
+                 entry, which carries the ephemeris and the OCUDU satellite extension.
+
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+
+    revision 2026-08-06 { description "Initial version: NTN serving cell parameters (SIB19)."; }
+
+    typedef polarization_type {
+        description "Polarization of a service-link transmission.";
+        type enumeration {
+            enum rhcp { description "Right-hand circular polarization."; }
+            enum lhcp { description "Left-hand circular polarization."; }
+            enum linear { description "Linear polarization."; }
+        }
+    }
+
+    grouping ntn_extensions_subtree {
+        description "OCUDU extension of the NRCellDU config with NTN serving cell parameters.";
+
+        container ocudu_nrcelldu_ntn_extensions {
+            presence "This cell is an NTN serving cell.";
+
+            leaf satellite_idx {
+                description "Index of the satellite serving this cell. Matches the satelliteId of an entry in "
+                          + "ManagedElement/NTNFunction/EphemerisInfoSet/attributes/EphemerisInfos, parsed as an "
+                          + "integer (satelliteId is a zero-padded 5-digit string).";
+                type uint8;
+                mandatory true;
+            }
+
+            leaf cell_specific_koffset {
+                description "Scheduling offset used for the timing relationships modified for NTN operation "
+                          + "(TS 38.213, TS 38.300 clause 16.14.2). The specifications express K_offset in slots at "
+                          + "15 kHz SCS; it is given here in milliseconds to stay unambiguous at other SCS values. "
+                          + "An NTN serving cell always has one, so it is mandatory.";
+                type uint16 { range "1..1023"; }
+                units milliseconds;
+                mandatory true;
+            }
+
+            leaf ntn_ul_sync_validity_dur {
+                description "Maximum duration from epoch time for which the UE may keep applying the broadcast "
+                          + "assistance information without acquiring new information.";
+                type uint16 { range "5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 50 | 55 | 60 | 120 | 180 | 240 | 900"; }
+                units seconds;
+                default 5;
+            }
+
+            leaf distance_threshold {
+                description "Distance from the cell reference location used for location-based measurement "
+                          + "(TS 38.304). Each step represents 50 m.";
+                type uint32 { range "0..3276250"; }
+                units meters;
+            }
+
+            leaf t_service {
+                description "Time at which this cell stops serving the area it currently covers. Either an "
+                          + "RFC 3339 / ISO 8601 timestamp or Unix milliseconds.";
+                type union {
+                    type yang:date-and-time;
+                    type uint64;
+                }
+            }
+
+            leaf epoch_sfn_offset {
+                description "Offset in system frames between the SIB19 transmission slot and the epoch time of the "
+                          + "NTN assistance information, so the broadcast information becomes valid this many frames "
+                          + "after the SIB19 Tx slot.";
+                type uint64;
+                units frames;
+            }
+
+            leaf ta_report {
+                description "Whether timing advance reporting is enabled. Mandatory present for the serving cell in "
+                          + "SIB19 per TS 38.331, hence the default rather than absence.";
+                type boolean;
+                default false;
+            }
+
+            leaf use_state_vector {
+                description "Whether to broadcast the ephemeris as ECEF state vectors (true) or ECI orbital "
+                          + "parameters (false). When absent, the format follows whichever of positionVelocity or "
+                          + "orbital the referenced EphemerisInfos entry carries.";
+                type boolean;
+            }
+
+            container epoch_time {
+                presence "An explicit epoch time is configured for the assistance information.";
+                description "Starting time of the DL sub-frame the NTN assistance information refers to. When "
+                          + "absent, the gNB derives it.";
+
+                leaf sfn {
+                    description "System frame number part.";
+                    type uint16 { range "0..1023"; }
+                    mandatory true;
+                }
+                leaf subframe_number {
+                    description "Sub-frame number within the SFN.";
+                    type uint8 { range "0..9"; }
+                    mandatory true;
+                }
+            }
+
+            container reference_location {
+                presence "A reference location is configured for this cell.";
+                description "Reference location of the serving cell, used together with distance_threshold for "
+                          + "location-based measurement.";
+                uses types3gpp:GeographicalCoordinates;
+            }
+
+            container polarization {
+                presence "Service-link polarization is signalled for this cell.";
+                description "Polarization information for downlink and uplink transmission on the service link.";
+
+                leaf dl {
+                    description "Polarization for downlink transmission on the service link.";
+                    type polarization_type;
+                }
+                leaf ul {
+                    description "Polarization for uplink transmission on the service link.";
+                    type polarization_type;
+                }
+            }
+
+            container feeder_link {
+                presence "Feeder link parameters are configured for Doppler compensation.";
+                description "Feeder link parameters used to compute the Doppler shifts to pre-compensate.";
+
+                leaf enable_doppler_compensation {
+                    description "Whether feeder link Doppler compensation is applied.";
+                    type boolean;
+                    default false;
+                }
+                leaf dl_freq {
+                    description "Downlink feeder link carrier frequency (gNB to satellite).";
+                    type decimal64 { fraction-digits 1; range "0.0..100000000000.0"; }
+                    units hertz;
+                }
+                leaf ul_freq {
+                    description "Uplink feeder link carrier frequency (satellite to gNB).";
+                    type decimal64 { fraction-digits 1; range "0.0..100000000000.0"; }
+                    units hertz;
+                }
+            }
+        }
+    }
+}

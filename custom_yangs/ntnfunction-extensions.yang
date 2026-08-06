@@ -1,0 +1,252 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module ntnfunction-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-ntnfunction-extension:1.0";
+    prefix "ocudu-ntnfunction";
+
+    import _3gpp-common-managed-element { prefix me3gpp; }
+    import _3gpp-common-yang-types { prefix types3gpp; }
+    import _3gpp-nr-nrm-ntnfunction { prefix ntn3gpp; }
+
+    organization "Software Radio Systems Ltd";
+    description "OCUDU adaptation of the 3GPP NTNFunction satellite model.
+
+                 One EphemerisInfos entry maps onto one element of the OCUDU 'ntn.satellites' YAML
+                 list, which cells reference by satellite_idx. Making that work takes both an
+                 augment and a set of deviations, so both live here:
+
+                 AUGMENT. 3GPP models the ephemeris itself (satelliteId, epochTime and the
+                 positionVelocity / orbital choice) but nothing about how the gNB should propagate
+                 that state, nor about the ground segment behind the feeder link. The OCUDU
+                 satellite object also carries an orbit propagator selection, the NTN gateway
+                 location and a TA-info override, so those three are augmented onto the standard
+                 list entry rather than modelled in a parallel tree.
+
+                 DEVIATIONS. 3GPP TS 28.541 models the EphemerisInfos leaves as the raw ASN.1 field
+                 values of TS 38.331 EphemerisInfo, with the step factor stated only in the
+                 description ('Actual value = field value * 1.3'). Two problems follow:
+
+                 1. The declared ranges do not match TS 38.331. positionX/Y/Z are uint32 0..604800,
+                    which at the documented 1.3 m step tops out at ~786 km and cannot be negative;
+                    TS 38.331 uses INTEGER (-33554432..33554431), i.e. +/-43620 km, which is what an
+                    actual LEO/GEO state vector needs. The orbital parameters have the same problem.
+                 2. Carrying raw field values would put the step conversion in the O1 adapter, where
+                    a future 3GPP range correction would silently change every value on the wire.
+
+                 The deviations therefore restate the leaves in SI units (metres, m/s, radians) over
+                 the TS 38.331 value ranges, which is also exactly what the OCUDU CLI accepts, so the
+                 adapter passes values through unscaled. The 'units' substatements of the deviated
+                 leaves (meter, meter/second, radian) stay correct and are left in place.
+
+                 satelliteId is deviated separately: the 3GPP pattern is
+                 '00([01][0-9][0-9])|(2[0-4][0-9]|(25[0-5]))', whose alternation is mis-grouped, so
+                 anchored matching accepts 00000..00127 but rejects 00128..00255 despite the
+                 description documenting allowedValues 00000..00255. The pattern below is the
+                 correctly grouped form of the documented range.
+
+                 Checked against Rel20_SA112 (ntnfunction rev 2026-05-08, CR-1718): identical to
+                 Rel19_SA112 apart from the revision line, so these are not a short-lived workaround.
+
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+
+    revision 2026-08-06 { description "Initial version: satellite extensions and SI-unit ephemeris deviations."; }
+
+    grouping ntn_satellite_extensions_subtree {
+        description "OCUDU extension of a 3gpp NTNFunction EphemerisInfos entry.";
+
+        container ocudu_ntn_satellite_extensions {
+
+            // The gNB derives the common TA either from the gateway position or from explicit TA
+            // values, never both; rejecting it here turns what would be a start-up failure after a
+            // restart into an edit-config error.
+            must "not(gateway_location and ta_info)" {
+                error-message "gateway_location and ta_info are mutually exclusive.";
+            }
+
+            leaf propagator_type {
+                description "Orbit propagator the gNB uses to advance this satellite's state from epochTime.";
+                type enumeration {
+                    enum rk4 { description "Runge-Kutta 4th order numerical propagator."; }
+                    enum keplerian { description "Analytical two-body Keplerian propagator."; }
+                }
+                default rk4;
+            }
+
+            container gateway_location {
+                presence "NTN gateway location is configured for this satellite.";
+                description "Geodetic location of the NTN gateway on the feeder link. Mutually exclusive with "
+                          + "ta_info: either the gateway position is given and the common TA is derived from it, "
+                          + "or the TA values are supplied directly.";
+
+                uses types3gpp:GeographicalCoordinates;
+
+                leaf altitude {
+                    description "Altitude of the NTN gateway above sea level.";
+                    type types3gpp:Altitude { range "-1000.0..20000.0"; }
+                    default 0.0;
+                }
+            }
+
+            container ta_info {
+                presence "Common timing advance is configured explicitly for this satellite.";
+                description "Timing advance information broadcast in SIB19 (TS 38.331 TA-Info). Mutually exclusive "
+                          + "with gateway_location.";
+
+                leaf ta_common {
+                    description "Network-controlled common timing advance, including any offset the network "
+                              + "considers necessary. A value of 0 is valid.";
+                    type decimal64 { fraction-digits 6; range "0.0..270730.0"; }
+                    units microseconds;
+                    mandatory true;
+                }
+                leaf ta_common_drift {
+                    description "Drift rate of the common TA.";
+                    type decimal64 { fraction-digits 6; range "-51.4606..51.4606"; }
+                    units microseconds/second;
+                    default 0.0;
+                }
+                leaf ta_common_drift_variant {
+                    description "Drift rate variation of the common TA.";
+                    type decimal64 { fraction-digits 6; range "0.0..0.57898"; }
+                    units microseconds/second2;
+                    default 0.0;
+                }
+                leaf ta_common_offset {
+                    description "Constant offset added to the NTA-common broadcast in SIB19, to model fixed system "
+                              + "delays that do not depend on satellite position.";
+                    type decimal64 { fraction-digits 6; range "0.0..10000.0"; }
+                    units microseconds;
+                }
+            }
+        }
+    }
+
+    augment "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+          + "/ntn3gpp:EphemerisInfos" {
+        uses ntn_satellite_extensions_subtree;
+    }
+
+    /*
+     * Position / velocity state vector (TS 38.331 EphemerisStateVectors).
+     *
+     * Note the deviation paths descend through the choice and its shorthand case, both of which are
+     * named in the schema node identifier: .../EphemerisInfos/positionVelocity-or-orbital (choice)
+     * /positionVelocity (case) /positionVelocity (list) /<leaf>.
+     */
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:positionVelocity"
+            + "/ntn3gpp:positionVelocity/ntn3gpp:positionX" {
+        deviate replace {
+            type decimal64 { fraction-digits 1; range "-43620761.6..43620759.3"; }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:positionVelocity"
+            + "/ntn3gpp:positionVelocity/ntn3gpp:positionY" {
+        deviate replace {
+            type decimal64 { fraction-digits 1; range "-43620761.6..43620759.3"; }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:positionVelocity"
+            + "/ntn3gpp:positionVelocity/ntn3gpp:positionZ" {
+        deviate replace {
+            type decimal64 { fraction-digits 1; range "-43620761.6..43620759.3"; }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:positionVelocity"
+            + "/ntn3gpp:positionVelocity/ntn3gpp:velocityVX" {
+        deviate replace {
+            type decimal64 { fraction-digits 2; range "-7864.32..7864.26"; }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:positionVelocity"
+            + "/ntn3gpp:positionVelocity/ntn3gpp:velocityVY" {
+        deviate replace {
+            type decimal64 { fraction-digits 2; range "-7864.32..7864.26"; }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:positionVelocity"
+            + "/ntn3gpp:positionVelocity/ntn3gpp:velocityVZ" {
+        deviate replace {
+            type decimal64 { fraction-digits 2; range "-7864.32..7864.26"; }
+        }
+    }
+
+    /* Orbital parameters (TS 38.331 EphemerisOrbitalParameters). */
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:orbital"
+            + "/ntn3gpp:orbital/ntn3gpp:semiMajorAxis" {
+        // The 3GPP default of 0 lies outside the semi-major axis range, so it is dropped rather
+        // than replaced: an unset semi-major axis means "no orbital ephemeris configured".
+        deviate delete {
+            default "0";
+        }
+        deviate replace {
+            type decimal64 { fraction-digits 2; range "6500000.0..42998632.07"; }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:orbital"
+            + "/ntn3gpp:orbital/ntn3gpp:eccentricity" {
+        deviate replace {
+            type decimal64 { fraction-digits 11; range "0.0..0.01500510825"; }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:orbital"
+            + "/ntn3gpp:orbital/ntn3gpp:periapsis" {
+        deviate replace {
+            type decimal64 { fraction-digits 11; range "0.0..6.28407400155"; }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:orbital"
+            + "/ntn3gpp:orbital/ntn3gpp:longitude" {
+        deviate replace {
+            type decimal64 { fraction-digits 11; range "0.0..6.28407400155"; }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:orbital"
+            + "/ntn3gpp:orbital/ntn3gpp:inclination" {
+        deviate replace {
+            type decimal64 { fraction-digits 11; range "-1.57101850624..1.57101848283"; }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:positionVelocity-or-orbital/ntn3gpp:orbital"
+            + "/ntn3gpp:orbital/ntn3gpp:meanAnomaly" {
+        deviate replace {
+            type decimal64 { fraction-digits 11; range "0.0..6.28407400155"; }
+        }
+    }
+
+    /* Satellite identifier: correctly grouped form of the documented 00000..00255 range. */
+
+    deviation "/me3gpp:ManagedElement/ntn3gpp:NTNFunction/ntn3gpp:EphemerisInfoSet/ntn3gpp:attributes"
+            + "/ntn3gpp:EphemerisInfos/ntn3gpp:satelliteId" {
+        deviate replace {
+            type string {
+                pattern "00([01][0-9][0-9]|2[0-4][0-9]|25[0-5])";
+            }
+        }
+    }
+}

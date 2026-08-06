@@ -11,6 +11,7 @@ module nrcelldu-base-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-08-06 { description "Added band leaf"; }
     revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
 
@@ -36,6 +37,22 @@ module nrcelldu-base-extensions {
                 description "Cell common subcarrier spacing";
                 type mcap:scs-config-type;
                 default KHZ_30;
+            }
+
+            leaf band {
+                description "NR operating band of the cell. When absent, the gNB derives a band from the
+                             downlink ARFCN, which picks the first matching band and so cannot be relied on
+                             where several bands overlap -- notably the NTN bands (n247-n256), whose ARFCN
+                             ranges also fall inside terrestrial bands. Set it explicitly for an NTN cell.
+
+                             The 3GPP model does carry a band list (NRFrequency/multiFrequencyBandListNR)
+                             but declares it 'config false', gNB-derived state, so it cannot configure one.
+
+                             The range spans the whole nr_band enum, FR1 n1 up to FR2 n263. It is not
+                             the set of valid bands: the enum is sparse, and OCUDU also accepts
+                             user-defined band numbers via custom_freq_bands. Validating which band
+                             numbers actually exist is left to the gNB.";
+                type uint16 { range "1..263"; }
             }
         }        
     }

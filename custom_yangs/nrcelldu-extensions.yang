@@ -25,10 +25,12 @@ module nrcelldu-extensions {
     import nrcelldu-sib-extensions { prefix ocudu-nrcelldu-sib; }
     import nrcelldu-paging-extensions { prefix ocudu-nrcelldu-paging; }
     import nrcelldu-drx-extensions { prefix ocudu-nrcelldu-drx; }
+    import nrcelldu-ntn-extensions { prefix ocudu-nrcelldu-ntn; }
 
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-08-06 { description "Added ntn sub-extension"; }
     revision 2026-05-13 { description "Added pusch/pucch/pdcch/csi/srs sub-extensions"; }
     revision 2026-04-02 { description "Renamed srs instances to ocudu";}
     revision 2025-01-08 { description "Initial version"; }
@@ -53,6 +55,7 @@ module nrcelldu-extensions {
             uses ocudu-nrcelldu-sib:sib_extensions_subtree;
             uses ocudu-nrcelldu-paging:paging_extensions_subtree;
             uses ocudu-nrcelldu-drx:drx_extensions_subtree;
+            uses ocudu-nrcelldu-ntn:ntn_extensions_subtree;
         }
     }
 
