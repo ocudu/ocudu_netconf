@@ -1,0 +1,38 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module expert-execution-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-expert-execution-extensions:1.0";
+    prefix "ocudu-expert-execution";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-08-07 { description "Initial version"; }
+
+    grouping expert_execution_extensions_subtree {
+        description "OCUDU extensions for expert execution configuration.";
+
+        container ocudu_expert_execution_extensions {
+            description "Application thread pool configuration options.";
+
+            container main_pool {
+                description "Main worker pool, which serves upper PHY and upper layer processing.";
+
+                leaf nof_threads {
+                    description "Number of worker threads in the main pool. When absent, the
+                                 application derives it from the cell configuration as
+                                 sum(nof_antennas_dl + nof_antennas_ul) + nof_cells + 2, which may
+                                 be lower than the concurrency the upper PHY requires: a cell with
+                                 a high layer count and bandwidth needs a pool of at least the
+                                 derived maximum PUSCH and SRS concurrency, otherwise the
+                                 application refuses to start. The value is capped at the number of
+                                 available CPUs minus a small reserve, and must not exceed the
+                                 number of CPU cores.";
+                    type uint16 { range "1..1024"; }
+                }
+            }
+        }
+    }
+}
