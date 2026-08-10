@@ -8,10 +8,13 @@ set -euo pipefail
 source /usr/local/bin/sysrepo_common.sh
 
 YANG_3GPP_DIR=/opt/dev/MnS/yang-models
+YANG_EXTERNAL_YAMS_DIR=/opt/dev/MnS/yang-models/external-yams
 CUSTOM_YANG_DIR=/opt/dev
 
 echo "Installing CU-CP YANG modules ..."
 
+ensure_module "$YANG_EXTERNAL_YAMS_DIR/ietf-inet-types.yang"
+ensure_module "$YANG_EXTERNAL_YAMS_DIR/ietf-yang-types.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-common-yang-extensions.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-common-yang-types.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-common-top.yang"
