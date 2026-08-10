@@ -518,6 +518,16 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <pusch_channel_estimator_cfo_compensation>false</pusch_channel_estimator_cfo_compensation>
         <pusch_channel_equalizer_algorithm>mmse</pusch_channel_equalizer_algorithm>
       </ocudu_expert_phy_extensions>
+      <ocudu_expert_execution_extensions>
+        <main_pool>
+          <nof_threads>4</nof_threads>
+        </main_pool>
+        <upper_phy>
+          <max_pucch_concurrency>unlimited</max_pucch_concurrency>
+          <max_pusch_and_srs_concurrency>4</max_pusch_and_srs_concurrency>
+          <max_pdsch_concurrency>unlimited</max_pdsch_concurrency>
+        </upper_phy>
+      </ocudu_expert_execution_extensions>
       <ocudu_log_extensions>
         <filename>/tmp/du.log</filename>
         <all_level>warning</all_level>
