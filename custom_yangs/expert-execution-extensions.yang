@@ -9,7 +9,41 @@ module expert-execution-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-08-10 { description "Add threads/upper_phy max_pusch_and_srs_concurrency"; }
     revision 2026-08-07 { description "Initial version"; }
+
+    typedef concurrency {
+        description "A processing concurrency limit: either an explicit number of threads, or
+                     'unlimited' for no limit. Zero is equivalent to 'unlimited'.
+
+                     The application also rejects any value above the host's CPU count, which is a
+                     deployment property and so cannot be expressed as a range here.";
+        type union {
+            type enumeration {
+                enum unlimited {
+                    description "Do not limit the number of concurrent threads.";
+                }
+            }
+            type uint32;
+        }
+    }
+
+    typedef derivable_concurrency {
+        description "A concurrency limit that the application can also work out for itself.
+
+                     Only max_pusch_and_srs_concurrency supports 'auto'. The other channels never
+                     resolve it, so setting them to 'auto' leaves the internal sentinel in place and
+                     the value then fails the application's concurrency range check.";
+        type union {
+            type enumeration {
+                enum auto {
+                    description "Derive the limit from the cell bandwidth, the number of cells and
+                                 the maximum number of layers.";
+                }
+            }
+            type concurrency;
+        }
+    }
 
     grouping expert_execution_extensions_subtree {
         description "OCUDU extensions for expert execution configuration.";
@@ -31,6 +65,48 @@ module expert-execution-extensions {
                                  available CPUs minus a small reserve, and must not exceed the
                                  number of CPU cores.";
                     type uint16 { range "1..1024"; }
+                }
+            }
+
+            container upper_phy {
+                description "Upper PHY processing thread limits, applied across all cells.";
+
+                leaf max_pucch_concurrency {
+                    description "Maximum number of threads that may concurrently process the Physical
+                                 Uplink Control Channel (PUCCH).";
+                    type concurrency;
+                    default unlimited;
+                }
+
+                leaf max_pusch_and_srs_concurrency {
+                    description "Maximum number of threads that may concurrently process the Physical
+                                 Uplink Shared Channel (PUSCH) and Sounding Reference Signals (SRS).
+                                 'auto' derives the limit from the cell bandwidth, number of cells and
+                                 maximum number of layers; 'unlimited' applies no limit. When hardware
+                                 acceleration is enabled the application overrides this with the number
+                                 of accelerator queues.
+
+                                 Note this interacts with main_pool/nof_threads: the main pool must have
+                                 at least this many threads or the application refuses to start.";
+
+                    // Rejecting it here turns a start-up failure after a restart into an
+                    // edit-config error. Only checkable when both are explicit numbers: a symbolic
+                    // value, or an absent nof_threads, is resolved by the application at run time.
+                    must ". = 'auto' or . = 'unlimited' or not(../../main_pool/nof_threads)"
+                       + " or number(.) <= number(../../main_pool/nof_threads)" {
+                        error-message "max_pusch_and_srs_concurrency must not exceed main_pool/nof_threads.";
+                    }
+
+                    type derivable_concurrency;
+                    default auto;
+                }
+
+                leaf max_pdsch_concurrency {
+                    description "Maximum number of threads that may concurrently process the Physical
+                                 Downlink Shared Channel (PDSCH). When hardware acceleration is enabled
+                                 the application overrides this with the number of accelerator queues.";
+                    type concurrency;
+                    default unlimited;
                 }
             }
         }
