@@ -319,6 +319,11 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <full_i_rnti_profile>profile0</full_i_rnti_profile>
         <short_i_rnti_profile>profile0</short_i_rnti_profile>
         <request_pdu_session_timeout>3</request_pdu_session_timeout>
+        <rrc>
+          <force_reestablishment_fallback>false</force_reestablishment_fallback>
+          <force_resume_fallback>false</force_resume_fallback>
+          <rrc_procedure_guard_time_ms>1000</rrc_procedure_guard_time_ms>
+        </rrc>
         <ocudu_log_extensions>
           <filename>/tmp/cu.log</filename>
           <all_level>warning</all_level>
