@@ -21,6 +21,7 @@ module gnbcucpfunction-extensions {
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
     revision 2026-08-20 { description "Replace nof_i_rnti_ue_bits with full_i_rnti_profile/short_i_rnti_profile, following the I-RNTI composition of TS 38.300 Annex F"; }
+    revision 2026-08-14 { description "Add cu_cp.rrc configuration subtree"; }
     revision 2026-08-10 { description "Add top-level cu_cp options: connection/UE/DRB limits, inactivity timer and RRC-inactive parameters"; }
     revision 2026-07-01 { description "Add remaining cu_cp.amf configuration on EP_NgC: bind_interface, SCTP socket tuning, no_core, amf_reconnection_retry_time, procedure_timeout"; }
     revision 2026-06-29 { description "Add optional nRTAC leaf so a standalone gNB-CU-CP can set the Tracking Area Code advertised in the NGAP supported-TA list"; }
@@ -131,6 +132,44 @@ module gnbcucpfunction-extensions {
                 type uint32;
                 units seconds;
                 default 3;
+            }
+
+            container rrc {
+                description "RRC-specific configuration, rendered as the cu_cp/rrc YAML subtree.";
+
+                leaf force_reestablishment_fallback {
+                    description "Force an RRC re-establishment to fall back to an RRC setup.";
+                    type boolean;
+                    default false;
+                }
+
+                leaf force_resume_fallback {
+                    description "Force an RRC resume to fall back to an RRC setup.";
+                    type boolean;
+                    default false;
+                }
+
+                leaf rrc_procedure_guard_time_ms {
+                    description "Guard time added to the RRC procedure timeout for message exchange
+                                 with the UE.
+
+                                 It must exceed 2 * the SRB maxRetxThreshold * t-PollRetransmit
+                                 (TS 38.331 clause 9.2.1), which with the defaults is 2 * 8 * 45 ms =
+                                 720 ms. Those SRB parameters are configured per signalling radio
+                                 bearer rather than on this network function, so the relationship
+                                 cannot be checked here.";
+                    type uint32;
+                    units milliseconds;
+                    default 1000;
+                }
+
+                leaf rrc_reject_wait_time_s {
+                    description "waitTime signalled in the RRC Reject waitTime IE. The IE is optional
+                                 (TS 38.331, Need N): when this leaf is absent the gNB sends an RRC
+                                 Reject with no waitTime, so it deliberately carries no default.";
+                    type uint8 { range "1..16"; }
+                    units seconds;
+                }
             }
 
             uses ocudu-log:log_extensions_subtree;
