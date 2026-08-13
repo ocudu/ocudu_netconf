@@ -20,6 +20,7 @@ module gnbcucpfunction-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-08-10 { description "Add top-level cu_cp options: connection/UE/DRB limits, inactivity timer and RRC-inactive parameters"; }
     revision 2026-07-01 { description "Add remaining cu_cp.amf configuration on EP_NgC: bind_interface, SCTP socket tuning, no_core, amf_reconnection_retry_time, procedure_timeout"; }
     revision 2026-06-29 { description "Add optional nRTAC leaf so a standalone gNB-CU-CP can set the Tracking Area Code advertised in the NGAP supported-TA list"; }
     revision 2026-06-23 { description "Add configurable NG-C (NGAP/SCTP) AMF port on EP_NgC"; }
@@ -38,6 +39,75 @@ module gnbcucpfunction-extensions {
                              supported-TA list towards the AMF. 3GPP models nRTAC only on
                              NRCellDU/GNBCUUPFunction, this leaf fills that gap.";
                 reference "3GPP TS 23.003, 3GPP TS 38.413";
+            }
+
+            leaf max_nof_dus {
+                description "Maximum number of DU connections the CU-CP may accept.";
+                type uint16;
+                default 6;
+            }
+
+            leaf max_nof_cu_ups {
+                description "Maximum number of CU-UP connections the CU-CP may accept.";
+                type uint16;
+                default 6;
+            }
+
+            leaf max_nof_ues {
+                description "Maximum number of UEs the CU-CP may accept.";
+                type uint32;
+                default 8192;
+            }
+
+            leaf max_nof_drbs_per_ue {
+                description "Maximum number of data radio bearers per UE.";
+                type uint8 { range "1..29"; }
+                default 8;
+            }
+
+            leaf inactivity_timer {
+                description "UE / PDU session / DRB inactivity timer.";
+                type uint16 { range "1..7200"; }
+                units seconds;
+                default 120;
+            }
+
+            leaf enable_rrc_inactive {
+                description "Whether a UE is moved to RRC inactive on expiry of the inactivity timer.
+                             When disabled, the UE is released instead.";
+                type boolean;
+                default false;
+            }
+
+            leaf ran_paging_cycle {
+                description "RAN paging cycle for RRC inactive UEs, in radio frames.";
+                type uint16 { range "32 | 64 | 128 | 256"; }
+                units frames;
+                default 32;
+            }
+
+            leaf t380 {
+                description "RRC inactivity timer T380. Started when the UE receives an RRCRelease
+                             carrying a suspend config, stopped on RRCResume.";
+                type uint16 { range "5 | 10 | 20 | 30 | 60 | 120 | 360 | 720"; }
+                units minutes;
+                default 10;
+            }
+
+            leaf nof_i_rnti_ue_bits {
+                description "Number of bits used for the UE identity in the short and full I-RNTI.";
+                type uint8 { range "1..18"; }
+                default 13;
+            }
+
+            leaf request_pdu_session_timeout {
+                description "Timeout for requesting a PDU session after the InitialUeMessage is sent to
+                             the core; on expiry the UE is released. Must be larger than the cell's T310
+                             (cell_cfg/sib/t310), which lives on a different network function and so
+                             cannot be cross-checked here.";
+                type uint32;
+                units seconds;
+                default 3;
             }
 
             uses ocudu-log:log_extensions_subtree;
