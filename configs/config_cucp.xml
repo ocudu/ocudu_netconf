@@ -337,6 +337,12 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <force_resume_fallback>false</force_resume_fallback>
           <rrc_procedure_guard_time_ms>1000</rrc_procedure_guard_time_ms>
         </rrc>
+        <security>
+          <integrity>not_needed</integrity>
+          <confidentiality>required</confidentiality>
+          <nea_pref_list>nea0,nea2,nea1,nea3</nea_pref_list>
+          <nia_pref_list>nia2,nia1,nia3</nia_pref_list>
+        </security>
         <!-- Tracking Area Code advertised to the AMF in the NGAP supported-TA list. Needed on
              a standalone CU-CP, where there is no co-located DU cell to source nRTAC from. -->
         <nRTAC>7</nRTAC>
