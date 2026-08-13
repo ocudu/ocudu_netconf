@@ -308,6 +308,16 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
       </EP_F1C>
 
       <ocudu_gnbcucpfunction_extensions xmlns="urn:ocudu-gnbcucpfunction-extension:1.0">
+        <max_nof_dus>6</max_nof_dus>
+        <max_nof_cu_ups>6</max_nof_cu_ups>
+        <max_nof_ues>8192</max_nof_ues>
+        <max_nof_drbs_per_ue>8</max_nof_drbs_per_ue>
+        <inactivity_timer>120</inactivity_timer>
+        <enable_rrc_inactive>false</enable_rrc_inactive>
+        <ran_paging_cycle>32</ran_paging_cycle>
+        <t380>10</t380>
+        <nof_i_rnti_ue_bits>13</nof_i_rnti_ue_bits>
+        <request_pdu_session_timeout>3</request_pdu_session_timeout>
         <ocudu_log_extensions>
           <filename>/tmp/cu.log</filename>
           <all_level>warning</all_level>
