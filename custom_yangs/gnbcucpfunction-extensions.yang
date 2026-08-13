@@ -23,12 +23,31 @@ module gnbcucpfunction-extensions {
     revision 2026-08-20 { description "Replace nof_i_rnti_ue_bits with full_i_rnti_profile/short_i_rnti_profile, following the I-RNTI composition of TS 38.300 Annex F"; }
     revision 2026-08-14 { description "Add cu_cp.rrc configuration subtree"; }
     revision 2026-08-10 { description "Add top-level cu_cp options: connection/UE/DRB limits, inactivity timer and RRC-inactive parameters"; }
+    revision 2026-08-10 { description "Add cu_cp.security configuration subtree"; }
     revision 2026-07-01 { description "Add remaining cu_cp.amf configuration on EP_NgC: bind_interface, SCTP socket tuning, no_core, amf_reconnection_retry_time, procedure_timeout"; }
     revision 2026-06-29 { description "Add optional nRTAC leaf so a standalone gNB-CU-CP can set the Tracking Area Code advertised in the NGAP supported-TA list"; }
     revision 2026-06-23 { description "Add configurable NG-C (NGAP/SCTP) AMF port on EP_NgC"; }
     revision 2026-06-08 { description "Allow FQDN (remoteAddress -> inet:host) on EP_NgC; remove remoteAddress on EP_F1C and EP_E1 (CU-CP terminates F1-C/E1 as a server, so the connect address lives on the peer)"; }
     revision 2026-05-28 { description "Add remote-control-extensions subtree"; }
     revision 2026-04-30 { description "Initial version"; }
+
+    typedef security_indication {
+        description "Protection indication signalled towards the core for a DRB.";
+        type enumeration {
+            enum required;
+            enum preferred;
+            enum not_needed;
+        }
+    }
+
+    typedef algorithm_pref_list {
+        description "Comma-separated, ordered list of security algorithms, most preferred first.
+                     The application strips whitespace and lowercases before parsing, so the
+                     refining patterns allow spaces around the separators.";
+        type string {
+            length "1..64";
+        }
+    }
 
     grouping gnbcucpfunction_extensions_subtree {
 
@@ -169,6 +188,43 @@ module gnbcucpfunction-extensions {
                                  Reject with no waitTime, so it deliberately carries no default.";
                     type uint8 { range "1..16"; }
                     units seconds;
+                }
+            }
+
+            container security {
+                description "Security configuration, rendered as the cu_cp/security YAML subtree.";
+
+                leaf integrity {
+                    description "Default integrity protection indication signalled for DRBs.";
+                    type security_indication;
+                    default not_needed;
+                }
+
+                leaf confidentiality {
+                    description "Default confidentiality protection indication signalled for DRBs.";
+                    type security_indication;
+                    default required;
+                }
+
+                leaf nea_pref_list {
+                    description "Ordered preference list for selecting the ciphering algorithm (NEA).
+                                 NEA0 (null ciphering) is permitted here.";
+                    type algorithm_pref_list {
+                        pattern "nea[0-3]( *, *nea[0-3])*";
+                    }
+                    default "nea0,nea2,nea1,nea3";
+                }
+
+                leaf nia_pref_list {
+                    description "Ordered preference list for selecting the integrity algorithm (NIA).
+
+                                 NIA0 is deliberately not accepted: it is null integrity protection and
+                                 the application rejects it outright with 'NIA0 cannot be selected in
+                                 the algorithm preferences'.";
+                    type algorithm_pref_list {
+                        pattern "nia[1-3]( *, *nia[1-3])*";
+                    }
+                    default "nia2,nia1,nia3";
                 }
             }
 
