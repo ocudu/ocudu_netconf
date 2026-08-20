@@ -20,6 +20,7 @@ module gnbcucpfunction-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-08-20 { description "Replace nof_i_rnti_ue_bits with full_i_rnti_profile/short_i_rnti_profile, following the I-RNTI composition of TS 38.300 Annex F"; }
     revision 2026-08-10 { description "Add top-level cu_cp options: connection/UE/DRB limits, inactivity timer and RRC-inactive parameters"; }
     revision 2026-07-01 { description "Add remaining cu_cp.amf configuration on EP_NgC: bind_interface, SCTP socket tuning, no_core, amf_reconnection_retry_time, procedure_timeout"; }
     revision 2026-06-29 { description "Add optional nRTAC leaf so a standalone gNB-CU-CP can set the Tracking Area Code advertised in the NGAP supported-TA list"; }
@@ -94,10 +95,32 @@ module gnbcucpfunction-extensions {
                 default 10;
             }
 
-            leaf nof_i_rnti_ue_bits {
-                description "Number of bits used for the UE identity in the short and full I-RNTI.";
-                type uint8 { range "1..18"; }
-                default 13;
+            leaf full_i_rnti_profile {
+                description "I-RNTI profile the Full-I-RNTI of a suspended UE is composed with. The
+                             profile sets the width of the Local NG-RAN Node Identifier the I-RNTI
+                             carries, and so how many of the remaining bits are left for the UE
+                             reference.";
+                reference "3GPP TS 38.300 table F-1";
+                type enumeration {
+                    enum profile0;
+                    enum profile1;
+                    enum profile2;
+                    enum profile3;
+                }
+                default profile0;
+            }
+
+            leaf short_i_rnti_profile {
+                description "I-RNTI profile the Short-I-RNTI of a suspended UE is composed with. The
+                             profile sets the width of the Local NG-RAN Node Identifier the I-RNTI
+                             carries, and so how many of the remaining bits are left for the UE
+                             reference.";
+                reference "3GPP TS 38.300 table F-2";
+                type enumeration {
+                    enum profile0;
+                    enum profile1;
+                }
+                default profile0;
             }
 
             leaf request_pdu_session_timeout {
