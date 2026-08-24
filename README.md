@@ -63,6 +63,19 @@ For the hybrid-odu identity copy `client-hybrid-odu.crt` / `client-hybrid-odu.ke
 
 Replace `ocudu-netconf` above with the running container's name (from `docker ps`) — not the image name; under docker-compose use `docker compose cp <service>:...` instead. Point your client at `tls/client.{crt,key}` for mutual auth, with `tls/ca.crt` as the trust anchor for the server's cert.
 
+## Enable NETCONF call-home
+
+Pass `--enable-callhome <host>[:<port>]` to make the server dial a NETCONF
+call-home manager (RFC 8071) at the given address (port defaults to `4334`)
+alongside its normal listen endpoint — emulating an O-RU that accepts no
+inbound NETCONF and calls its manager instead. The connection is persistent:
+the server keeps one connection up and re-dials when it drops. Server
+identity and user authentication are the same as on the listen endpoint.
+
+```
+$ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config ru --enable-callhome 172.17.0.1:4334
+```
+
 ## Run with console access
 
 `$ docker run --entrypoint /bin/bash -it -p 830:830 ocudu-netconf/ocudu-netconf:latest`

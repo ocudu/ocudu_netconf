@@ -11,12 +11,13 @@ CONFIG_VARIANT=""
 YANG_PROFILE=""
 TLS_ENABLED=0
 TLS_CERT_DIR=/etc/netconf-tls
+CALLHOME_TARGET=""
 
 usage() {
     cat <<EOF
 Usage:
   $0 --config <gnb|cu|cucp|cuup|du|ru> [--custom-config <path>] [--running-config <path>]
-     [--enable-tls] [--tls-cert-dir <path>]
+     [--enable-tls] [--tls-cert-dir <path>] [--enable-callhome <host>[:<port>]]
 
 Options:
   --config          Select the built-in YANG/profile setup and bundled config.
@@ -24,6 +25,8 @@ Options:
   --running-config  Override the internal persisted running-config path.
   --enable-tls      Enable a NETCONF-over-TLS listen endpoint on port 6513 alongside the default SSH endpoint.
   --tls-cert-dir    Directory containing ca.crt, server.crt, server.key, client.crt (default: /etc/netconf-tls).
+  --enable-callhome Dial the given NETCONF call-home manager (RFC 8071); <host> is an IPv4 address or a
+                    hostname (no IPv6 literal), port defaults to 4334.
   -h, --help        Show this help message.
 EOF
 }
@@ -142,6 +145,15 @@ while [ $# -gt 0 ]; do
             fi
             TLS_CERT_DIR="$1"
             ;;
+        --enable-callhome)
+            shift
+            if [ -z "$1" ]; then
+                echo "Error: Missing value for --enable-callhome." >&2
+                usage
+                exit 1
+            fi
+            CALLHOME_TARGET="$1"
+            ;;
         -h|--help)
             usage
             exit 0
@@ -212,6 +224,15 @@ merge_selected_config
 
 if [ "$TLS_ENABLED" = "1" ]; then
     /usr/local/bin/setup_tls.sh "$TLS_CERT_DIR"
+fi
+
+if [ -n "$CALLHOME_TARGET" ]; then
+    CALLHOME_HOST="${CALLHOME_TARGET%%:*}"
+    case "$CALLHOME_TARGET" in
+        *:*) CALLHOME_PORT="${CALLHOME_TARGET#*:}" ;;
+        *)   CALLHOME_PORT=4334 ;;
+    esac
+    /usr/local/bin/setup_callhome.sh "$CALLHOME_HOST" "$CALLHOME_PORT" || exit 1
 fi
 
 echo "Starting netconf server .."
