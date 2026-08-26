@@ -20,6 +20,7 @@ module nrcelldu-ntn-extensions {
 
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
 
+    revision 2026-08-26 { description "Remove epoch_time and epoch_sfn_offset: the gNB derives the epoch of the broadcast assistance information itself and accepts neither knob."; }
     revision 2026-08-06 { description "Initial version: NTN serving cell parameters (SIB19)."; }
 
     typedef polarization_type {
@@ -79,14 +80,6 @@ module nrcelldu-ntn-extensions {
                 }
             }
 
-            leaf epoch_sfn_offset {
-                description "Offset in system frames between the SIB19 transmission slot and the epoch time of the "
-                          + "NTN assistance information, so the broadcast information becomes valid this many frames "
-                          + "after the SIB19 Tx slot.";
-                type uint64;
-                units frames;
-            }
-
             leaf ta_report {
                 description "Whether timing advance reporting is enabled. Mandatory present for the serving cell in "
                           + "SIB19 per TS 38.331, hence the default rather than absence.";
@@ -99,23 +92,6 @@ module nrcelldu-ntn-extensions {
                           + "parameters (false). When absent, the format follows whichever of positionVelocity or "
                           + "orbital the referenced EphemerisInfos entry carries.";
                 type boolean;
-            }
-
-            container epoch_time {
-                presence "An explicit epoch time is configured for the assistance information.";
-                description "Starting time of the DL sub-frame the NTN assistance information refers to. When "
-                          + "absent, the gNB derives it.";
-
-                leaf sfn {
-                    description "System frame number part.";
-                    type uint16 { range "0..1023"; }
-                    mandatory true;
-                }
-                leaf subframe_number {
-                    description "Sub-frame number within the SFN.";
-                    type uint8 { range "0..9"; }
-                    mandatory true;
-                }
             }
 
             container reference_location {
