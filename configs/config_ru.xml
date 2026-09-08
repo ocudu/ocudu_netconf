@@ -68,5 +68,222 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
       <name>mplane-ro</name>
       <user-name>mplane</user-name>
     </group>
+    <group>
+      <name>hybrid-odu</name>
+      <user-name>hybrid-odu</user-name>
+    </group>
   </groups>
+  <!-- O-RAN WG4 M-plane spec, Table 6.5-1, hybrid-odu column. -->
+  <rule-list>
+    <name>hybrid-odu</name>
+    <group>hybrid-odu</group>
+    <!-- Base NETCONF operations the client needs (exec-default is deny). -->
+    <rule>
+      <name>nc-get</name>
+      <module-name>ietf-netconf</module-name>
+      <rpc-name>get</rpc-name>
+      <access-operations>exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>nc-get-config</name>
+      <module-name>ietf-netconf</module-name>
+      <rpc-name>get-config</rpc-name>
+      <access-operations>exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>nc-edit-config</name>
+      <module-name>ietf-netconf</module-name>
+      <rpc-name>edit-config</rpc-name>
+      <access-operations>exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>nc-create-subscription</name>
+      <module-name>notifications</module-name>
+      <rpc-name>create-subscription</rpc-name>
+      <access-operations>exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <!-- Read, write and exec. -->
+    <rule>
+      <name>o-ran-supervision-rwx</name>
+      <module-name>o-ran-supervision</module-name>
+      <access-operations>*</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-uplane-conf-rwx</name>
+      <module-name>o-ran-uplane-conf</module-name>
+      <access-operations>*</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-operations-rwx</name>
+      <module-name>o-ran-operations</module-name>
+      <access-operations>*</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-usermgmt-rwx</name>
+      <module-name>o-ran-usermgmt</module-name>
+      <access-operations>*</access-operations>
+      <action>permit</action>
+    </rule>
+    <!-- Read and write. -->
+    <rule>
+      <name>o-ran-processing-element-rw</name>
+      <module-name>o-ran-processing-element</module-name>
+      <access-operations>create read update delete</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-delay-management-rw</name>
+      <module-name>o-ran-delay-management</module-name>
+      <access-operations>create read update delete</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-module-cap-rw</name>
+      <module-name>o-ran-module-cap</module-name>
+      <access-operations>create read update delete</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-certificates-rw</name>
+      <module-name>o-ran-certificates</module-name>
+      <access-operations>create read update delete</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>ietf-netconf-acm-rw</name>
+      <module-name>ietf-netconf-acm</module-name>
+      <access-operations>create read update delete</access-operations>
+      <action>permit</action>
+    </rule>
+    <!-- Read and exec. -->
+    <rule>
+      <name>ietf-hardware-rx</name>
+      <module-name>ietf-hardware</module-name>
+      <access-operations>read exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-fm-rx</name>
+      <module-name>o-ran-fm</module-name>
+      <access-operations>read exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-sync-rx</name>
+      <module-name>o-ran-sync</module-name>
+      <access-operations>read exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-performance-management-rx</name>
+      <module-name>o-ran-performance-management</module-name>
+      <access-operations>read exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>ietf-yang-library-rx</name>
+      <module-name>ietf-yang-library</module-name>
+      <access-operations>read exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>ietf-netconf-monitoring-rx</name>
+      <module-name>ietf-netconf-monitoring</module-name>
+      <access-operations>read exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>ietf-netconf-notifications-rx</name>
+      <module-name>ietf-netconf-notifications</module-name>
+      <access-operations>read exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>ietf-keystore-rx</name>
+      <module-name>ietf-keystore</module-name>
+      <access-operations>read exec</access-operations>
+      <action>permit</action>
+    </rule>
+    <!-- Read only. -->
+    <rule>
+      <name>o-ran-hardware-r</name>
+      <module-name>o-ran-hardware</module-name>
+      <access-operations>read</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-interfaces-r</name>
+      <module-name>o-ran-interfaces</module-name>
+      <access-operations>read</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>ietf-interfaces-r</name>
+      <module-name>ietf-interfaces</module-name>
+      <access-operations>read</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>ietf-ip-r</name>
+      <module-name>ietf-ip</module-name>
+      <access-operations>read</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-software-management-r</name>
+      <module-name>o-ran-software-management</module-name>
+      <access-operations>read</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-mplane-int-r</name>
+      <module-name>o-ran-mplane-int</module-name>
+      <access-operations>read</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>o-ran-dhcp-r</name>
+      <module-name>o-ran-dhcp</module-name>
+      <access-operations>read</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>ietf-system-r</name>
+      <module-name>ietf-system</module-name>
+      <access-operations>read</access-operations>
+      <action>permit</action>
+    </rule>
+    <rule>
+      <name>ietf-truststore-r</name>
+      <module-name>ietf-truststore</module-name>
+      <access-operations>read</access-operations>
+      <action>permit</action>
+    </rule>
+    <!-- No access. -->
+    <rule>
+      <name>o-ran-file-management-none</name>
+      <module-name>o-ran-file-management</module-name>
+      <access-operations>*</access-operations>
+      <action>deny</action>
+    </rule>
+    <rule>
+      <name>o-ran-troubleshooting-none</name>
+      <module-name>o-ran-troubleshooting</module-name>
+      <access-operations>*</access-operations>
+      <action>deny</action>
+    </rule>
+    <rule>
+      <name>ietf-subscribed-notifications-none</name>
+      <module-name>ietf-subscribed-notifications</module-name>
+      <access-operations>*</access-operations>
+      <action>deny</action>
+    </rule>
+  </rule-list>
 </nacm>
