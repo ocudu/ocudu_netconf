@@ -8,6 +8,9 @@ set -euo pipefail
 CERT_DIR="${1:-/etc/netconf-tls}"
 # Client cert CN becomes the NETCONF username (cert-to-name). Override to escape sysrepo's NACM-recovery user.
 CLIENT_CN="${CLIENT_CN:-root}"
+# Second client identity: CN of client-hybrid-odu.crt, the user name the ru
+# profile's NACM places in the hybrid-odu group.
+HYBRID_ODU_CN="${HYBRID_ODU_CN:-hybrid-odu}"
 
 SERVER_CRT="$CERT_DIR/server.crt"
 SERVER_KEY="$CERT_DIR/server.key"
@@ -35,17 +38,21 @@ if [ ! -e "$CA_CRT" ]; then
         -CA "$CA_CRT" -CAkey "$CERT_DIR/ca.key" -CAcreateserial \
         -out "$SERVER_CRT" -days 30 -sha256 >/dev/null 2>&1
 
-    # Client: generate key + CSR (CN=$CLIENT_CN, drives the cert-to-name mapping).
-    # When connecting to the netconf server, the client authenticates as this
-    # username — the cert-to-name uses map-type=common-name to derive it.
-    openssl req -new -newkey rsa:2048 -nodes \
-        -keyout "$CERT_DIR/client.key" -out "$CERT_DIR/client.csr" \
-        -subj "/CN=$CLIENT_CN" >/dev/null 2>&1
-        
-    # Client: sign the client CSR with the CA.
-    openssl x509 -req -in "$CERT_DIR/client.csr" \
-        -CA "$CA_CRT" -CAkey "$CERT_DIR/ca.key" -CAcreateserial \
-        -out "$CERT_DIR/client.crt" -days 30 -sha256 >/dev/null 2>&1
+    # Clients: generate key + CSR (CN drives the cert-to-name mapping) and sign
+    # it with the CA. When connecting to the netconf server, the client
+    # authenticates as the CN — the cert-to-name uses map-type=common-name to
+    # derive the username, so no per-cert mapping entry is needed.
+    issue_client_cert() {
+        local cn="$1" base="$2"
+        openssl req -new -newkey rsa:2048 -nodes \
+            -keyout "$CERT_DIR/$base.key" -out "$CERT_DIR/$base.csr" \
+            -subj "/CN=$cn" >/dev/null 2>&1
+        openssl x509 -req -in "$CERT_DIR/$base.csr" \
+            -CA "$CA_CRT" -CAkey "$CERT_DIR/ca.key" -CAcreateserial \
+            -out "$CERT_DIR/$base.crt" -days 30 -sha256 >/dev/null 2>&1
+    }
+    issue_client_cert "$CLIENT_CN" client
+    issue_client_cert "$HYBRID_ODU_CN" client-hybrid-odu
 
     chmod 0644 "$CERT_DIR"/*.crt "$CERT_DIR"/*.key
 fi

@@ -41,7 +41,14 @@ The cert dir (default `/etc/netconf-tls`, override with `--tls-cert-dir <path>`)
 - **Empty / unprovisioned** (no `ca.crt` present): on first start the container self-signs a CA plus matching server and client certs into the dir. Useful for dev / lab / integration tests.
 - **Operator-provisioned** (`ca.crt` already present): the container leaves the dir alone and uses the operator's `ca.crt` + `server.crt` + `server.key` as-is. Use this for production — mount your CA-issued material into `/etc/netconf-tls` (e.g. via a Kubernetes Secret with `readOnly: true`).
 
-The trust model is the same in both modes: the server accepts any client cert that chains to the trusted `ca.crt`, and the cert's Common Name becomes the NETCONF username via the `cert-to-name` mapping (`map-type=common-name`). So a client cert with `CN=root` connects as the `root` netconf user. In self-signed mode that's only the auto-generated `client.crt`; in operator-provisioned mode it's anyone holding a cert signed by your CA — provision and revoke accordingly.
+The trust model is the same in both modes: the server accepts any client cert that chains to the trusted `ca.crt`, and the cert's Common Name becomes the NETCONF username via the `cert-to-name` mapping (`map-type=common-name`). So a client cert with `CN=root` connects as the `root` netconf user. In self-signed mode those are the two auto-generated client certs; in operator-provisioned mode it's anyone holding a cert signed by your CA — provision and revoke accordingly.
+
+Self-signed mode issues two client identities:
+
+- `client.crt` / `client.key` with `CN=root` (override with `CLIENT_CN=<name>`). `root` is sysrepo's recovery user and bypasses NACM; set `CLIENT_CN=mplane` to connect as the read-only `mplane-ro` group of the `ru` profile.
+- `client-hybrid-odu.crt` / `client-hybrid-odu.key` with `CN=hybrid-odu` (override with `HYBRID_ODU_CN=<name>`). In the `ru` profile this user is in the `hybrid-odu` NACM group, whose rule-list in `configs/config_ru.xml` grants the hybrid-odu access of the O-RAN WG4 M-plane spec, Table 6.5-1.
+
+No system user is needed for either name; the username only feeds NACM.
 
 To connect from outside the container as a NETCONF client over TLS (e.g. via `ncclient.manager.connect_tls(host="localhost", port=6513, ...)` against a self-signed run), copy the auto-generated client cert + key + CA out of the running container:
 
@@ -51,6 +58,8 @@ docker cp ocudu-netconf:/etc/netconf-tls/ca.crt     tls/ca.crt
 docker cp ocudu-netconf:/etc/netconf-tls/client.crt tls/client.crt
 docker cp ocudu-netconf:/etc/netconf-tls/client.key tls/client.key
 ```
+
+For the hybrid-odu identity copy `client-hybrid-odu.crt` / `client-hybrid-odu.key` instead.
 
 Replace `ocudu-netconf` above with the running container's name (from `docker ps`) — not the image name; under docker-compose use `docker compose cp <service>:...` instead. Point your client at `tls/client.{crt,key}` for mutual auth, with `tls/ca.crt` as the trust anchor for the server's cert.
 
