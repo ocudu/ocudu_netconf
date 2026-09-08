@@ -85,7 +85,9 @@ run_profile_setup() {
             /usr/local/bin/setup_du.sh
             ;;
         ru)
-            /usr/local/bin/setup_ru.sh
+            # the standalone mock O-RU also serves the PM model; the DU-side
+            # profiles reach setup_ru.sh through setup_du.sh without this flag
+            /usr/local/bin/setup_ru.sh --standalone
             ;;
         *)
             echo "Error: Unsupported YANG profile '$YANG_PROFILE'." >&2

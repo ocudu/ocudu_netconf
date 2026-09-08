@@ -10,6 +10,12 @@ source /usr/local/bin/sysrepo_common.sh
 YANG_MISC_DIR=/opt/dev/yang-models-misc
 YANG_EXTERNAL_YAMS_DIR=/opt/dev/MnS/yang-models/external-yams
 
+# --standalone: the image runs as the mock O-RU itself (entrypoint --config ru).
+# setup_du.sh also sources this script for the DU-side servers; those keep the
+# module set the O1 SMO mount is validated against.
+STANDALONE_RU=0
+[ "${1:-}" = "--standalone" ] && STANDALONE_RU=1
+
 echo "Installing RU YANG modules ..."
 
 ensure_module "$YANG_MISC_DIR/iana-if-type@2017-01-19.yang"
@@ -46,6 +52,12 @@ ensure_module "$YANG_MISC_DIR/o-ran-operations.yang"
 ensure_module "$YANG_MISC_DIR/o-ran-fm.yang"
 ensure_module "$YANG_MISC_DIR/o-ran-dhcp.yang"
 ensure_module "$YANG_MISC_DIR/o-ran-certificates.yang"
+if [ "$STANDALONE_RU" = 1 ]; then
+    # o-ran-performance-management (PM configuration + measurement-result-stats)
+    # for the mock O-RU only: its submodules are not served over get-schema, so
+    # the model must stay out of the du/gnb profiles' advertised set.
+    ensure_module "$YANG_MISC_DIR/o-ran-performance-management.yang" -s "$YANG_MISC_DIR"
+fi
 
 ensure_feature "ietf-hardware" "hardware-state"
 ensure_feature "o-ran-hardware" "ENERGYSAVING"
