@@ -76,6 +76,36 @@ identity and user authentication are the same as on the listen endpoint.
 $ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config ru --enable-callhome 172.17.0.1:4334
 ```
 
+## Provision the SSH host key
+
+The host key is generated at image build time, so it is the same in every container from a tag
+and different after every rebuild — breaking any client that pins it.
+
+Mount your own instead. The key dir (default `/etc/netconf-ssh`, override with
+`--ssh-hostkey-dir <path>`) is read on every start, and the first of `ssh_host_ed25519_key`,
+`ssh_host_ecdsa_key`, `ssh_host_rsa_key` found is installed and its fingerprint logged:
+
+```bash
+ssh-keygen -t ed25519 -N "" -f ./ssh_host_ed25519_key
+docker run -it -p 830:830 -v $PWD:/etc/netconf-ssh:ro \
+    ocudu-netconf/ocudu-netconf:latest --config gnb
+
+# clients verify it against this; the bracket form is needed off port 22
+printf '[%s]:%s %s\n' ocudu-netconf 830 "$(cut -d' ' -f1,2 ./ssh_host_ed25519_key.pub)" > known_hosts
+```
+
+Any unencrypted encoding `ssh-keygen` writes is accepted (OpenSSH, `-m PEM`, `-m PKCS8`); an
+encrypted one is refused, not prompted for. Use ed25519 or ecdsa — an RSA key is recorded in
+`known_hosts` as `ssh-rsa` but offered as `rsa-sha2-512`/`rsa-sha2-256`, so a client narrowing
+to the recorded name cannot negotiate it. Mounting one is warned about, not refused: it still
+serves clients that handle the mismatch, but the O1 adapter will not verify it.
+
+With no key mounted the server installs the ed25519 key generated into the image at build time,
+which is stable per image tag and changes on every rebuild.
+
+Mount the key `0400`. Under Kubernetes the pod needs a `fsGroup`: the kubelet chowns the
+projected Secret to `root:<fsGroup>` and widens the mode so the server (uid 1000) can read it.
+
 ## Run with console access
 
 `$ docker run --entrypoint /bin/bash -it -p 830:830 ocudu-netconf/ocudu-netconf:latest`
