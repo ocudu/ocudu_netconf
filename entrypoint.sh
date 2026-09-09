@@ -13,12 +13,14 @@ YANG_PROFILE=""
 TLS_ENABLED=0
 TLS_CERT_DIR=/etc/netconf-tls
 CALLHOME_TARGET=""
+SSH_HOSTKEY_DIR=/etc/netconf-ssh
 
 usage() {
     cat <<EOF
 Usage:
   $0 --config <gnb|cu|cucp|cuup|du|ru> [--custom-config <path>] [--running-config <path>]
      [--enable-tls] [--tls-cert-dir <path>] [--enable-callhome <host>[:<port>]]
+     [--ssh-hostkey-dir <path>]
 
 Options:
   --config          Select the built-in YANG/profile setup and bundled config.
@@ -28,6 +30,9 @@ Options:
   --tls-cert-dir    Directory containing ca.crt, server.crt, server.key, client.crt (default: /etc/netconf-tls).
   --enable-callhome Dial the given NETCONF call-home manager (RFC 8071); <host> is an IPv4 address or a
                     hostname (no IPv6 literal), port defaults to 4334.
+  --ssh-hostkey-dir Directory containing ssh_host_ed25519_key, ssh_host_ecdsa_key or
+                    ssh_host_rsa_key, the SSH host key the server presents (default:
+                    /etc/netconf-ssh). Without one the ed25519 key built into the image is used.
   -h, --help        Show this help message.
 EOF
 }
@@ -155,6 +160,15 @@ while [ $# -gt 0 ]; do
             fi
             CALLHOME_TARGET="$1"
             ;;
+        --ssh-hostkey-dir)
+            shift
+            if [ -z "$1" ]; then
+                echo "Error: Missing value for --ssh-hostkey-dir." >&2
+                usage
+                exit 1
+            fi
+            SSH_HOSTKEY_DIR="$1"
+            ;;
         -h|--help)
             usage
             exit 0
@@ -222,6 +236,13 @@ else
 fi
 
 merge_selected_config
+
+# Falls back to the image's ed25519 key when none is mounted. Fail closed: serving netopeer2's
+# own genkey instead would lock out every client that verifies the provisioned one.
+if ! /usr/local/bin/setup_ssh_hostkey.sh "$SSH_HOSTKEY_DIR"; then
+    echo "Error: SSH host key setup failed." >&2
+    exit 1
+fi
 
 if [ "$TLS_ENABLED" = "1" ]; then
     /usr/local/bin/setup_tls.sh "$TLS_CERT_DIR"

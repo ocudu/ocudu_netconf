@@ -146,6 +146,14 @@ ENV NP2_MODULE_DIR=/usr/share/yang/modules/netopeer2 \
 RUN bash /usr/share/netopeer2/scripts/setup.sh && \
     bash /usr/share/netopeer2/scripts/merge_hostkey.sh && \
     bash /usr/share/netopeer2/scripts/merge_config.sh
+
+# Default host key, installed by setup_ssh_hostkey.sh when nothing is mounted. merge_hostkey.sh
+# above generates an RSA one, which a client cannot verify: known_hosts records it as 'ssh-rsa'
+# while the server offers only rsa-sha2-256/512. Generated here so it is stable per image tag.
+RUN mkdir -p /etc/netconf-ssh-default && \
+    ssh-keygen -t ed25519 -N '' -q -f /etc/netconf-ssh-default/ssh_host_ed25519_key && \
+    chown -R 1000:1000 /etc/netconf-ssh-default && \
+    chmod 400 /etc/netconf-ssh-default/ssh_host_ed25519_key
     
 # copy downloaded yangs from builder
 COPY --from=builder /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/ /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/
