@@ -9,6 +9,7 @@ module nrcelldu-sib-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-09-10 { description "Move the fixed ETWS/CMAS content into a test sub-container."; }
     revision 2026-06-03 { description "Initial version: si_window_length, si_sched_info list, RRC UE timers
                                        (t300/t301/t310/n310/t311/n311/t319) and ETWS/CMAS warning messages."; }
 
@@ -85,53 +86,61 @@ module nrcelldu-sib-extensions {
             container etws {
                 description "Earthquake and Tsunami Warning System message parameters (broadcast over SIB6/SIB7).";
 
-                leaf message_id {
-                    description "ETWS message ID (TS 23.041).";
-                    type uint16;
-                    default 4356;
-                }
-                leaf serial_num {
-                    description "ETWS message serial number (TS 23.041).";
-                    type uint16;
-                    default 12288;
-                }
-                leaf warning_type {
-                    description "ETWS warning type (TS 23.041).";
-                    type uint16;
-                    default 2432;
-                }
-                leaf data_coding_scheme {
-                    description "CBS data coding scheme used for the warning message (TS 23.038).";
-                    type uint8;
-                    default 0;
-                }
-                leaf warning_message {
-                    description "ETWS warning message. Required only if SIB7 is scheduled; otherwise leave unset.";
-                    type string;
+                container test {
+                    description "Fixed content broadcast from the cell start, for testing purposes.";
+
+                    leaf message_id {
+                        description "ETWS message ID (TS 23.041).";
+                        type uint16;
+                        default 4356;
+                    }
+                    leaf serial_num {
+                        description "ETWS message serial number (TS 23.041).";
+                        type uint16;
+                        default 12288;
+                    }
+                    leaf warning_type {
+                        description "ETWS warning type (TS 23.041).";
+                        type uint16;
+                        default 2432;
+                    }
+                    leaf data_coding_scheme {
+                        description "CBS data coding scheme used for the warning message (TS 23.038).";
+                        type uint8;
+                        default 0;
+                    }
+                    leaf warning_message {
+                        description "ETWS warning message. Required only if SIB7 is scheduled; otherwise leave unset.";
+                        type string;
+                    }
                 }
             }
 
             container cmas {
                 description "Commercial Mobile Alert Service message parameters (broadcast over SIB8).";
 
-                leaf message_id {
-                    description "CMAS message ID (TS 23.041).";
-                    type uint16;
-                    default 4370;
-                }
-                leaf serial_num {
-                    description "CMAS message serial number (TS 23.041).";
-                    type uint16;
-                    default 12291;
-                }
-                leaf data_coding_scheme {
-                    description "CBS data coding scheme used for the warning message (TS 23.038).";
-                    type uint8;
-                    default 0;
-                }
-                leaf warning_message {
-                    description "CMAS warning message.";
-                    type string;
+                container test {
+                    description "Fixed content broadcast from the cell start, for testing purposes.";
+
+                    leaf message_id {
+                        description "CMAS message ID (TS 23.041).";
+                        type uint16;
+                        default 4370;
+                    }
+                    leaf serial_num {
+                        description "CMAS message serial number (TS 23.041).";
+                        type uint16;
+                        default 12291;
+                    }
+                    leaf data_coding_scheme {
+                        description "CBS data coding scheme used for the warning message (TS 23.038).";
+                        type uint8;
+                        default 0;
+                    }
+                    leaf warning_message {
+                        description "CMAS warning message.";
+                        type string;
+                    }
                 }
             }
         }
