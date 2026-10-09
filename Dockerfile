@@ -142,8 +142,14 @@ ENV NP2_MODULE_DIR=/usr/share/yang/modules/netopeer2 \
     NP2_MODULE_GROUP=sysrepo \
     LN2_MODULE_DIR=/usr/share/yang/modules/libnetconf2
 
-# netopeer2 postinstall scripts setting default values for ietf-netconf-server yang module
+# netopeer2 postinstall scripts setting default values for ietf-netconf-server yang module.
+# netopeer-notifications is uninstalled right after setup.sh: netopeer2 >= 2.8 emits its
+# netconf-rpc-execution notification on the default NETCONF stream around subscription
+# RPCs, which OpenDaylight-based controllers cannot parse and abort the mount on (YangTools
+# also rejects the module's mandatory session-type augment, RFC 7950 section 7.17).
+# netopeer2 silently skips the notification when the module is absent.
 RUN bash /usr/share/netopeer2/scripts/setup.sh && \
+    sysrepoctl -u netopeer-notifications && \
     bash /usr/share/netopeer2/scripts/merge_hostkey.sh && \
     bash /usr/share/netopeer2/scripts/merge_config.sh
 

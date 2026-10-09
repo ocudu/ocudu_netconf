@@ -106,6 +106,31 @@ which is stable per image tag and changes on every rebuild.
 Mount the key `0400`. Under Kubernetes the pod needs a `fsGroup`: the kubelet chowns the
 projected Secret to `root:<fsGroup>` and widens the mode so the server (uid 1000) can read it.
 
+## ODL compatibility (netopeer-notifications removed)
+
+The image uninstalls netopeer2's `netopeer-notifications` module at build time, right after
+netopeer2's own `setup.sh`. netopeer2 >= 2.8 uses the module to emit a `netconf-rpc-execution`
+notification on the default NETCONF stream around subscription-management RPCs; OpenDaylight-based
+controllers cannot parse these notifications (namespace `urn:cesnet:netopeer-notifcations`) and
+abort the NETCONF mount on them. YangTools also rejects the module itself because of its
+mandatory `session-type` augment (RFC 7950 section 7.17). netopeer2 silently skips the
+notifications when the module is absent, and they cannot be filtered per subscription
+(CESNET/netopeer2#1789).
+
+Consequences of the removal:
+
+- no `netconf-rpc-execution` notifications
+- no `netconf-call-home-endpoint-fail` notification
+- no `session-type` leaf in `netconf-session-start` / `netconf-session-end`
+- `ietf-netconf-notifications` itself is unaffected
+
+If a deployment ever needs the module back, the schema stays in the image and can be
+reinstalled at runtime (the server picks it up after a restart):
+
+```
+$ docker exec <container> sysrepoctl -i /usr/share/yang/modules/netopeer2/netopeer-notifications@2026-01-05.yang
+```
+
 ## Run with console access
 
 `$ docker run --entrypoint /bin/bash -it -p 830:830 ocudu-netconf/ocudu-netconf:latest`
