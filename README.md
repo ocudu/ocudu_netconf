@@ -131,6 +131,38 @@ reinstalled at runtime (the server picks it up after a restart):
 $ docker exec <container> sysrepoctl -i /usr/share/yang/modules/netopeer2/netopeer-notifications@2026-01-05.yang
 ```
 
+## NETCONF SSH user with password authentication
+
+The server's stock SSH users authenticate against the system (keyboard-interactive), which
+clients like OpenDaylight cannot do — they only implement the SSH "password" method. Setting
+both `NETCONF_SSH_USERNAME` and `NETCONF_SSH_PASSWORD` (or neither) creates an ietf-ssh-server
+local user (RFC 9644) with password authentication in the `default-ssh` endpoint and grants it
+full NACM access (group `o1-admin`, permit-all rule), so it can read and write like `root`:
+
+```
+$ docker run -it -p 830:830 -e NETCONF_SSH_USERNAME=odl -e NETCONF_SSH_PASSWORD=secret ocudu-netconf/ocudu-netconf:latest --config gnb
+```
+
+The password is stored in libnetconf2's `<hashed-password>` format: a cleartext value is
+wrapped as `$0$<password>`, a value starting with `$` (a crypt(3) hash, e.g. `$6$...` from
+`mkpasswd -m sha-512`) is used verbatim. Under Kubernetes take the password from a Secret so it
+never appears in the pod spec:
+
+```yaml
+env:
+  - name: NETCONF_SSH_USERNAME
+    value: odl
+  - name: NETCONF_SSH_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: netconf-ssh-credentials
+        key: password
+```
+
+Notes: the user is re-applied on every start (rotate the password by changing the env and
+restarting); once created it persists in the exported running config, so removing the env
+variables does not remove the user — edit the datastore for that.
+
 ## Run with console access
 
 `$ docker run --entrypoint /bin/bash -it -p 830:830 ocudu-netconf/ocudu-netconf:latest`

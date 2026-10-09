@@ -14,6 +14,14 @@ TLS_ENABLED=0
 TLS_CERT_DIR=/etc/netconf-tls
 CALLHOME_TARGET=""
 SSH_HOSTKEY_DIR=/etc/netconf-ssh
+NETCONF_SSH_USERNAME="${NETCONF_SSH_USERNAME:-}"
+NETCONF_SSH_PASSWORD="${NETCONF_SSH_PASSWORD:-}"
+if [ -n "$NETCONF_SSH_USERNAME" ] || [ -n "$NETCONF_SSH_PASSWORD" ]; then
+    if [ -z "$NETCONF_SSH_USERNAME" ] || [ -z "$NETCONF_SSH_PASSWORD" ]; then
+        echo "Error: NETCONF_SSH_USERNAME and NETCONF_SSH_PASSWORD must be set together." >&2
+        exit 1
+    fi
+fi
 
 usage() {
     cat <<EOF
@@ -34,6 +42,18 @@ Options:
                     ssh_host_rsa_key, the SSH host key the server presents (default:
                     /etc/netconf-ssh). Without one the ed25519 key built into the image is used.
   -h, --help        Show this help message.
+
+Environment variables:
+  NETCONF_SSH_USERNAME
+                    Together with NETCONF_SSH_PASSWORD, create an ietf-ssh-server local
+                    user with password authentication (RFC 9644) in the "default-ssh"
+                    endpoint and grant it full NACM access. Enables the SSH "password"
+                    method for clients that cannot do keyboard-interactive (e.g.
+                    OpenDaylight). Default: unset, no user is created.
+  NETCONF_SSH_PASSWORD
+                    The user's password: a cleartext value is stored as \$0\$<password>;
+                    a value starting with \$ (a crypt(3) hash, e.g. \$6\$ from
+                    mkpasswd -m sha-512) is used verbatim.
 EOF
 }
 
@@ -242,6 +262,16 @@ merge_selected_config
 if ! /usr/local/bin/setup_ssh_hostkey.sh "$SSH_HOSTKEY_DIR"; then
     echo "Error: SSH host key setup failed." >&2
     exit 1
+fi
+
+# Optional ietf-ssh-server local user with password authentication for clients that
+# cannot do keyboard-interactive (e.g. OpenDaylight). Runs after the config merge so
+# the endpoint it targets exists; fail closed, the user is useless half-configured.
+if [ -n "$NETCONF_SSH_USERNAME" ]; then
+    if ! /usr/local/bin/setup_ssh_user.sh "$NETCONF_SSH_USERNAME" "$NETCONF_SSH_PASSWORD"; then
+        echo "Error: NETCONF SSH user setup failed." >&2
+        exit 1
+    fi
 fi
 
 if [ "$TLS_ENABLED" = "1" ]; then
