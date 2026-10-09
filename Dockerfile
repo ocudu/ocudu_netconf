@@ -147,6 +147,13 @@ RUN bash /usr/share/netopeer2/scripts/setup.sh && \
     bash /usr/share/netopeer2/scripts/merge_hostkey.sh && \
     bash /usr/share/netopeer2/scripts/merge_config.sh
 
+# get-schema (RFC 6022) serves schemas only from the sysrepo repository directory,
+# but only installed modules are copied there by sysrepoctl. Modules that are
+# merely imported into the context (libyang's bundled type and support schemas)
+# are advertised in the capabilities and the monitoring data, so schema-downloading
+# controllers would fail on them; copy them in without overwriting installed ones.
+RUN cp -n /usr/share/yang/modules/libyang/*.yang /etc/sysrepo/yang/
+
 # Default host key, installed by setup_ssh_hostkey.sh when nothing is mounted. merge_hostkey.sh
 # above generates an RSA one, which a client cannot verify: known_hosts records it as 'ssh-rsa'
 # while the server offers only rsa-sha2-256/512. Generated here so it is stable per image tag.
