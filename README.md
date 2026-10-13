@@ -144,9 +144,10 @@ $ docker run -it -p 830:830 -e NETCONF_SSH_USERNAME=odl -e NETCONF_SSH_PASSWORD=
 ```
 
 The password is stored in libnetconf2's `<hashed-password>` format: a cleartext value is
-wrapped as `$0$<password>`, a value starting with `$` (a crypt(3) hash, e.g. `$6$...` from
-`mkpasswd -m sha-512`) is used verbatim. Under Kubernetes take the password from a Secret so it
-never appears in the pod spec:
+hashed with SHA-512 crypt (`openssl passwd -6`) before it is stored, so neither the datastore
+nor the running config exported on container stop ever contains the password; a value starting
+with `$` (a crypt(3) hash, e.g. `$6$...` from `mkpasswd -m sha-512`) is used verbatim. Under
+Kubernetes take the password from a Secret so it never appears in the pod spec:
 
 ```yaml
 env:
@@ -160,8 +161,8 @@ env:
 ```
 
 Notes: the user is re-applied on every start (rotate the password by changing the env and
-restarting); once created it persists in the exported running config, so removing the env
-variables does not remove the user — edit the datastore for that.
+restarting); removing the env vars removes the user and its NACM grant on the next start,
+so no working login survives in the persisted running config.
 
 ## Run with console access
 

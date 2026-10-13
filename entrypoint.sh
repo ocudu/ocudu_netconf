@@ -51,9 +51,10 @@ Environment variables:
                     method for clients that cannot do keyboard-interactive (e.g.
                     OpenDaylight). Default: unset, no user is created.
   NETCONF_SSH_PASSWORD
-                    The user's password: a cleartext value is stored as \$0\$<password>;
-                    a value starting with \$ (a crypt(3) hash, e.g. \$6\$ from
-                    mkpasswd -m sha-512) is used verbatim.
+                    The user's password: a cleartext value is hashed with SHA-512 crypt
+                    (openssl passwd -6) before it is stored, so only the hash ever reaches
+                    the datastore; a value starting with \$ (a crypt(3) hash, e.g. \$6\$
+                    from mkpasswd -m sha-512) is used verbatim.
 EOF
 }
 
@@ -226,6 +227,7 @@ fi
 
 mkdir -p "$(dirname "$RUNNING_CONFIG")"
 PROFILE_STATE="$(dirname "$RUNNING_CONFIG")/yang-profile"
+NETCONF_SSH_USER_STATE="$(dirname "$RUNNING_CONFIG")/netconf-ssh-user"
 
 # protects against reusing persisted state of one profile (e.g. ru) with a different profile (e.g. du) when rerunning container with persisted state using docker -v option
 if [ -e "$PROFILE_STATE" ]; then
@@ -267,11 +269,31 @@ fi
 # Optional ietf-ssh-server local user with password authentication for clients that
 # cannot do keyboard-interactive (e.g. OpenDaylight). Runs after the config merge so
 # the endpoint it targets exists; fail closed, the user is useless half-configured.
+# The state file remembers which user the env vars created, so a start without the
+# env vars removes the user again instead of leaving a working login in the
+# persisted config, and a renamed user takes its grant along instead of leaking it.
 if [ -n "$NETCONF_SSH_USERNAME" ]; then
+    if [ -e "$NETCONF_SSH_USER_STATE" ]; then
+        PREVIOUS_SSH_USER="$(cat "$NETCONF_SSH_USER_STATE")"
+        if [ "$PREVIOUS_SSH_USER" != "$NETCONF_SSH_USERNAME" ]; then
+            if ! /usr/local/bin/setup_ssh_user.sh --remove "$PREVIOUS_SSH_USER"; then
+                echo "Error: NETCONF SSH user removal failed." >&2
+                exit 1
+            fi
+        fi
+    fi
     if ! /usr/local/bin/setup_ssh_user.sh "$NETCONF_SSH_USERNAME" "$NETCONF_SSH_PASSWORD"; then
         echo "Error: NETCONF SSH user setup failed." >&2
         exit 1
     fi
+    printf '%s\n' "$NETCONF_SSH_USERNAME" > "$NETCONF_SSH_USER_STATE"
+elif [ -e "$NETCONF_SSH_USER_STATE" ]; then
+    PREVIOUS_SSH_USER="$(cat "$NETCONF_SSH_USER_STATE")"
+    if ! /usr/local/bin/setup_ssh_user.sh --remove "$PREVIOUS_SSH_USER"; then
+        echo "Error: NETCONF SSH user removal failed." >&2
+        exit 1
+    fi
+    rm -f "$NETCONF_SSH_USER_STATE"
 fi
 
 if [ "$TLS_ENABLED" = "1" ]; then
