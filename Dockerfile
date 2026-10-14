@@ -10,6 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # install common dependencies
 RUN apt-get update \
+    && apt-get upgrade -y \
     && apt-get install -y \
     ca-certificates \
     openssh-client \
