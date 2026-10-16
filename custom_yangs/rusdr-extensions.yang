@@ -9,6 +9,7 @@ module rusdr-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-10-16 { description "Removed amplitude_control enable_clipping and ceiling (dropped by the gNB)."; }
     revision 2026-07-01 { description "Initial version: SDR (RF frontend) Radio Unit configuration."; }
 
     grouping rusdr_extensions_subtree {
@@ -92,21 +93,11 @@ module rusdr-extensions {
             }
 
             container amplitude_control {
-                description "Baseband amplitude control / clipping to limit PA distortion.";
+                description "Baseband amplitude control.";
                 leaf tx_gain_backoff {
                     description "Gain backoff between the full-scale amplitude and the expected signal, in dB.";
                     type decimal64 { fraction-digits 3; }
                     default "12.0";
-                }
-                leaf enable_clipping {
-                    description "Enable clipping of the baseband samples.";
-                    type boolean;
-                    default false;
-                }
-                leaf ceiling {
-                    description "Clipping ceiling referenced to full scale, in dBFS.";
-                    type decimal64 { fraction-digits 3; }
-                    default "-0.1";
                 }
             }
 
