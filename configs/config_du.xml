@@ -578,6 +578,7 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
           <enable_rlc>false</enable_rlc>
           <enable_mac>false</enable_mac>
           <enable_du_low>false</enable_du_low>
+          <enable_app_usage>true</enable_app_usage>
         </layers>
       </ocudu_metrics_extensions>
 

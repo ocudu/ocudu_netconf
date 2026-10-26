@@ -9,6 +9,10 @@ module metrics-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-10-26 {
+        description "Add enable_app_usage to the layers of every function. All
+                     ocudu apps register it (apps/services/app_resource_usage).";
+    }
     revision 2026-05-13 {
         description "Split metrics_extensions_subtree into per-function subtrees
                      (cucp/cuup/du). Each function only carries the periodicity and
@@ -40,6 +44,17 @@ module metrics-extensions {
         }
     }
 
+    grouping metrics_extensions_common_layer_leaves {
+        description "Layer keys accepted by every ocudu app via the shared
+                     apps/services/app_resource_usage CLI11 schema.";
+
+        leaf enable_app_usage {
+            description "Enable application resource usage metrics reporting
+                         (CPU, memory and power consumption)";
+            type boolean;
+        }
+    }
+
     grouping metrics_extensions_cucp_subtree {
         description "OCUDU metrics extensions valid under GNBCUCPFunction. The
                      periodicity and layer keys here are exactly the ones the cu_cp
@@ -60,6 +75,8 @@ module metrics-extensions {
 
             container layers {
                 description "Enable per-layer metrics reporting for CU-CP layers.";
+
+                uses metrics_extensions_common_layer_leaves;
 
                 leaf enable_pdcp {
                     description "Enable PDCP layer metrics reporting (CU-CP side)";
@@ -99,6 +116,8 @@ module metrics-extensions {
 
             container layers {
                 description "Enable per-layer metrics reporting for CU-UP layers.";
+
+                uses metrics_extensions_common_layer_leaves;
 
                 leaf enable_e1ap {
                     description "Enable E1AP layer metrics reporting";
@@ -141,6 +160,8 @@ module metrics-extensions {
 
             container layers {
                 description "Enable per-layer metrics reporting for DU layers.";
+
+                uses metrics_extensions_common_layer_leaves;
 
                 leaf enable_ru {
                     description "Enable RU (OFH) layer metrics reporting";
