@@ -97,9 +97,12 @@ RUN cd /opt/dev && \
     xargs -a deb_packages.txt -I{} cp "{}" /out/sysrepo/
 
 # libnetconf2
+# Revert c3881708, it corrupts the SSH stream (CESNET/libnetconf2#647); drop after v4.6.4.
 RUN cd /opt/dev && \
     git clone --branch ${LIBNETCONF2_TAG} https://github.com/CESNET/libnetconf2.git && \
-    cd libnetconf2 && apkg build -b && \
+    cd libnetconf2 && \
+    git -c user.email=build@ocudu.local -c user.name=ocudu-build revert --no-edit c3881708 && \
+    apkg build -b && \
     find pkg/pkgs/ubuntu-${OS_VERSION} -type f -name "*.deb" > deb_packages.txt && \
     dpkg -i $(cat deb_packages.txt) && \
     mkdir -p /out/libnetconf2 && \
