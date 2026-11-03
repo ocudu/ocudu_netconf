@@ -25,6 +25,7 @@ module gnbdufunction-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-11-03 { description "Add warn_on_drop on GNBDUFunction"; }
     revision 2026-08-07 { description "Add expert-execution-extensions subtree (main pool thread sizing)"; }
     revision 2026-07-01 { description "Add rusdr-extensions subtree (SDR Radio Unit configuration)"; }
     revision 2026-06-23 { description "Add configurable F1-U (GTP-U) bind/peer UDP ports on EP_F1U"; }
@@ -49,6 +50,13 @@ module gnbdufunction-extensions {
             uses ocudu-remote-control:remote_control_extensions_subtree;
             uses ocudu-rudummy:rudummy_extensions_subtree;
             uses ocudu-rusdr:rusdr_extensions_subtree;
+
+            leaf warn_on_drop {
+                description "Log a warning for packets dropped in F1-U, RLC and MAC
+                             due to full queues.";
+                type boolean;
+                default false;
+            }
         }
     }
 
