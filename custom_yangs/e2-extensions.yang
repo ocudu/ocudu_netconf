@@ -1,0 +1,151 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module e2-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-e2-extension:1.0";
+    prefix "ocudu-e2";
+
+    import _3gpp-common-managed-element { prefix me3gpp; }
+    import _3gpp-nr-nrm-gnbcucpfunction { prefix gnbcucp3gpp; }
+    import _3gpp-nr-nrm-gnbcuupfunction { prefix gnbcuup3gpp; }
+    import _3gpp-nr-nrm-gnbdufunction { prefix gnbdu3gpp; }
+    import ietf-inet-types { prefix inet; }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.
+
+                 E2 agent configuration ('e2'). Every function has its own enable leaf.
+                 The gNB reads one 'e2' section, so where functions share a gNB config the
+                 RIC connection leaves exist only once: on the GNBCUCPFunction when present,
+                 else on the GNBDUFunction, else on the GNBCUUPFunction.";
+
+    revision 2026-11-03 { description "Initial version"; }
+
+    grouping e2_connection_leaves {
+        leaf-list addrs {
+            type inet:host;
+            ordered-by user;
+            default "127.0.0.1";
+            description "RIC addresses. Several addresses enable SCTP multi-homing.";
+        }
+        leaf port {
+            type inet:port-number { range "20000..40000"; }
+            default 36421;
+            description "RIC SCTP port.";
+        }
+        leaf-list bind_addrs {
+            type inet:ip-address;
+            ordered-by user;
+            default "127.0.0.1";
+            description "Local bind addresses. Several addresses enable SCTP multi-homing.";
+        }
+
+        // SCTP socket tuning for the E2 association. -1 selects the system default.
+        leaf sctp_rto_initial {
+            type int32;
+            default 120;
+            description "SCTP initial RTO in milliseconds (-1 for system default).";
+        }
+        leaf sctp_rto_min {
+            type int32;
+            default 120;
+            description "SCTP minimum RTO in milliseconds (-1 for system default).";
+        }
+        leaf sctp_rto_max {
+            type int32;
+            default 500;
+            description "SCTP maximum RTO in milliseconds (-1 for system default).";
+        }
+        leaf sctp_init_max_attempts {
+            type int32;
+            default 3;
+            description "SCTP INIT maximum attempts (-1 for system default).";
+        }
+        leaf sctp_max_init_timeo {
+            type int32;
+            default 500;
+            description "SCTP maximum INIT timeout in milliseconds (-1 for system default).";
+        }
+        leaf sctp_hb_interval {
+            type int32;
+            default 30000;
+            description "SCTP heartbeat interval in milliseconds (-1 for system default).";
+        }
+        leaf sctp_assoc_max_retx {
+            type int32;
+            default 10;
+            description "SCTP association maximum retransmissions (-1 for system default).";
+        }
+        leaf sctp_nodelay {
+            type boolean;
+            default false;
+            description "Send SCTP messages immediately without any Nagle-like batching.";
+        }
+
+        leaf e2sm_kpm_enabled {
+            type boolean;
+            default false;
+            description "Enable the KPM service model.";
+        }
+        leaf e2sm_rc_enabled {
+            type boolean;
+            default false;
+            description "Enable the RC service model.";
+        }
+        leaf e2sm_ccc_enabled {
+            type boolean;
+            default false;
+            description "Enable the CCC service model. Only the DU E2 agent supports CCC; the
+                         CU-CP and CU-UP agents always run without it.";
+        }
+    }
+
+    grouping e2_extensions_du_subtree {
+        container ocudu_e2_extensions {
+            leaf enable_du_e2 {
+                type boolean;
+                default false;
+                description "Enable the DU E2 agent.";
+            }
+            uses e2_connection_leaves {
+                when "not(/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction)";
+            }
+        }
+    }
+
+    grouping e2_extensions_cucp_subtree {
+        container ocudu_e2_extensions {
+            must "(count(addrs) <= 1 and count(bind_addrs) <= 1)"
+               + " or not(/me3gpp:ManagedElement/gnbcuup3gpp:GNBCUUPFunction"
+               + " or /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction)" {
+                error-message "E2 SCTP multi-homing (several addrs/bind_addrs) is only supported when the
+                               CU-CP runs alone: the combined cu/gnb apps accept one address each.";
+                description "The gNB merges options that several units register under one name, and
+                             the merged option takes a single value (cli11_utils add_option). Drop
+                             this once the gNB keeps the vector arity.";
+            }
+            leaf enable_cu_cp_e2 {
+                type boolean;
+                default false;
+                description "Enable the CU-CP E2 agent.";
+            }
+            uses e2_connection_leaves;
+        }
+    }
+
+    grouping e2_extensions_cuup_subtree {
+        container ocudu_e2_extensions {
+            leaf enable_cu_up_e2 {
+                type boolean;
+                default false;
+                description "Enable the CU-UP E2 agent.";
+            }
+            uses e2_connection_leaves {
+                when "not(/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction)"
+                   + " and not(/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction)";
+            }
+        }
+    }
+}

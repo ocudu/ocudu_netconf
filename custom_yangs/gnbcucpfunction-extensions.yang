@@ -20,10 +20,12 @@ module gnbcucpfunction-extensions {
     import remote-control-extensions { prefix ocudu-remote-control; }
     import trace-extensions { prefix ocudu-trace; }
     import qos-extensions { prefix ocudu-qos; }
+    import e2-extensions { prefix ocudu-e2; }
 
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-11-13 { description "Add e2 extensions (e2-extensions)"; }
     revision 2026-11-06 { description "Add trace-extensions subtree"; }
     revision 2026-11-05 { description "Make the CESManagementFunction load-threshold lists optional on NRCellCU, so energySavingControl can be set on its own"; }
     revision 2026-11-03 { description "Add qos list (qos-extensions)"; }
@@ -241,6 +243,7 @@ module gnbcucpfunction-extensions {
             uses ocudu-remote-control:remote_control_extensions_subtree;
             uses ocudu-trace:trace_extensions_cucp_subtree;
             uses ocudu-qos:qos_extensions_cucp_subtree;
+            uses ocudu-e2:e2_extensions_cucp_subtree;
         }
     }
 

@@ -17,10 +17,12 @@ module gnbcuupfunction-extensions {
     import remote-control-extensions { prefix ocudu-remote-control; }
     import trace-extensions { prefix ocudu-trace; }
     import qos-extensions { prefix ocudu-qos; }
+    import e2-extensions { prefix ocudu-e2; }
 
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-11-13 { description "Add e2 extensions (e2-extensions)"; }
     revision 2026-11-06 { description "Add trace-extensions subtree"; }
     revision 2026-11-03 { description "Add qos list (qos-extensions)"; }
     revision 2026-07-01 { description "Add CU-UP test_mode extensions on GNBCUUPFunction"; }
@@ -41,6 +43,7 @@ module gnbcuupfunction-extensions {
             uses ocudu-remote-control:remote_control_extensions_subtree;
             uses ocudu-trace:trace_extensions_cuup_subtree;
             uses ocudu-qos:qos_extensions_cuup_subtree;
+            uses ocudu-e2:e2_extensions_cuup_subtree;
 
             container ocudu_gnbcuupfunction_testmode_extensions {
                 description "OCUDU CU-UP test mode: generates synthetic DL/UL user-plane

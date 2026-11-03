@@ -494,6 +494,11 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
       </ocudu_trace_extensions>
 
       <warn_on_drop>false</warn_on_drop>
+      <ocudu_e2_extensions>
+        <enable_du_e2>false</enable_du_e2>
+        <addrs>127.0.0.1</addrs>
+        <port>36421</port>
+      </ocudu_e2_extensions>
       <ocudu_ru_sdr_extensions>
         <device_driver>uhd</device_driver>
         <device_args>type=b200,num_recv_frames=64,num_send_frames=64</device_args>

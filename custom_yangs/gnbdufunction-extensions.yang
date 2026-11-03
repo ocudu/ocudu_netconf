@@ -23,10 +23,12 @@ module gnbdufunction-extensions {
     import rudummy-extensions { prefix ocudu-rudummy; }
     import rusdr-extensions { prefix ocudu-rusdr; }
     import qos-extensions { prefix ocudu-qos; }
+    import e2-extensions { prefix ocudu-e2; }
 
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-11-13 { description "Add e2 extensions (e2-extensions)"; }
     revision 2026-11-06 { description "Add trace-extensions subtree"; }
     revision 2026-11-03 { description "Add warn_on_drop on GNBDUFunction; add qos and srbs lists (qos-extensions)"; }
     revision 2026-08-07 { description "Add expert-execution-extensions subtree (main pool thread sizing)"; }
@@ -62,6 +64,7 @@ module gnbdufunction-extensions {
                 type boolean;
                 default false;
             }
+            uses ocudu-e2:e2_extensions_du_subtree;
         }
     }
 

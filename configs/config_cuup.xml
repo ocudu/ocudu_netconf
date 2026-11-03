@@ -89,6 +89,11 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
         <max_tracing_events_per_file>1000000</max_tracing_events_per_file>
       </ocudu_trace_extensions>
 
+      <ocudu_e2_extensions>
+        <enable_cu_up_e2>false</enable_cu_up_e2>
+        <addrs>127.0.0.1</addrs>
+        <port>36421</port>
+      </ocudu_e2_extensions>
       <ocudu_log_extensions>
         <filename>/tmp/cuup.log</filename>
         <all_level>warning</all_level>
