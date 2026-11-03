@@ -1,0 +1,432 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module qos-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-qos-extension:1.0";
+    prefix "ocudu-qos";
+
+    import _3gpp-common-managed-element { prefix me3gpp; }
+    import _3gpp-nr-nrm-gnbdufunction { prefix gnbdu3gpp; }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.
+
+                 Per-5QI radio bearer ('qos') and signalling radio bearer ('srbs')
+                 configuration. The gNB reads one 'qos' list that the DU, CU-CP and
+                 CU-UP each parse for their own subsections, so every function gets its
+                 own list holding only those subsections and the O1 adapter merges them
+                 by five_qi. Leaf names are the gNB YAML keys.
+
+                 A non-empty 'qos' list REPLACES the gNB built-in per-5QI defaults (and,
+                 on the DU, the NTN adaptation of them): only the 5QIs listed here are
+                 supported. Leave the lists empty to keep the built-in defaults.
+
+                 Leaves the gNB has no default for are mandatory, except where 0 is a
+                 usable value: an omitted key is zero-initialised by the gNB, so those
+                 defaults are 0.";
+
+    revision 2026-11-03 { description "Initial version"; }
+
+    grouping rlc_am_tx_rx {
+        description "RLC AM TX/RX parameters common to the DU and CU-CP.";
+
+        container tx {
+            leaf sn {
+                type uint8 { range "12 | 18"; }
+                mandatory true;
+                description "RLC AM TX SN size, in bits.";
+            }
+            leaf t-poll-retransmit {
+                type uint16 {
+                    range "5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 50 | 55 | 60 | 65 | 70 | 75 | 80 | 85 | 90 | 95
+                           | 100 | 105 | 110 | 115 | 120 | 125 | 130 | 135 | 140 | 145 | 150 | 155 | 160 | 165 | 170
+                           | 175 | 180 | 185 | 190 | 195 | 200 | 205 | 210 | 215 | 220 | 225 | 230 | 235 | 240 | 245
+                           | 250 | 300 | 350 | 400 | 450 | 500 | 800 | 1000 | 2000 | 4000";
+                }
+                mandatory true;
+                description "RLC AM TX t-PollRetransmit, in milliseconds.";
+            }
+            leaf max-retx-threshold {
+                type uint8 { range "1 | 2 | 3 | 4 | 6 | 8 | 16 | 32"; }
+                mandatory true;
+                description "RLC AM maxRetxThreshold.";
+            }
+            leaf poll-pdu {
+                type int32 {
+                    range "-1 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 6144 | 8192 | 12288
+                           | 16384 | 20480 | 24576 | 28672 | 32768 | 40960 | 49152 | 57344 | 65536";
+                }
+                mandatory true;
+                description "RLC AM TX pollPDU. -1 is infinity.";
+            }
+            leaf poll-byte {
+                type int32 {
+                    range "-1 | 1 | 2 | 5 | 8 | 10 | 15 | 25 | 50 | 75 | 100 | 125 | 250 | 375 | 500 | 750 | 1000
+                           | 1250 | 1500 | 2000 | 3000 | 4000 | 4500 | 5000 | 5500 | 6000 | 6500 | 7000 | 7500 | 8000
+                           | 9000 | 10000 | 11000 | 12000 | 13000 | 14000 | 15000 | 16000 | 17000 | 18000 | 20000
+                           | 25000 | 30000 | 40000";
+                }
+                mandatory true;
+                description "RLC AM TX pollByte, in kilobytes. -1 is infinity.";
+            }
+            leaf max_window {
+                type uint32;
+                default 0;
+                description "Non-standard limit of the TX window size, to bound memory use.
+                             0 means no limit other than the SN size.";
+            }
+            leaf queue-size {
+                type uint32 { range "1..max"; }
+                default 4096;
+                description "RLC AM TX SDU queue size, in SDUs.";
+            }
+        }
+
+        container rx {
+            leaf sn {
+                type uint8 { range "12 | 18"; }
+                mandatory true;
+                description "RLC AM RX SN size, in bits.";
+            }
+            leaf t-reassembly {
+                type uint8 {
+                    range "0 | 5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 50 | 55 | 60 | 65 | 70 | 75 | 80 | 85 | 90
+                           | 95 | 100 | 110 | 120 | 130 | 140 | 150 | 160 | 170 | 180 | 190 | 200";
+                }
+                default 0;
+                description "RLC AM RX t-Reassembly, in milliseconds.";
+            }
+            leaf t-status-prohibit {
+                type uint16 {
+                    range "0 | 5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 50 | 55 | 60 | 65 | 70 | 75 | 80 | 85 | 90
+                           | 95 | 100 | 105 | 110 | 115 | 120 | 125 | 130 | 135 | 140 | 145 | 150 | 155 | 160 | 165
+                           | 170 | 175 | 180 | 185 | 190 | 195 | 200 | 205 | 210 | 215 | 220 | 225 | 230 | 235 | 240
+                           | 245 | 250 | 300 | 350 | 400 | 450 | 500 | 800 | 1000 | 1200 | 1600 | 2000 | 2400";
+                }
+                default 0;
+                description "RLC AM RX t-StatusProhibit, in milliseconds.";
+            }
+            leaf max_sn_per_status {
+                type uint32;
+                must "not(../sn) or (../sn = 12 and . < 2048) or (../sn = 18 and . < 131072)" {
+                    error-message "max_sn_per_status must be below the RLC AM window size (2^(sn-1)).";
+                }
+                default 0;
+                description "Maximum number of SNs visited when building a status report.
+                             0 means no limit.";
+            }
+        }
+    }
+
+    grouping rlc_um_tx_rx {
+        description "RLC UM (bidirectional) TX/RX parameters common to the DU and CU-CP.";
+
+        container tx {
+            leaf sn {
+                type uint8 { range "6 | 12"; }
+                mandatory true;
+                description "RLC UM TX SN size, in bits.";
+            }
+            leaf queue-size {
+                type uint32 { range "1..max"; }
+                mandatory true;
+                description "RLC UM TX SDU queue size, in SDUs.";
+            }
+        }
+
+        container rx {
+            leaf sn {
+                type uint8 { range "6 | 12"; }
+                mandatory true;
+                description "RLC UM RX SN size, in bits.";
+            }
+            leaf t-reassembly {
+                type uint8 {
+                    range "0 | 5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 50 | 55 | 60 | 65 | 70 | 75 | 80 | 85 | 90
+                           | 95 | 100 | 110 | 120 | 130 | 140 | 150 | 160 | 170 | 180 | 190 | 200";
+                }
+                default 0;
+                description "RLC UM RX t-Reassembly, in milliseconds.";
+            }
+        }
+    }
+
+    grouping rlc_mode {
+        leaf mode {
+            type enumeration {
+                enum am;
+                enum um-bidir;
+            }
+            default am;
+            description "RLC mode. Only the subsection of the selected mode is used.";
+        }
+    }
+
+    grouping du_rlc_am {
+        uses rlc_am_tx_rx {
+            augment "tx" {
+                leaf queue-bytes {
+                    type uint32 { range "1..max"; }
+                    default 6172672;
+                    description "RLC AM TX SDU queue size, in bytes.";
+                }
+            }
+        }
+    }
+
+    grouping triggered_ul_grant_delay {
+        leaf delay {
+            type uint8 { range "1..16"; }
+            description "Minimum delay between the DL PDCCH and the UL PDCCH, in milliseconds.";
+        }
+    }
+
+    grouping qos_extensions_du_subtree {
+        description "DU subsections of 'qos' (rlc, f1u_du, mac) and the DU-only 'srbs'.";
+
+        list qos {
+            key five_qi;
+            description "Per-5QI DU radio bearer configuration.";
+
+            leaf five_qi {
+                type uint8;
+                description "5QI.";
+            }
+
+            container rlc {
+                uses rlc_mode;
+
+                container um-bidir {
+                    when "../mode = 'um-bidir'";
+                    uses rlc_um_tx_rx {
+                        augment "tx" {
+                            leaf queue-bytes {
+                                type uint32 { range "1..max"; }
+                                mandatory true;
+                                description "RLC UM TX SDU queue size, in bytes.";
+                            }
+                        }
+                    }
+                }
+                container am {
+                    when "../mode = 'am'";
+                    uses du_rlc_am;
+                }
+            }
+
+            container f1u_du {
+                leaf backoff_timer {
+                    type int32 { range "0..max"; }
+                    mandatory true;
+                    description "F1-U backoff timer for transmit/delivery notifications, in milliseconds.";
+                }
+                leaf ul_buffer_size {
+                    type uint32;
+                    default 0;
+                    description "F1-U UL buffer size used during handover. The gNB built-in 5QI
+                                 defaults use 4096, but an explicit 'qos' entry that omits it gets 0.";
+                }
+            }
+
+            container mac {
+                leaf allowed_harq_mode {
+                    type enumeration {
+                        enum mode_a;
+                        enum mode_b;
+                    }
+                    description "Restrict this 5QI's logical channel to UL grants of this HARQ mode.
+                                 Unrestricted when absent.";
+                }
+                leaf dl_harq_feedback {
+                    type enumeration {
+                        enum enabled;
+                        enum disabled;
+                    }
+                    description "Restrict this 5QI's logical channel to DL HARQ processes with this
+                                 feedback setting. Unrestricted when absent.";
+                }
+                container triggered_ul_grant {
+                    presence "Enables a proactive UL grant triggered by a DL allocation.";
+                    uses triggered_ul_grant_delay {
+                        refine delay { default 3; }
+                    }
+                    leaf grant_size {
+                        type uint16 { range "1..1500"; }
+                        default 512;
+                        description "UL pending bytes injected into the BSR.";
+                    }
+                }
+            }
+        }
+
+        list srbs {
+            key srb_id;
+            description "Per-SRB RLC/MAC overrides. SRBs not listed keep the gNB defaults.";
+
+            leaf srb_id {
+                type uint8 { range "1..2"; }
+                description "SRB Id.";
+            }
+
+            container rlc {
+                description "RLC AM parameters of the SRB.";
+                uses du_rlc_am;
+            }
+
+            container mac {
+                container triggered_ul_grant {
+                    presence "Enables a proactive UL grant triggered by a DL allocation.";
+                    must "../../srb_id = 1" {
+                        error-message "triggered_ul_grant is only supported for SRB1.";
+                    }
+                    uses triggered_ul_grant_delay {
+                        refine delay { default 10; }
+                    }
+                }
+            }
+        }
+    }
+
+    grouping qos_extensions_cucp_subtree {
+        description "CU-CP subsections of 'qos' (rlc, pdcp).";
+
+        list qos {
+            key five_qi;
+            description "Per-5QI CU-CP radio bearer configuration.";
+
+            leaf five_qi {
+                type uint8;
+                description "5QI.";
+            }
+
+            container rlc {
+                when "not(/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction)";
+                description "RLC parameters as seen by the CU-CP. In a gNB with a DU in the same
+                             ManagedElement the gNB reads one shared 'qos.rlc', so this is
+                             unavailable there and the DU's rlc is used.";
+                uses rlc_mode;
+
+                container um-bidir {
+                    when "../mode = 'um-bidir'";
+                    uses rlc_um_tx_rx;
+                }
+                container am {
+                    when "../mode = 'am'";
+                    uses rlc_am_tx_rx;
+                }
+            }
+
+            container pdcp {
+                container rohc {
+                    leaf rohc_type {
+                        type enumeration {
+                            enum none;
+                            enum rohc;
+                            enum uplink_only_rohc;
+                        }
+                        must ". = 'none' or ../../rx/out_of_order_delivery = 'false'" {
+                            error-message "ROHC is ineffective with out-of-order delivery enabled.";
+                        }
+                        default none;
+                        description "Header compression type.";
+                    }
+                    leaf max_cid {
+                        type uint16;
+                        default 15;
+                        description "Maximum CID.";
+                    }
+                    leaf profile0x0001 { type boolean; default false; description "ROHCv1 RTP/UDP/IP."; }
+                    leaf profile0x0002 { type boolean; default false; description "ROHCv1 UDP/IP."; }
+                    leaf profile0x0003 { type boolean; default false; description "ROHCv1 ESP/IP."; }
+                    leaf profile0x0004 { type boolean; default false; description "ROHCv1 IP."; }
+                    leaf profile0x0006 { type boolean; default false; description "ROHCv1 TCP/IP."; }
+                    leaf profile0x0101 { type boolean; default false; description "ROHCv2 RTP/UDP/IP."; }
+                    leaf profile0x0102 { type boolean; default false; description "ROHCv2 UDP/IP."; }
+                    leaf profile0x0103 { type boolean; default false; description "ROHCv2 ESP/IP."; }
+                    leaf profile0x0104 { type boolean; default false; description "ROHCv2 IP."; }
+                }
+
+                container tx {
+                    leaf sn {
+                        type uint8 { range "12 | 18"; }
+                        mandatory true;
+                        description "PDCP TX SN size, in bits.";
+                    }
+                    leaf discard_timer {
+                        type int16 {
+                            range "-1 | 10 | 20 | 30 | 40 | 50 | 60 | 75 | 100 | 150 | 200 | 250 | 300 | 500 | 750
+                                   | 1500";
+                        }
+                        mandatory true;
+                        description "PDCP TX discard timer, in milliseconds. -1 is infinity.";
+                    }
+                    leaf status_report_required {
+                        type boolean;
+                        must ". = 'false'" {
+                            error-message "PDCP TX status report is not supported yet by the gNB.";
+                        }
+                        default false;
+                        description "Whether a PDCP status report is required.";
+                    }
+                }
+
+                container rx {
+                    leaf sn {
+                        type uint8 { range "12 | 18"; }
+                        mandatory true;
+                        description "PDCP RX SN size, in bits.";
+                    }
+                    leaf t_reordering {
+                        type int16 {
+                            range "-1 | 0 | 1 | 2 | 4 | 5 | 8 | 10 | 15 | 20 | 30 | 40 | 50 | 60 | 80 | 100 | 120
+                                   | 140 | 160 | 180 | 200 | 220 | 240 | 260 | 280 | 300 | 500 | 750 | 1000 | 1250
+                                   | 1500 | 1750 | 2000 | 2250 | 2500 | 2750 | 3000";
+                        }
+                        mandatory true;
+                        description "PDCP RX t-Reordering, in milliseconds. -1 is infinity (not advised
+                                     on DRBs: it can stall data).";
+                    }
+                    leaf out_of_order_delivery {
+                        type boolean;
+                        default false;
+                        description "Whether out-of-order delivery to upper layers is enabled.";
+                    }
+                }
+            }
+        }
+    }
+
+    grouping qos_extensions_cuup_subtree {
+        description "CU-UP subsection of 'qos' (f1u_cu_up).";
+
+        list qos {
+            key five_qi;
+            description "Per-5QI CU-UP radio bearer configuration.";
+
+            leaf five_qi {
+                type uint8;
+                description "5QI.";
+            }
+
+            container f1u_cu_up {
+                leaf backoff_timer {
+                    type int32 { range "0..max"; }
+                    default 5;
+                    description "F1-U backoff timer for discard notifications, in milliseconds.";
+                }
+                leaf queue_size {
+                    type uint32;
+                    default 8192;
+                    description "F1-U PDU queue size.";
+                }
+                leaf batch_size {
+                    type uint32;
+                    default 256;
+                    description "F1-U PDU batch size.";
+                }
+            }
+        }
+    }
+}

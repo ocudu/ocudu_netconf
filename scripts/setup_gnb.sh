@@ -6,8 +6,11 @@
 
 set -euo pipefail
 
+source /usr/local/bin/sysrepo_common.sh
+
 echo "Installing CU/DU YANG modules ..."
 
 /usr/local/bin/setup_du.sh
 /usr/local/bin/setup_cu.sh
 
+ensure_module /opt/dev/gnb-qos-consistency.yang

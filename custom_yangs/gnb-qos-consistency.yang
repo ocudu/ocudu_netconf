@@ -1,0 +1,44 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module gnb-qos-consistency {
+    yang-version 1.1;
+    namespace "urn:ocudu-gnb-qos-consistency:1.0";
+    prefix "ocudu-gnb-qos-consistency";
+
+    import _3gpp-common-managed-element { prefix me3gpp; }
+    import _3gpp-nr-nrm-gnbcucpfunction { prefix gnbcucp3gpp; }
+    import _3gpp-nr-nrm-gnbdufunction { prefix gnbdu3gpp; }
+    import gnbcucpfunction-extensions { prefix ocudu-gnbcucpfunction; }
+    import gnbdufunction-extensions { prefix ocudu-gnbdufunction; }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.
+
+                 Installed where the DU and CU-CP share one gNB config (gnb). The DU
+                 requires rlc and f1u_du, the CU-CP rlc and pdcp in every 'qos' entry, so
+                 both functions must configure the same set of 5QIs.";
+
+    revision 2026-11-03 { description "Initial version"; }
+
+    deviation "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/ocudu-gnbdufunction:ocudu_gnbdufunction_extensions/ocudu-gnbdufunction:qos/ocudu-gnbdufunction:five_qi" {
+        deviate add {
+            must "not(/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction) "
+               + "or /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ocudu-gnbcucpfunction:ocudu_gnbcucpfunction_extensions"
+               + "/ocudu-gnbcucpfunction:qos[ocudu-gnbcucpfunction:five_qi = current()]" {
+                error-message "Every GNBDUFunction qos five_qi must also be configured on GNBCUCPFunction.";
+            }
+        }
+    }
+
+    deviation "/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ocudu-gnbcucpfunction:ocudu_gnbcucpfunction_extensions/ocudu-gnbcucpfunction:qos/ocudu-gnbcucpfunction:five_qi" {
+        deviate add {
+            must "not(/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction) "
+               + "or /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/ocudu-gnbdufunction:ocudu_gnbdufunction_extensions"
+               + "/ocudu-gnbdufunction:qos[ocudu-gnbdufunction:five_qi = current()]" {
+                error-message "Every GNBCUCPFunction qos five_qi must also be configured on GNBDUFunction.";
+            }
+        }
+    }
+}

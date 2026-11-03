@@ -1,0 +1,34 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module cu-qos-consistency {
+    yang-version 1.1;
+    namespace "urn:ocudu-cu-qos-consistency:1.0";
+    prefix "ocudu-cu-qos-consistency";
+
+    import _3gpp-common-managed-element { prefix me3gpp; }
+    import _3gpp-nr-nrm-gnbcucpfunction { prefix gnbcucp3gpp; }
+    import _3gpp-nr-nrm-gnbcuupfunction { prefix gnbcuup3gpp; }
+    import gnbcucpfunction-extensions { prefix ocudu-gnbcucpfunction; }
+    import gnbcuupfunction-extensions { prefix ocudu-gnbcuupfunction; }
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.
+
+                 Installed where the CU-CP and CU-UP share one gNB config (cu, gnb). The
+                 CU-CP requires rlc and pdcp in every 'qos' entry, so a 5QI configured
+                 only on the CU-UP would make the gNB reject the config.";
+
+    revision 2026-11-03 { description "Initial version"; }
+
+    deviation "/me3gpp:ManagedElement/gnbcuup3gpp:GNBCUUPFunction/ocudu-gnbcuupfunction:ocudu_gnbcuupfunction_extensions/ocudu-gnbcuupfunction:qos/ocudu-gnbcuupfunction:five_qi" {
+        deviate add {
+            must "not(/me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction) "
+               + "or /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ocudu-gnbcucpfunction:ocudu_gnbcucpfunction_extensions"
+               + "/ocudu-gnbcucpfunction:qos[ocudu-gnbcucpfunction:five_qi = current()]" {
+                error-message "Every GNBCUUPFunction qos five_qi must also be configured on GNBCUCPFunction.";
+            }
+        }
+    }
+}
