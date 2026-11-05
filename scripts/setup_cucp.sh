@@ -44,10 +44,12 @@ ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-gnbcuupfunction.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-ep.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-rrmpolicy.yang"
 ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-nrcellrelation.yang"
+ensure_module "$YANG_3GPP_DIR/_3gpp-nr-nrm-cesmanagementfunction.yang"
 
 ensure_feature "_3gpp-common-managed-function" "MeasurementsUnderManagedFunction"
 ensure_feature "_3gpp-common-managed-element" "FmUnderManagedElement"
 ensure_feature "_3gpp-nr-nrm-ep" "EPClassesUnderGNBCUCPFunction"
+ensure_feature "_3gpp-nr-nrm-nrcellcu" "CESManagementFunction"
 
 ensure_module "$CUSTOM_YANG_DIR/log-extensions.yang"
 ensure_module "$CUSTOM_YANG_DIR/metrics-extensions.yang"

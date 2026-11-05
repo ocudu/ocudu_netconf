@@ -9,6 +9,8 @@ module gnbcucpfunction-extensions {
     import _3gpp-common-managed-element { prefix me3gpp; }
     import _3gpp-nr-nrm-gnbcucpfunction { prefix gnbcucp3gpp; }
     import _3gpp-nr-nrm-ep { prefix ep3gpp; }
+    import _3gpp-nr-nrm-nrcellcu { prefix nrcellcu3gpp; }
+    import _3gpp-nr-nrm-cesmanagementfunction { prefix cesmf3gpp; }
     import _3gpp-5g-common-yang-types { prefix types5g3gpp; }
     import ietf-inet-types { prefix inet; }
 
@@ -23,6 +25,7 @@ module gnbcucpfunction-extensions {
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
     revision 2026-11-06 { description "Add trace-extensions subtree"; }
+    revision 2026-11-05 { description "Make the CESManagementFunction load-threshold lists optional on NRCellCU, so energySavingControl can be set on its own"; }
     revision 2026-11-03 { description "Add qos list (qos-extensions)"; }
     revision 2026-08-20 { description "Replace nof_i_rnti_ue_bits with full_i_rnti_profile/short_i_rnti_profile, following the I-RNTI composition of TS 38.300 Annex F"; }
     revision 2026-08-14 { description "Add cu_cp.rrc configuration subtree"; }
@@ -268,6 +271,33 @@ module gnbcucpfunction-extensions {
                      never dials the peer. The E1 connect address is configured on the
                      gNB-CU-UP's EP_E1 instead. 3GPP marks remoteAddress mandatory, so remove
                      it from the CU-CP's EP_E1 to forbid it being set.";
+    }
+
+    // The CU-CP switches cells off/on only on energySavingControl (centralized ES). It does not
+    // evaluate the distributed-ES load thresholds below, which 3GPP marks min-elements 1; make
+    // them optional so an SMO can set energySavingControl without inventing threshold values.
+    deviation /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/nrcellcu3gpp:NRCellCU/cesmf3gpp:CESManagementFunction/cesmf3gpp:attributes/cesmf3gpp:intraRatEsActivationOriginalCellLoadParameters {
+        deviate replace { min-elements 0; }
+    }
+
+    deviation /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/nrcellcu3gpp:NRCellCU/cesmf3gpp:CESManagementFunction/cesmf3gpp:attributes/cesmf3gpp:intraRatEsActivationCandidateCellsLoadParameters {
+        deviate replace { min-elements 0; }
+    }
+
+    deviation /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/nrcellcu3gpp:NRCellCU/cesmf3gpp:CESManagementFunction/cesmf3gpp:attributes/cesmf3gpp:intraRatEsDeactivationCandidateCellsLoadParameters {
+        deviate replace { min-elements 0; }
+    }
+
+    deviation /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/nrcellcu3gpp:NRCellCU/cesmf3gpp:CESManagementFunction/cesmf3gpp:attributes/cesmf3gpp:interRatEsActivationOriginalCellParameters {
+        deviate replace { min-elements 0; }
+    }
+
+    deviation /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/nrcellcu3gpp:NRCellCU/cesmf3gpp:CESManagementFunction/cesmf3gpp:attributes/cesmf3gpp:interRatEsActivationCandidateCellParameters {
+        deviate replace { min-elements 0; }
+    }
+
+    deviation /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/nrcellcu3gpp:NRCellCU/cesmf3gpp:CESManagementFunction/cesmf3gpp:attributes/cesmf3gpp:interRatEsDeactivationCandidateCellParameters {
+        deviate replace { min-elements 0; }
     }
 
     augment /me3gpp:ManagedElement/gnbcucp3gpp:GNBCUCPFunction/ep3gpp:EP_NgC/ep3gpp:attributes {
