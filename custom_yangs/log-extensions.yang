@@ -9,6 +9,7 @@ module log-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-11-06 { description "Added the remaining gNB log channel levels"; }
     revision 2026-05-05 { description "Renamed module to log-extensions; namespace, prefix, and container updated to drop function- prefix"; }
     revision 2026-04-30 { description "Renamed module to function-log-extensions for reuse across DU/CU/CUCP/CUUP"; }
     revision 2026-04-02 { description "Renamed srs instances to ocudu";}
@@ -96,6 +97,81 @@ module log-extensions {
 
             leaf gtpu_level {
                 description "Log level for GTPU";
+                type log_level;
+            }
+
+            leaf lib_level {
+                description "Generic log level";
+                type log_level;
+            }
+
+            leaf e2ap_level {
+                description "Log level for E2AP";
+                type log_level;
+            }
+
+            leaf fapi_level {
+                description "Log level for FAPI";
+                type log_level;
+            }
+
+            leaf ofh_level {
+                description "Log level for Open Fronthaul";
+                type log_level;
+            }
+
+            leaf radio_level {
+                description "Log level for the SDR radio";
+                type log_level;
+            }
+
+            leaf hal_level {
+                description "Log level for HAL";
+                type log_level;
+            }
+
+            leaf du_level {
+                description "Log level for the DU";
+                type log_level;
+            }
+
+            leaf f1ap_level {
+                description "Log level for F1AP";
+                type log_level;
+            }
+
+            leaf f1u_level {
+                description "Log level for F1-U";
+                type log_level;
+            }
+
+            leaf ntn_level {
+                description "Log level for NTN";
+                type log_level;
+            }
+
+            leaf cu_level {
+                description "Log level for the CU";
+                type log_level;
+            }
+
+            leaf xnap_level {
+                description "Log level for XNAP";
+                type log_level;
+            }
+
+            leaf nrppa_level {
+                description "Log level for NRPPA";
+                type log_level;
+            }
+
+            leaf e1ap_level {
+                description "Log level for E1AP";
+                type log_level;
+            }
+
+            leaf sec_level {
+                description "Log level for security functions";
                 type log_level;
             }
         }        
