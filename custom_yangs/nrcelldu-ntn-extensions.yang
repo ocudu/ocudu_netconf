@@ -20,6 +20,7 @@ module nrcelldu-ntn-extensions {
 
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
 
+    revision 2026-11-06 { description "Add k_mac, TA report and UE-specific Koffset options, moving_ref_location, sat_switch_with_resync and the ncells neighbour list. satellite_idx and cell_specific_koffset are no longer mandatory, so a TN cell can carry NTN neighbours only."; }
     revision 2026-08-26 { description "Remove epoch_time and epoch_sfn_offset: the gNB derives the epoch of the broadcast assistance information itself and accepts neither knob."; }
     revision 2026-08-06 { description "Initial version: NTN serving cell parameters (SIB19)."; }
 
@@ -32,35 +33,88 @@ module nrcelldu-ntn-extensions {
         }
     }
 
+    typedef ul_sync_validity_duration {
+        description "Maximum duration from epoch time for which the UE may keep applying the broadcast
+                     assistance information without acquiring new information.";
+        type uint16 { range "5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 50 | 55 | 60 | 120 | 180 | 240 | 900"; }
+        units seconds;
+    }
+
+    typedef scheduling_offset {
+        description "Scheduling offset in milliseconds (the specifications count slots at 15 kHz SCS).";
+        type uint16 { range "1..1023"; }
+        units milliseconds;
+    }
+
+    typedef k_mac {
+        description "Scheduling offset used when downlink and uplink frame timing are not aligned at the
+                     gNB, in milliseconds (the specifications count slots at 15 kHz SCS).";
+        type uint16 { range "1..512"; }
+        units milliseconds;
+    }
+
+    grouping polarization_container {
+        container polarization {
+            presence "Service-link polarization is signalled.";
+            description "Polarization information for downlink and uplink transmission on the service link.";
+
+            leaf dl {
+                description "Polarization for downlink transmission on the service link.";
+                type polarization_type;
+            }
+            leaf ul {
+                description "Polarization for uplink transmission on the service link.";
+                type polarization_type;
+            }
+        }
+    }
+
     grouping ntn_extensions_subtree {
         description "OCUDU extension of the NRCellDU config with NTN serving cell parameters.";
 
         container ocudu_nrcelldu_ntn_extensions {
-            presence "This cell is an NTN serving cell.";
+            presence "This cell has an NTN configuration.";
+            description "NTN configuration of the cell. Setting cell_specific_koffset makes it an NTN serving
+                         cell (SIB19 serving-cell parameters); a cell without it, such as a TN-band cell, can
+                         still advertise NTN neighbour cells through ncells.";
+
+            must "not(cell_specific_koffset) or satellite_idx" {
+                error-message "An NTN serving cell (cell_specific_koffset set) needs satellite_idx.";
+            }
+            must "cell_specific_koffset or not(satellite_idx or k_mac or distance_threshold or t_service"
+               + " or ta_report_offset_threshold or use_state_vector or reference_location or polarization"
+               + " or feeder_link or moving_ref_location or sat_switch_with_resync)" {
+                error-message "NTN serving-cell parameters need cell_specific_koffset; without it the cell only advertises ncells.";
+            }
+            must "cell_specific_koffset or ncells" {
+                error-message "Set cell_specific_koffset for an NTN serving cell, or ncells for NTN neighbour cells.";
+            }
 
             leaf satellite_idx {
                 description "Index of the satellite serving this cell. Matches the satelliteId of an entry in "
                           + "ManagedElement/NTNFunction/EphemerisInfoSet/attributes/EphemerisInfos, parsed as an "
                           + "integer (satelliteId is a zero-padded 5-digit string).";
                 type uint8;
-                mandatory true;
             }
 
             leaf cell_specific_koffset {
                 description "Scheduling offset used for the timing relationships modified for NTN operation "
                           + "(TS 38.213, TS 38.300 clause 16.14.2). The specifications express K_offset in slots at "
                           + "15 kHz SCS; it is given here in milliseconds to stay unambiguous at other SCS values. "
-                          + "An NTN serving cell always has one, so it is mandatory.";
-                type uint16 { range "1..1023"; }
-                units milliseconds;
-                mandatory true;
+                          + "Setting it makes this cell an NTN serving cell.";
+                type scheduling_offset;
+            }
+
+            leaf k_mac {
+                description "Scheduling offset used when downlink and uplink frame timing are not aligned at the "
+                          + "gNB (TS 38.213).";
+                type k_mac;
             }
 
             leaf ntn_ul_sync_validity_dur {
-                description "Maximum duration from epoch time for which the UE may keep applying the broadcast "
-                          + "assistance information without acquiring new information.";
-                type uint16 { range "5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 50 | 55 | 60 | 120 | 180 | 240 | 900"; }
-                units seconds;
+                description "UL sync validity duration of the serving cell. Neighbour cells and the satellite "
+                          + "switch target inherit it when they do not set their own.";
+                type ul_sync_validity_duration;
                 default 5;
             }
 
@@ -87,6 +141,48 @@ module nrcelldu-ntn-extensions {
                 default false;
             }
 
+            leaf ta_report_offset_threshold {
+                description "Threshold of T_TA variation at which the UE sends a Timing Advance Report "
+                          + "(offsetThresholdTA, TS 38.321 clause 5.4.8). Setting it enables tar-Config.";
+                type decimal64 {
+                    fraction-digits 1;
+                    range "0.5 | 1.0 | 2.0 | 3.0 | 4.0 | 5.0 | 6.0 | 7.0 | 8.0 | 9.0 | 10.0 | 11.0 | 12.0 | 13.0 | 14.0 | 15.0";
+                }
+                units milliseconds;
+            }
+
+            leaf ta_report_sr_enabled {
+                description "Whether a triggered Timing Advance Report may raise a Scheduling Request when no "
+                          + "uplink grant is available (timingAdvanceSR).";
+                must ". = 'false' or ../ta_report_offset_threshold" {
+                    error-message "ta_report_sr_enabled requires ta_report_offset_threshold.";
+                }
+                type boolean;
+                default false;
+            }
+
+            leaf ue_specific_koffset_enabled {
+                description "Whether each UE gets a Koffset derived from the T_TA it reports (TS 38.321 clause "
+                          + "5.18.24). The application also rejects it together with PDSCH HARQ feedback "
+                          + "disabling or PUSCH HARQ mode B.";
+                must ". = 'false' or ../ta_report_offset_threshold" {
+                    error-message "ue_specific_koffset_enabled requires ta_report_offset_threshold.";
+                }
+                type boolean;
+                default false;
+            }
+
+            leaf ue_specific_koffset_margin {
+                description "Margin added to the reported T_TA when deriving a UE Koffset.";
+                must "../ue_specific_koffset_enabled = 'false'"
+                   + " or (. < ../cell_specific_koffset and . >= ../ta_report_offset_threshold)" {
+                    error-message "ue_specific_koffset_margin must be smaller than cell_specific_koffset and at least ta_report_offset_threshold.";
+                }
+                type uint8 { range "0..63"; }
+                units milliseconds;
+                default 2;
+            }
+
             leaf use_state_vector {
                 description "Whether to broadcast the ephemeris as ECEF state vectors (true) or ECI orbital "
                           + "parameters (false). When absent, the format follows whichever of positionVelocity or "
@@ -101,19 +197,7 @@ module nrcelldu-ntn-extensions {
                 uses types3gpp:GeographicalCoordinates;
             }
 
-            container polarization {
-                presence "Service-link polarization is signalled for this cell.";
-                description "Polarization information for downlink and uplink transmission on the service link.";
-
-                leaf dl {
-                    description "Polarization for downlink transmission on the service link.";
-                    type polarization_type;
-                }
-                leaf ul {
-                    description "Polarization for uplink transmission on the service link.";
-                    type polarization_type;
-                }
-            }
+            uses polarization_container;
 
             container feeder_link {
                 presence "Feeder link parameters are configured for Doppler compensation.";
@@ -133,6 +217,148 @@ module nrcelldu-ntn-extensions {
                     description "Uplink feeder link carrier frequency (satellite to gNB).";
                     type decimal64 { fraction-digits 1; range "0.0..100000000000.0"; }
                     units hertz;
+                }
+            }
+
+            container moving_ref_location {
+                presence "A moving reference location is configured for this cell.";
+                description "Moving reference location of an Earth-moving NTN cell (Rel-18).";
+                uses types3gpp:GeographicalCoordinates;
+            }
+
+            container sat_switch_with_resync {
+                presence "A satellite switch with resynchronization is configured.";
+                description "Satellite switch with resynchronization (SatSwitchWithReSync, Rel-18). The target
+                             keeps the serving cell's cell_specific_koffset and k_mac, since the application
+                             cannot change them across a switch; the other target parameters fall back to the
+                             serving cell's values when absent.";
+                must "../t_service" {
+                    error-message "sat_switch_with_resync requires t_service on the serving cell: it is the instant the switch executes.";
+                }
+
+                leaf satellite_idx {
+                    description "Index of the target satellite. Matches the satelliteId of an EphemerisInfos "
+                              + "entry, like the serving cell's satellite_idx.";
+                    type uint8;
+                    mandatory true;
+                }
+
+                leaf t_service_start {
+                    description "Time at which the target satellite starts serving. Either an RFC 3339 / ISO 8601 "
+                              + "timestamp or Unix milliseconds.";
+                    type union {
+                        type yang:date-and-time;
+                        type uint64;
+                    }
+                    mandatory true;
+                }
+
+                leaf ssb_time_offset_sf {
+                    description "SSB time offset of the target, in subframes.";
+                    must ". mod 5 = 0" {
+                        error-message "ssb_time_offset_sf must be a multiple of 5.";
+                    }
+                    type uint8 { range "0..159"; }
+                }
+
+                leaf ntn_ul_sync_validity_dur {
+                    description "UL sync validity duration after the switch.";
+                    type ul_sync_validity_duration;
+                }
+
+                uses polarization_container;
+
+                leaf ta_report {
+                    description "Whether timing advance reporting is enabled after the switch.";
+                    type boolean;
+                }
+
+                leaf use_state_vector {
+                    description "Whether to broadcast the target ephemeris as ECEF state vectors (true) or ECI "
+                              + "orbital parameters (false).";
+                    type boolean;
+                }
+
+                leaf promote_to_serving {
+                    description "Whether the target parameters become the serving cell's NTN configuration at "
+                              + "t_service, instead of only being advertised in SIB19 until then.";
+                    type boolean;
+                    default false;
+                }
+
+                leaf promote_neighbors {
+                    description "With promote_to_serving, keep the neighbour cell list (ncells) after the switch "
+                              + "instead of clearing it.";
+                    must ". = 'false' or ../promote_to_serving = 'true'" {
+                        error-message "promote_neighbors requires promote_to_serving.";
+                    }
+                    type boolean;
+                    default false;
+                }
+            }
+
+            list ncells {
+                description "NTN neighbour cells advertised in SIB19. Valid for NTN and TN serving cells.";
+                key idx;
+                ordered-by user;
+                max-elements 8;
+
+                leaf idx {
+                    description "Entry identifier. Only the list order is sent to the gNB.";
+                    type uint8 { range "0..7"; }
+                }
+
+                leaf satellite_idx {
+                    description "Index of the neighbour cell's satellite. Matches the satelliteId of an "
+                              + "EphemerisInfos entry.";
+                    type uint8;
+                    mandatory true;
+                }
+
+                leaf pci {
+                    description "Physical cell identity of the neighbour cell.";
+                    type uint16 { range "0..1007"; }
+                }
+
+                leaf carrier_freq {
+                    description "Carrier frequency of the neighbour cell, as an NR-ARFCN.";
+                    type uint32 { range "0..3279165"; }
+                }
+
+                leaf cell_specific_koffset {
+                    description "Cell-specific scheduling offset of the neighbour cell.";
+                    type scheduling_offset;
+                }
+
+                leaf ntn_ul_sync_validity_dur {
+                    description "UL sync validity duration of the neighbour cell.";
+                    type ul_sync_validity_duration;
+                }
+
+                leaf k_mac {
+                    description "K_mac of the neighbour cell.";
+                    type k_mac;
+                }
+
+                uses polarization_container;
+
+                leaf ta_report {
+                    description "Whether timing advance reporting is enabled in the neighbour cell.";
+                    type boolean;
+                }
+
+                leaf has_feeder_link {
+                    description "Whether the neighbour cell has a feeder link (transparent payload). Its ta-Info "
+                              + "is then broadcast, which needs gateway_location or ta_info on the referenced "
+                              + "satellite.";
+                    type boolean;
+                    default false;
+                }
+
+                leaf use_state_vector {
+                    description "Whether to broadcast the neighbour ephemeris as ECEF state vectors (true) or ECI "
+                              + "orbital parameters (false).";
+                    type boolean;
                 }
             }
         }
