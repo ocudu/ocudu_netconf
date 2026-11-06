@@ -297,6 +297,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
       </EP_NgC>
 
       <ocudu_gnbcucpfunction_extensions xmlns="urn:ocudu-gnbcucpfunction-extension:1.0">
+        <ocudu_trace_extensions>
+          <max_tracing_events_per_file>1000000</max_tracing_events_per_file>
+        </ocudu_trace_extensions>
+
         <max_nof_dus>6</max_nof_dus>
         <max_nof_cu_ups>6</max_nof_cu_ups>
         <max_nof_ues>8192</max_nof_ues>
@@ -390,6 +394,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
     </EP_NgU>
 
     <ocudu_gnbcuupfunction_extensions xmlns="urn:ocudu-gnbcuupfunction-extension:1.0">
+      <ocudu_trace_extensions>
+        <max_tracing_events_per_file>1000000</max_tracing_events_per_file>
+      </ocudu_trace_extensions>
+
       <ocudu_metrics_extensions>
         <periodicity>
           <cu_up_report_period>1000</cu_up_report_period>
@@ -879,6 +887,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
     </EP_F1U>
 
     <ocudu_gnbdufunction_extensions xmlns="urn:ocudu-gnbdufunction-extension:1.0">
+      <ocudu_trace_extensions>
+        <max_tracing_events_per_file>1000000</max_tracing_events_per_file>
+      </ocudu_trace_extensions>
+
       <warn_on_drop>false</warn_on_drop>
       <ocudu_ru_sdr_extensions>
         <device_driver>uhd</device_driver>

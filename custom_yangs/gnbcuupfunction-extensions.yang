@@ -15,11 +15,13 @@ module gnbcuupfunction-extensions {
     import metrics-extensions { prefix ocudu-metrics; }
     import pcap-extensions { prefix ocudu-pcap; }
     import remote-control-extensions { prefix ocudu-remote-control; }
+    import trace-extensions { prefix ocudu-trace; }
     import qos-extensions { prefix ocudu-qos; }
 
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-11-06 { description "Add trace-extensions subtree"; }
     revision 2026-11-03 { description "Add qos list (qos-extensions)"; }
     revision 2026-07-01 { description "Add CU-UP test_mode extensions on GNBCUUPFunction"; }
     revision 2026-06-23 { description "Add configurable F1-U (GTP-U) bind/peer UDP ports on EP_F1U"; }
@@ -37,6 +39,7 @@ module gnbcuupfunction-extensions {
             uses ocudu-metrics:metrics_extensions_cuup_subtree;
             uses ocudu-pcap:pcap_extensions_subtree;
             uses ocudu-remote-control:remote_control_extensions_subtree;
+            uses ocudu-trace:trace_extensions_cuup_subtree;
             uses ocudu-qos:qos_extensions_cuup_subtree;
 
             container ocudu_gnbcuupfunction_testmode_extensions {

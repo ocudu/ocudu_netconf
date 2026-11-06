@@ -19,6 +19,7 @@ module gnbdufunction-extensions {
     import metrics-extensions { prefix ocudu-metrics; }
     import pcap-extensions { prefix ocudu-pcap; }
     import remote-control-extensions { prefix ocudu-remote-control; }
+    import trace-extensions { prefix ocudu-trace; }
     import rudummy-extensions { prefix ocudu-rudummy; }
     import rusdr-extensions { prefix ocudu-rusdr; }
     import qos-extensions { prefix ocudu-qos; }
@@ -26,6 +27,7 @@ module gnbdufunction-extensions {
     organization "Software Radio Systems Ltd";
     description "The module defines YANG extensions needed for OCUDU
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-11-06 { description "Add trace-extensions subtree"; }
     revision 2026-11-03 { description "Add warn_on_drop on GNBDUFunction; add qos and srbs lists (qos-extensions)"; }
     revision 2026-08-07 { description "Add expert-execution-extensions subtree (main pool thread sizing)"; }
     revision 2026-07-01 { description "Add rusdr-extensions subtree (SDR Radio Unit configuration)"; }
@@ -49,6 +51,7 @@ module gnbdufunction-extensions {
             uses ocudu-metrics:metrics_extensions_du_subtree;
             uses ocudu-pcap:pcap_extensions_subtree;
             uses ocudu-remote-control:remote_control_extensions_subtree;
+            uses ocudu-trace:trace_extensions_du_subtree;
             uses ocudu-rudummy:rudummy_extensions_subtree;
             uses ocudu-rusdr:rusdr_extensions_subtree;
             uses ocudu-qos:qos_extensions_du_subtree;

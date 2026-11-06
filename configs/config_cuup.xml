@@ -85,6 +85,10 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
     </EP_F1U>
 
     <ocudu_gnbcuupfunction_extensions xmlns="urn:ocudu-gnbcuupfunction-extension:1.0">
+      <ocudu_trace_extensions>
+        <max_tracing_events_per_file>1000000</max_tracing_events_per_file>
+      </ocudu_trace_extensions>
+
       <ocudu_log_extensions>
         <filename>/tmp/cuup.log</filename>
         <all_level>warning</all_level>

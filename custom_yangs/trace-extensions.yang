@@ -1,0 +1,121 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+module trace-extensions {
+    yang-version 1.1;
+    namespace "urn:ocudu-trace-extension:1.0";
+    prefix "ocudu-trace";
+
+    organization "Software Radio Systems Ltd";
+    description "The module defines YANG extensions needed for OCUDU event tracing configuration
+                 Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
+    revision 2026-11-06 { description "Initial version"; }
+
+    grouping trace_extensions_common_leaves {
+        description "Top-level trace keys accepted by every ocudu app via the shared
+                     apps/helpers/tracing CLI11 schema.";
+
+        leaf filename {
+            description "Path of the trace file. Tracing is enabled only when this is set.";
+            type string { length "1..max"; }
+        }
+
+        leaf max_tracing_events_per_file {
+            description "Maximum number of events per trace file. Zero means no limit.";
+            type uint32;
+            default 1000000;
+        }
+
+        leaf nof_tracing_events_before_severe {
+            description "Number of events to write before a severe event. Zero writes all events.";
+            type uint32;
+            default 0;
+        }
+    }
+
+    grouping trace_extensions_cucp_subtree {
+        description "OCUDU trace extensions valid under GNBCUCPFunction.";
+
+        container ocudu_trace_extensions {
+            uses trace_extensions_common_leaves;
+        }
+    }
+
+    grouping trace_extensions_cuup_subtree {
+        description "OCUDU trace extensions valid under GNBCUUPFunction. The layer key is the one
+                     the cu_up unit registers (apps/units/o_cu_up/cu_up/cu_up_unit_config_cli11_schema.cpp).";
+
+        container ocudu_trace_extensions {
+            uses trace_extensions_common_leaves;
+
+            container layers {
+                leaf cu_up_enable {
+                    description "Enable tracing of the CU-UP executors.";
+                    // The application refuses to start when CU-UP executor tracing is requested
+                    // without a trace file. This only checks the CU-UP function's own filename, so
+                    // in a gnb or cu deployment set the filename on this function as well.
+                    must ". = 'false' or ../../filename" {
+                        error-message "cu_up_enable requires a trace filename.";
+                    }
+                    type boolean;
+                    default false;
+                }
+            }
+        }
+    }
+
+    grouping trace_extensions_du_subtree {
+        description "OCUDU trace extensions valid under GNBDUFunction. The layer keys are the ones
+                     the du_high, du_low and ru_sdr units register, and schedtrace is a du_high
+                     option (apps/units/flexible_o_du).";
+
+        container ocudu_trace_extensions {
+            uses trace_extensions_common_leaves;
+
+            container layers {
+                leaf du_high_enable {
+                    description "Enable tracing of the DU-high executors.";
+                    type boolean;
+                    default false;
+                }
+
+                leaf phy_enable {
+                    description "Enable tracing of the physical layer executors.";
+                    type boolean;
+                    default false;
+                }
+
+                leaf ru_enable {
+                    description "Enable tracing of the RU executors. Only the SDR Radio Unit
+                                 (ru_sdr) uses it.";
+                    type boolean;
+                    default false;
+                }
+            }
+
+            container schedtrace {
+                description "MAC scheduler event and decision tracing. It writes its own files
+                             and does not need the trace filename.";
+
+                leaf enabled {
+                    description "Enable schedtrace.";
+                    type boolean;
+                    default false;
+                }
+
+                leaf path {
+                    description "Directory for the schedtrace files. One file is generated per cell.";
+                    type string { length "1..max"; }
+                    default "/tmp";
+                }
+
+                leaf flush_period_ms {
+                    description "Period at which pending events are written to the schedtrace files.";
+                    type uint32;
+                    units "milliseconds";
+                    default 50;
+                }
+            }
+        }
+    }
+}
