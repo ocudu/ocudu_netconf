@@ -55,6 +55,11 @@ Environment variables:
                     (openssl passwd -6) before it is stored, so only the hash ever reaches
                     the datastore; a value starting with \$ (a crypt(3) hash, e.g. \$6\$
                     from mkpasswd -m sha-512) is used verbatim.
+  NETCONF_CONFIG_GENERATION
+                    Any string. The running config saved on stop is loaded on the next start
+                    only while this value, the --custom-config file and the installed YANG
+                    modules are unchanged; otherwise the server starts from --custom-config.
+                    Default: unset.
 EOF
 }
 
@@ -241,23 +246,59 @@ fi
 run_profile_setup
 printf '%s\n' "$YANG_PROFILE" > "$PROFILE_STATE"
 
-cleanup() {
-    echo "Container stopped, exporting running config .."
-    sysrepocfg --export -d running > "$RUNNING_CONFIG"
+CONFIG_FINGERPRINT_STATE="$(dirname "$RUNNING_CONFIG")/config-fingerprint"
+NP_PID=""
+CONFIG_LOADED=0
+
+# Written to a temporary file first, so a stop in the middle never leaves half a config.
+save_running_config() {
+    sysrepocfg --export -d running > "$RUNNING_CONFIG.tmp" && mv -f "$RUNNING_CONFIG.tmp" "$RUNNING_CONFIG"
 }
 
-# Trap SIGTERM and SIGINT so docker stop and Ctrl+C both export the running config.
-trap 'cleanup' SIGTERM SIGINT
+# Saves only once a config is loaded: a stop during the setup must not overwrite the saved
+# config with a half-initialised datastore.
+cleanup() {
+    if [ "$CONFIG_LOADED" = "1" ]; then
+        echo "Container stopped, exporting running config .."
+        save_running_config
+    fi
+    if [ -n "$NP_PID" ]; then
+        kill "$NP_PID" 2>/dev/null
+        wait "$NP_PID"
+    fi
+}
 
-# Load config either from old run (RUNNING_CONFIG) or from configMap (PRELOAD_CONFIG)
-if [ -e "$RUNNING_CONFIG" ]; then
+trap 'cleanup; exit 0' SIGTERM SIGINT
+
+# The saved config belongs to one initial config, one set of YANG modules and one
+# NETCONF_CONFIG_GENERATION. When any of them changes, the server starts from the initial
+# config again.
+CONFIG_FINGERPRINT="$({
+    sha256sum < "$PRELOAD_CONFIG"
+    sysrepoctl -l | awk -F'|' 'NF > 3 { print $1 $2 $7 }'
+    printf '%s\n' "${NETCONF_CONFIG_GENERATION:-}"
+} | sha256sum | cut -d' ' -f1)"
+
+if [ -e "$RUNNING_CONFIG" ] && [ "$(cat "$CONFIG_FINGERPRINT_STATE" 2>/dev/null)" = "$CONFIG_FINGERPRINT" ]; then
     echo "Importing existing config from last run $RUNNING_CONFIG .."
+    # Fail closed: a saved config that no longer loads is never replaced by the initial one.
+    if ! merge_selected_config; then
+        echo "Error: The saved running config $RUNNING_CONFIG does not load." >&2
+        exit 1
+    fi
 else
+    if [ -e "$RUNNING_CONFIG" ]; then
+        echo "Initial config, YANG modules or NETCONF_CONFIG_GENERATION changed, not loading $RUNNING_CONFIG .."
+    fi
     echo "Importing config from configMap $PRELOAD_CONFIG .."
-    cp "$PRELOAD_CONFIG" "$RUNNING_CONFIG"
+    if ! sysrepocfg --edit "$PRELOAD_CONFIG" --datastore running -f xml; then
+        echo "Error: The initial config $PRELOAD_CONFIG does not load." >&2
+        exit 1
+    fi
+    save_running_config || exit 1
+    printf '%s\n' "$CONFIG_FINGERPRINT" > "$CONFIG_FINGERPRINT_STATE"
 fi
-
-merge_selected_config
+CONFIG_LOADED=1
 
 # Falls back to the image's ed25519 key when none is mounted. Fail closed: serving netopeer2's
 # own genkey instead would lock out every client that verifies the provisioned one.
@@ -311,7 +352,14 @@ fi
 
 echo "Starting netconf server .."
 # Default pidfile lives under /run (root-owned) --> overwrite with /tmp
-netopeer2-server -v2 -d -p /tmp/netopeer2-server.pid
+# In the background: bash runs a trap only once the foreground command returns, and wait
+# returns as soon as a trapped signal arrives.
+netopeer2-server -v2 -d -p /tmp/netopeer2-server.pid &
+NP_PID=$!
+wait "$NP_PID"
+NP_STATUS=$?
 
-# Wait for all child processes to terminate
-wait
+# The server exited on its own: the datastore is still there, so keep what it held.
+echo "Netconf server exited ($NP_STATUS), exporting running config .."
+save_running_config
+exit "$NP_STATUS"

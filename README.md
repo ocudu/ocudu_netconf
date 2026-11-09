@@ -26,6 +26,16 @@ Use one of the built-in configs bundled in the image:
 
 On first start, the selected config also triggers the matching YANG setup script inside the container.
 
+## Keep the running config across restarts
+
+On stop (SIGTERM or SIGINT) the server saves its running config to
+`/etc/netconf-running/o1-config.xml` and loads it on the next start, so mount a volume there
+to keep it. The saved config is used only while the initial config (`--custom-config` or the
+bundled one), the YANG modules and `NETCONF_CONFIG_GENERATION` are unchanged; otherwise the
+server starts from the initial config. A saved config that no longer loads stops the start.
+
+`$ docker run -it -p 830:830 -v netconf-running:/etc/netconf-running ocudu-netconf/ocudu-netconf:latest --config gnb`
+
 ## Enable NETCONF over TLS
 
 Pass `--enable-tls` to expose a TLS endpoint on port `6513` alongside the SSH endpoint on `830`:
