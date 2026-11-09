@@ -243,6 +243,10 @@ if [ -e "$PROFILE_STATE" ]; then
     fi
 fi
 
+# In a Kubernetes pod /dev/shm outlives the container. sysrepo state left there by an earlier
+# run does not match the fresh repository in this container and breaks every sysrepo call.
+rm -f "${SYSREPO_SHM_DIR:-/dev/shm}/${SYSREPO_SHM_PREFIX:-sr}"_* "${SYSREPO_SHM_DIR:-/dev/shm}/${SYSREPO_SHM_PREFIX:-sr}"sub_*
+
 run_profile_setup
 printf '%s\n' "$YANG_PROFILE" > "$PROFILE_STATE"
 
