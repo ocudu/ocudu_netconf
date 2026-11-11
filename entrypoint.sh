@@ -257,8 +257,10 @@ NP_PID=""
 CONFIG_LOADED=0
 
 # Written to a temporary file first, so a stop in the middle never leaves half a config.
+# Owner-only: the export holds the keystore's private keys in cleartext.
 save_running_config() {
-    sysrepocfg --export -d running > "$RUNNING_CONFIG.tmp" && mv -f "$RUNNING_CONFIG.tmp" "$RUNNING_CONFIG"
+    rm -f "$RUNNING_CONFIG.tmp"
+    (umask 077; sysrepocfg --export -d running > "$RUNNING_CONFIG.tmp") && mv -f "$RUNNING_CONFIG.tmp" "$RUNNING_CONFIG"
 }
 
 # Saves only once a config is loaded: a stop during the setup must not overwrite the saved
