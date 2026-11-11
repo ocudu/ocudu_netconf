@@ -7,28 +7,32 @@
 set -euo pipefail
 
 KEY_DIR="${1:-/etc/netconf-ssh}"
+GENERATED_KEY="${2:-/etc/netconf-running/ssh_host_ed25519_key}"
 
-# The image's host key is the same in every container from a tag and changes on every rebuild,
-# so a client that pins it breaks on the next image bump. A mounted key replaces it in the
-# keystore entry 'genkey' the SSH endpoint refers to by name, so no endpoint config changes.
+# The key replaces netopeer2's RSA genkey in the keystore entry 'genkey' the SSH endpoint refers
+# to by name, so no endpoint config changes. That genkey is created at image build, so it is the
+# same in every container, and no verifying client can negotiate RSA; it is never served.
 # One entry holds one key: take the first of the names 'ssh-keygen -A' writes, strongest first.
-# The last candidate is the image's own ed25519 key, which keeps netopeer2's RSA genkey - the
-# one no verifying client can negotiate - from ever being served.
 HOST_KEY=""
 for candidate in \
         "$KEY_DIR/ssh_host_ed25519_key" \
         "$KEY_DIR/ssh_host_ecdsa_key" \
-        "$KEY_DIR/ssh_host_rsa_key" \
-        /etc/netconf-ssh-default/ssh_host_ed25519_key; do
+        "$KEY_DIR/ssh_host_rsa_key"; do
     if [ -e "$candidate" ]; then
         HOST_KEY="$candidate"
         break
     fi
 done
 
+# Nothing mounted: use a key of this container's own, generated on first start next to the
+# persisted running config, so it survives restarts wherever that config does.
 if [ -z "$HOST_KEY" ]; then
-    echo "No SSH host key in $KEY_DIR — keeping the host key generated in the image."
-    exit 0
+    if [ ! -e "$GENERATED_KEY" ]; then
+        echo "No SSH host key in $KEY_DIR — generating $GENERATED_KEY ..."
+        mkdir -p "$(dirname "$GENERATED_KEY")"
+        ssh-keygen -t ed25519 -N '' -q -f "$GENERATED_KEY"
+    fi
+    HOST_KEY="$GENERATED_KEY"
 fi
 
 # Looser than 0640 is usable but readable by every user in the container. -L because a

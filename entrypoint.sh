@@ -40,7 +40,8 @@ Options:
                     hostname (no IPv6 literal), port defaults to 4334.
   --ssh-hostkey-dir Directory containing ssh_host_ed25519_key, ssh_host_ecdsa_key or
                     ssh_host_rsa_key, the SSH host key the server presents (default:
-                    /etc/netconf-ssh). Without one the ed25519 key built into the image is used.
+                    /etc/netconf-ssh). Without one an ed25519 key is generated on first start
+                    next to the running config and reused while that is kept.
   -h, --help        Show this help message.
 
 Environment variables:
@@ -49,7 +50,8 @@ Environment variables:
                     user with password authentication (RFC 9644) in the "default-ssh"
                     endpoint and grant it full NACM access. Enables the SSH "password"
                     method for clients that cannot do keyboard-interactive (e.g.
-                    OpenDaylight). Default: unset, no user is created.
+                    OpenDaylight). Default: unset, no user is created. The image ships no
+                    login of its own, so without this (or TLS) nobody can connect over SSH.
   NETCONF_SSH_PASSWORD
                     The user's password: a cleartext value is hashed with SHA-512 crypt
                     (openssl passwd -6) before it is stored, so only the hash ever reaches
@@ -304,9 +306,9 @@ else
 fi
 CONFIG_LOADED=1
 
-# Falls back to the image's ed25519 key when none is mounted. Fail closed: serving netopeer2's
-# own genkey instead would lock out every client that verifies the provisioned one.
-if ! /usr/local/bin/setup_ssh_hostkey.sh "$SSH_HOSTKEY_DIR"; then
+# Falls back to a key generated on first start when none is mounted. Fail closed: serving
+# netopeer2's own genkey instead would lock out every client that verifies the provisioned one.
+if ! /usr/local/bin/setup_ssh_hostkey.sh "$SSH_HOSTKEY_DIR" "$(dirname "$RUNNING_CONFIG")/ssh_host_ed25519_key"; then
     echo "Error: SSH host key setup failed." >&2
     exit 1
 fi

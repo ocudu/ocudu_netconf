@@ -88,10 +88,11 @@ $ docker run -it -p 830:830 ocudu-netconf/ocudu-netconf:latest --config ru --ena
 
 ## Provision the SSH host key
 
-The host key is generated at image build time, so it is the same in every container from a tag
-and different after every rebuild — breaking any client that pins it.
+Without a mounted key, each container generates an ed25519 host key on first start, at
+`/etc/netconf-running/ssh_host_ed25519_key`. It is kept only as long as that directory is kept
+(see above), so a container without the volume presents a new key on every start.
 
-Mount your own instead. The key dir (default `/etc/netconf-ssh`, override with
+Mount your own key so clients can pin it. The key dir (default `/etc/netconf-ssh`, override with
 `--ssh-hostkey-dir <path>`) is read on every start, and the first of `ssh_host_ed25519_key`,
 `ssh_host_ecdsa_key`, `ssh_host_rsa_key` found is installed and its fingerprint logged:
 
@@ -109,9 +110,6 @@ encrypted one is refused, not prompted for. Use ed25519 or ecdsa — an RSA key 
 `known_hosts` as `ssh-rsa` but offered as `rsa-sha2-512`/`rsa-sha2-256`, so a client narrowing
 to the recorded name cannot negotiate it. Mounting one is warned about, not refused: it still
 serves clients that handle the mismatch, but the O1 adapter will not verify it.
-
-With no key mounted the server installs the ed25519 key generated into the image at build time,
-which is stable per image tag and changes on every rebuild.
 
 Mount the key `0400`. Under Kubernetes the pod needs a `fsGroup`: the kubelet chowns the
 projected Secret to `root:<fsGroup>` and widens the mode so the server (uid 1000) can read it.
@@ -143,11 +141,12 @@ $ docker exec <container> sysrepoctl -i /usr/share/yang/modules/netopeer2/netope
 
 ## NETCONF SSH user with password authentication
 
-The server's stock SSH users authenticate against the system (keyboard-interactive), which
-clients like OpenDaylight cannot do — they only implement the SSH "password" method. Setting
-both `NETCONF_SSH_USERNAME` and `NETCONF_SSH_PASSWORD` (or neither) creates an ietf-ssh-server
+The image ships no login: no system account has a password, so the stock keyboard-interactive
+login for `root` always fails. To connect over SSH, provision a user. Setting both
+`NETCONF_SSH_USERNAME` and `NETCONF_SSH_PASSWORD` (or neither) creates an ietf-ssh-server
 local user (RFC 9644) with password authentication in the `default-ssh` endpoint and grants it
-full NACM access (group `o1-admin`, permit-all rule), so it can read and write like `root`:
+full NACM access (group `o1-admin`, permit-all rule). The SSH "password" method also suits
+clients like OpenDaylight, which cannot do keyboard-interactive:
 
 ```
 $ docker run -it -p 830:830 -e NETCONF_SSH_USERNAME=odl -e NETCONF_SSH_PASSWORD=secret ocudu-netconf/ocudu-netconf:latest --config gnb
@@ -180,11 +179,11 @@ so no working login survives in the persisted running config.
 
 ## Connect with netopeer2-client
 
-Get shell in the ocudu-netconf container and execute:
+Get shell in the ocudu-netconf container and execute, as the user from `NETCONF_SSH_USERNAME`:
 
 ```
 $ netopeer2-cli
-> connect --login root
+> connect --login <user>
 > edit-config --target running --config=cellConfig.xml
 > get-config --source=running
 ```

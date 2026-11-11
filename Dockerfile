@@ -14,7 +14,6 @@ RUN apt-get update \
     && apt-get install -y \
     ca-certificates \
     openssh-client \
-    sudo \
     wget \
     unzip \
     # needed for convinience in container
@@ -24,24 +23,9 @@ RUN apt-get update \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Adding netconf user
-RUN adduser --system netconf && \
-    mkdir -p /home/netconf/.ssh && \
-    echo "netconf:netconf" | chpasswd && adduser netconf sudo
-
-# Clearing and setting authorized ssh keys
-RUN echo '' > /home/netconf/.ssh/authorized_keys && \
-    ssh-keygen -A && \
-    ssh-keygen -t dsa -P '' -f /home/netconf/.ssh/id_dsa && \
-    cat /home/netconf/.ssh/id_dsa.pub >> /home/netconf/.ssh/authorized_keys
-
-# Updating shell to bash
-RUN sed -i s#/home/netconf:/bin/false#/home/netconf:/bin/bash# /etc/passwd
-
-RUN mkdir /opt/dev && sudo chown -R netconf /opt/dev
-
-# set root password to root
-RUN echo "root:root" | chpasswd
+# No system account has a password: root stays locked, so the stock keyboard-interactive login
+# for root fails. Logins are provisioned per deployment (NETCONF_SSH_USERNAME/PASSWORD or TLS).
+RUN mkdir /opt/dev
 
 FROM base AS builder
 
@@ -164,14 +148,6 @@ RUN bash /usr/share/netopeer2/scripts/setup.sh && \
 # controllers would fail on them; copy them in without overwriting installed ones.
 RUN cp -n /usr/share/yang/modules/libyang/*.yang /etc/sysrepo/yang/
 
-# Default host key, installed by setup_ssh_hostkey.sh when nothing is mounted. merge_hostkey.sh
-# above generates an RSA one, which a client cannot verify: known_hosts records it as 'ssh-rsa'
-# while the server offers only rsa-sha2-256/512. Generated here so it is stable per image tag.
-RUN mkdir -p /etc/netconf-ssh-default && \
-    ssh-keygen -t ed25519 -N '' -q -f /etc/netconf-ssh-default/ssh_host_ed25519_key && \
-    chown -R 1000:1000 /etc/netconf-ssh-default && \
-    chmod 400 /etc/netconf-ssh-default/ssh_host_ed25519_key
-    
 # copy downloaded yangs from builder
 COPY --from=builder /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/ /opt/dev/modeling/data-model/yang/published/o-ran/ru-fh/
 COPY --from=builder /opt/dev/modeling/data-model/yang/published/ietf/        /opt/dev/modeling/data-model/yang/published/ietf/
