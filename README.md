@@ -51,11 +51,11 @@ The cert dir (default `/etc/netconf-tls`, override with `--tls-cert-dir <path>`)
 - **Empty / unprovisioned** (no `ca.crt` present): on first start the container self-signs a CA plus matching server and client certs into the dir. Useful for dev / lab / integration tests.
 - **Operator-provisioned** (`ca.crt` already present): the container leaves the dir alone and uses the operator's `ca.crt` + `server.crt` + `server.key` as-is. Use this for production — mount your CA-issued material into `/etc/netconf-tls` (e.g. via a Kubernetes Secret with `readOnly: true`).
 
-The trust model is the same in both modes: the server accepts any client cert that chains to the trusted `ca.crt`, and the cert's Common Name becomes the NETCONF username via the `cert-to-name` mapping (`map-type=common-name`). So a client cert with `CN=root` connects as the `root` netconf user. In self-signed mode those are the two auto-generated client certs; in operator-provisioned mode it's anyone holding a cert signed by your CA — provision and revoke accordingly.
+The trust model is the same in both modes: the server accepts any client cert that chains to the trusted `ca.crt`, and the cert's Common Name becomes the NETCONF username via the `cert-to-name` mapping (`map-type=common-name`). The name in `CLIENT_CN` (default `o1-admin`) gets full access through NACM (group `o1-admin`), unless the profile's NACM already places it in a group. Do not issue client certs with `CN=root`: that maps to sysrepo's recovery user, which bypasses NACM. In self-signed mode those are the two auto-generated client certs; in operator-provisioned mode it's anyone holding a cert signed by your CA — provision and revoke accordingly.
 
 Self-signed mode issues two client identities:
 
-- `client.crt` / `client.key` with `CN=root` (override with `CLIENT_CN=<name>`). `root` is sysrepo's recovery user and bypasses NACM; set `CLIENT_CN=mplane` to connect as the read-only `mplane-ro` group of the `ru` profile.
+- `client.crt` / `client.key` with `CN=o1-admin` (override with `CLIENT_CN=<name>`). Set `CLIENT_CN=mplane` to connect as the read-only `mplane-ro` group of the `ru` profile.
 - `client-hybrid-odu.crt` / `client-hybrid-odu.key` with `CN=hybrid-odu` (override with `HYBRID_ODU_CN=<name>`). In the `ru` profile this user is in the `hybrid-odu` NACM group, whose rule-list in `configs/config_ru.xml` grants the hybrid-odu access of the O-RAN WG4 M-plane spec, Table 6.5-1.
 
 No system user is needed for either name; the username only feeds NACM.

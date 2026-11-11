@@ -7,8 +7,10 @@
 set -euo pipefail
 
 CERT_DIR="${1:-/etc/netconf-tls}"
-# Client cert CN becomes the NETCONF username (cert-to-name). Override to escape sysrepo's NACM-recovery user.
-CLIENT_CN="${CLIENT_CN:-root}"
+# Client cert CN becomes the NETCONF username (cert-to-name). This name gets full access
+# through NACM below. A cert with CN=root would map to sysrepo's NACM-recovery user, which
+# bypasses NACM, so neither the self-signed cert nor a provisioned one should use it.
+CLIENT_CN="${CLIENT_CN:-o1-admin}"
 # Second client identity: CN of client-hybrid-odu.crt, the user name the ru
 # profile's NACM places in the hybrid-odu group.
 HYBRID_ODU_CN="${HYBRID_ODU_CN:-hybrid-odu}"
@@ -181,3 +183,12 @@ EOF
 
 echo "Applying TLS endpoint config to sysrepo running datastore ..."
 sysrepocfg --edit "$TLS_XML" --datastore running -f xml
+
+# Applies to provisioned certs too: issue the client cert with CN=$CLIENT_CN. A CN the
+# profile's NACM already places in a group (e.g. mplane, read-only in the ru profile) keeps
+# that group's access; o1-admin's permit-all would otherwise allow the writes it denies.
+if sysrepocfg --export -d running -f xml -m ietf-netconf-acm | grep -qF "<user-name>$CLIENT_CN</user-name>"; then
+    echo "TLS client '$CLIENT_CN' keeps the NACM group it already has."
+else
+    /usr/local/bin/nacm_admin.sh grant "$CLIENT_CN"
+fi

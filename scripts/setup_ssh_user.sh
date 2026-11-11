@@ -12,10 +12,9 @@ xml_escape() {
 }
 
 USER_XML=""
-NACM_XML=""
 
 cleanup() {
-    rm -f "$USER_XML" "$NACM_XML"
+    rm -f "$USER_XML"
 }
 trap cleanup EXIT
 
@@ -44,7 +43,6 @@ create_user() {
     echo "Configuring NETCONF SSH user '$username' with password authentication ..."
 
     USER_XML="$(mktemp)"
-    NACM_XML="$(mktemp)"
 
     cat >"$USER_XML" <<EOF
 <netconf-server xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-server">
@@ -74,31 +72,8 @@ EOF
 
     sysrepocfg --edit "$USER_XML" --datastore running -f xml
 
-    # NACM denies writes to everyone but the recovery user (root) by default, which would
-    # make the new user read-only. Grant it full access: membership in the "o1-admin"
-    # group plus a permit-all rule, so <edit-config> works for it like it does for root.
-    cat >"$NACM_XML" <<EOF
-<nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm">
-  <groups>
-    <group>
-      <name>o1-admin</name>
-      <user-name>${username_esc}</user-name>
-    </group>
-  </groups>
-  <rule-list>
-    <name>o1-admin-access</name>
-    <group>o1-admin</group>
-    <rule>
-      <name>permit-all</name>
-      <module-name>*</module-name>
-      <access-operations>*</access-operations>
-      <action>permit</action>
-    </rule>
-  </rule-list>
-</nacm>
-EOF
-
-    sysrepocfg --edit "$NACM_XML" --datastore running -f xml -m ietf-netconf-acm
+    # Full NACM access through the shared "o1-admin" group, not the recovery user root.
+    /usr/local/bin/nacm_admin.sh grant "$username"
 
     echo "NETCONF SSH user '$username' configured."
 }
@@ -114,7 +89,6 @@ remove_user() {
     echo "Removing NETCONF SSH user '$username' ..."
 
     USER_XML="$(mktemp)"
-    NACM_XML="$(mktemp)"
 
     cat >"$USER_XML" <<EOF
 <netconf-server xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-server" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
@@ -141,21 +115,8 @@ EOF
 
     sysrepocfg --edit "$USER_XML" --datastore running -f xml
 
-    # The group and the rule-list were created for this user alone, so they go with it.
-    cat >"$NACM_XML" <<EOF
-<nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-  <groups>
-    <group nc:operation="remove">
-      <name>o1-admin</name>
-    </group>
-  </groups>
-  <rule-list nc:operation="remove">
-    <name>o1-admin-access</name>
-  </rule-list>
-</nacm>
-EOF
-
-    sysrepocfg --edit "$NACM_XML" --datastore running -f xml -m ietf-netconf-acm
+    # Other members of "o1-admin" (e.g. the TLS client CN) keep their access.
+    /usr/local/bin/nacm_admin.sh revoke "$username"
 
     echo "NETCONF SSH user '$username' removed."
 }
