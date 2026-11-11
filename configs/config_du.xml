@@ -128,6 +128,7 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <nof_antennas_dl>2</nof_antennas_dl>
               <nof_antennas_ul>2</nof_antennas_ul>
               <common_scs>KHZ_30</common_scs>
+              <band>78</band>
             </ocudu_nrcelldu_base_extensions>            
             <ocudu_nrcelldu_ssb_extensions>
               <ssb_block_power_dbm>-16</ssb_block_power_dbm>
@@ -445,6 +446,7 @@ SPDX-License-Identifier: BSD-3-Clause-Open-MPI
               <nof_antennas_dl>2</nof_antennas_dl>
               <nof_antennas_ul>2</nof_antennas_ul>
               <common_scs>KHZ_30</common_scs>
+              <band>78</band>
             </ocudu_nrcelldu_base_extensions>            
             <ocudu_nrcelldu_ssb_extensions>
               <ssb_block_power_dbm>-16</ssb_block_power_dbm>
