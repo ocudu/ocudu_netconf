@@ -8,9 +8,11 @@
 # Configure a NETCONF call-home (RFC 8071) client so the server dials the
 # given manager instead of (only) listening — emulating an O-RU that accepts
 # no inbound NETCONF. The endpoint reuses the default SSH server identity
-# (the netopeer2-provisioned "genkey" keystore entry) and system-auth user
-# authentication, exactly like the default listen endpoint; the persistent
-# connection type keeps one connection up and re-dials when it drops.
+# (the netopeer2-provisioned "genkey" keystore entry) and refers to the
+# default listen endpoint for user authentication, so it accepts exactly the
+# users that endpoint does, including the one setup_ssh_user.sh provisions;
+# the persistent connection type keeps one connection up and re-dials when
+# it drops.
 
 set -euo pipefail
 
@@ -43,14 +45,7 @@ cat > "$CALLHOME_XML" <<EOF
                 </host-key>
               </server-identity>
               <client-authentication>
-                <users>
-                  <user>
-                    <name>root</name>
-                    <keyboard-interactive xmlns="urn:cesnet:libnetconf2-netconf-server">
-                      <use-system-auth/>
-                    </keyboard-interactive>
-                  </user>
-                </users>
+                <endpoint-reference xmlns="urn:cesnet:libnetconf2-netconf-server">default-ssh</endpoint-reference>
               </client-authentication>
             </ssh-server-parameters>
           </ssh>
