@@ -20,6 +20,7 @@ module nrcelldu-ntn-extensions {
 
                  Copyright (c) 2024-2026 Software Radio Systems. All rights reserved.";
 
+    revision 2026-11-12 { description "Order the ncells list by idx instead of by user order, so a reorder is a value change."; }
     revision 2026-11-06 { description "Add k_mac, TA report and UE-specific Koffset options, moving_ref_location, sat_switch_with_resync and the ncells neighbour list. satellite_idx and cell_specific_koffset are no longer mandatory, so a TN cell can carry NTN neighbours only."; }
     revision 2026-08-26 { description "Remove epoch_time and epoch_sfn_offset: the gNB derives the epoch of the broadcast assistance information itself and accepts neither knob."; }
     revision 2026-08-06 { description "Initial version: NTN serving cell parameters (SIB19)."; }
@@ -300,11 +301,11 @@ module nrcelldu-ntn-extensions {
             list ncells {
                 description "NTN neighbour cells advertised in SIB19. Valid for NTN and TN serving cells.";
                 key idx;
-                ordered-by user;
                 max-elements 8;
 
                 leaf idx {
-                    description "Entry identifier. Only the list order is sent to the gNB.";
+                    description "Position of the entry in the neighbour list sent to the gNB, in ascending order. "
+                              + "The value itself is not sent.";
                     type uint8 { range "0..7"; }
                 }
 
