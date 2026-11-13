@@ -235,6 +235,7 @@ fi
 mkdir -p "$(dirname "$RUNNING_CONFIG")"
 PROFILE_STATE="$(dirname "$RUNNING_CONFIG")/yang-profile"
 NETCONF_SSH_USER_STATE="$(dirname "$RUNNING_CONFIG")/netconf-ssh-user"
+TLS_CLIENT_CN_STATE="$(dirname "$RUNNING_CONFIG")/tls-client-cn"
 
 # protects against reusing persisted state of one profile (e.g. ru) with a different profile (e.g. du) when rerunning container with persisted state using docker -v option
 if [ -e "$PROFILE_STATE" ]; then
@@ -345,8 +346,34 @@ elif [ -e "$NETCONF_SSH_USER_STATE" ]; then
     rm -f "$NETCONF_SSH_USER_STATE"
 fi
 
+# setup_tls.sh grants the client cert's CN full NACM access. Like for the SSH user, the
+# state file revokes that grant when the CN changes or TLS is disabled, so it does not stay
+# in the persisted config. A CN that is also the SSH user keeps the SSH user's grant.
 if [ "$TLS_ENABLED" = "1" ]; then
-    /usr/local/bin/setup_tls.sh "$TLS_CERT_DIR"
+    export CLIENT_CN="${CLIENT_CN:-o1-admin}"
+    if [ -e "$TLS_CLIENT_CN_STATE" ]; then
+        PREVIOUS_TLS_CLIENT_CN="$(cat "$TLS_CLIENT_CN_STATE")"
+        if [ "$PREVIOUS_TLS_CLIENT_CN" != "$CLIENT_CN" ] && [ "$PREVIOUS_TLS_CLIENT_CN" != "$NETCONF_SSH_USERNAME" ]; then
+            if ! /usr/local/bin/nacm_admin.sh revoke "$PREVIOUS_TLS_CLIENT_CN"; then
+                echo "Error: NACM revoke of the previous TLS client failed." >&2
+                exit 1
+            fi
+        fi
+    fi
+    if ! /usr/local/bin/setup_tls.sh "$TLS_CERT_DIR"; then
+        echo "Error: TLS setup failed." >&2
+        exit 1
+    fi
+    printf '%s\n' "$CLIENT_CN" > "$TLS_CLIENT_CN_STATE"
+elif [ -e "$TLS_CLIENT_CN_STATE" ]; then
+    PREVIOUS_TLS_CLIENT_CN="$(cat "$TLS_CLIENT_CN_STATE")"
+    if [ "$PREVIOUS_TLS_CLIENT_CN" != "$NETCONF_SSH_USERNAME" ]; then
+        if ! /usr/local/bin/nacm_admin.sh revoke "$PREVIOUS_TLS_CLIENT_CN"; then
+            echo "Error: NACM revoke of the previous TLS client failed." >&2
+            exit 1
+        fi
+    fi
+    rm -f "$TLS_CLIENT_CN_STATE"
 fi
 
 if [ -n "$CALLHOME_TARGET" ]; then

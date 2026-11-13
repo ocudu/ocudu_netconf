@@ -6,10 +6,7 @@
 
 set -euo pipefail
 
-# Minimal escaping for element text in the config fragments: & first, then angle brackets.
-xml_escape() {
-    printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
-}
+source /usr/local/bin/sysrepo_common.sh
 
 USER_XML=""
 

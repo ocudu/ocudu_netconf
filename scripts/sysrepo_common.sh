@@ -6,6 +6,11 @@
 
 set -euo pipefail
 
+# Minimal escaping for element text in the config fragments: & first, then angle brackets.
+xml_escape() {
+    printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
+}
+
 module_name_from_file() {
     local file_path="$1"
     local filename

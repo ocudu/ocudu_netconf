@@ -14,9 +14,7 @@ set -euo pipefail
 # The group is shared by every user granted here (the SSH password user, the TLS client
 # CN), so revoke removes only that one member and leaves the others alone.
 
-xml_escape() {
-    printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
-}
+source /usr/local/bin/sysrepo_common.sh
 
 if [ -z "${2:-}" ]; then
     echo "Usage: $0 grant|revoke <username>" >&2
@@ -51,7 +49,8 @@ case "$1" in
 EOF
         ;;
     revoke)
-        # nc:operation="remove" passes silently when the member is already gone.
+        # nc:operation="remove" passes silently when the member is already gone. The
+        # default merge on the group creates an empty "o1-admin" when there is none; harmless.
         cat >"$NACM_XML" <<EOF
 <nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
   <groups>

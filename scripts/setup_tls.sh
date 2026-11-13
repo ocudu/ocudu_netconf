@@ -184,11 +184,32 @@ EOF
 echo "Applying TLS endpoint config to sysrepo running datastore ..."
 sysrepocfg --edit "$TLS_XML" --datastore running -f xml
 
+# Warn when the client identity is the recovery user. A cert dir kept from an older image
+# (e.g. a docker volume) still holds a self-signed client.crt with CN=root, and nothing
+# regenerates it while ca.crt exists.
+if [ "$CLIENT_CN" = root ]; then
+    echo "WARNING: CLIENT_CN=root is sysrepo's NACM recovery user, which bypasses NACM." >&2
+elif [ -e "$CERT_DIR/client.crt" ]; then
+    cert_cn="$(openssl x509 -in "$CERT_DIR/client.crt" -noout -subject -nameopt multiline |
+        while read -r key _ value; do
+            if [ "$key" = commonName ]; then printf '%s' "$value"; fi
+        done)"
+    if [ "$cert_cn" = root ]; then
+        echo "WARNING: $CERT_DIR/client.crt has CN=root, sysrepo's NACM recovery user, which bypasses NACM." \
+            "Delete the cert dir (e.g. docker compose down -v) to regenerate it with CN=$CLIENT_CN." >&2
+    fi
+fi
+
 # Applies to provisioned certs too: issue the client cert with CN=$CLIENT_CN. A CN the
-# profile's NACM already places in a group (e.g. mplane, read-only in the ru profile) keeps
+# profile's NACM places in another group (e.g. mplane, read-only in the ru profile) keeps
 # that group's access; o1-admin's permit-all would otherwise allow the writes it denies.
-if sysrepocfg --export -d running -f xml -m ietf-netconf-acm | grep -qF "<user-name>$CLIENT_CN</user-name>"; then
-    echo "TLS client '$CLIENT_CN' keeps the NACM group it already has."
+# Captured first so a failed export aborts instead of falling through to the grant. A CN
+# containing ' breaks the XPath and aborts too.
+other_group="$(sysrepocfg --export -d running -f xml \
+    -x "/ietf-netconf-acm:nacm/groups/group[name!='o1-admin'][user-name='$CLIENT_CN']")"
+if [ -n "$other_group" ]; then
+    echo "TLS client '$CLIENT_CN' keeps its NACM group from the profile."
 else
+    # Idempotent merge; also restores the o1-admin rule-list if a client deleted it.
     /usr/local/bin/nacm_admin.sh grant "$CLIENT_CN"
 fi
